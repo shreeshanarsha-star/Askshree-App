@@ -1,7 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Server-only client using the service role key — never expose this key to the browser.
-// Assumes SUPABASE_SERVICE_ROLE_KEY is already set in your Vercel env vars.
 function supabaseAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -29,8 +27,6 @@ export async function GET(request) {
   const runs = toolRuns.data || [];
   const subs = subscribers.data || [];
 
-  // Counts by status: expects values like 'free', 'grace', 'blocked', 'whitelisted'
-  // stored in ip_usage.status. Adjust the keys below if your app uses different labels.
   const statusCounts = ipRows.reduce((acc, r) => {
     acc[r.status] = (acc[r.status] || 0) + 1;
     return acc;
@@ -41,7 +37,6 @@ export async function GET(request) {
     return acc;
   }, {});
 
-  // Daily trend for the visitor/usage line chart
   const trendMap = {};
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
@@ -52,10 +47,22 @@ export async function GET(request) {
     if (key in trendMap) trendMap[key]++;
   });
 
-  // 7 (Mon-Sun) x 24 hour grid for the activity heatmap, UTC-based
   const heatmap = Array.from({ length: 7 }, () => Array(24).fill(0));
   runs.forEach((r) => {
     const d = new Date(r.created_at);
-    const day = (d.getUTCDay() + 6) % 7; // shift so 0 = Monday
+    const day = (d.getUTCDay() + 6) % 7;
     const hour = d.getUTCHours();
-    heatmap[day][hour]+
+    heatmap[day][hour] = heatmap[day][hour] + 1;
+  });
+
+  return Response.json({
+    totalVisitors: ipRows.length,
+    statusCounts,
+    newSignups: subs.length,
+    toolCounts,
+    trend: trendMap,
+    heatmap,
+    rangeDays: days,
+    hasData: runs.length > 0 || ipRows.length > 0,
+  });
+}
