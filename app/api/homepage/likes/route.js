@@ -1,21 +1,18 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../lib/supabase';
 
-// A single global counter for the homepage Like button — no per-visitor
-// identity beyond the browser's own localStorage toggle (handled client-side),
-// consistent with this site's lightweight, no-account-required approach.
+// A single global counter for the homepage Like button. Every click
+// increments it — no toggle/unlike, no per-visitor cap.
 export async function GET() {
   const db = supabaseAdmin();
   const { data } = await db.from('homepage_likes').select('count').eq('id', 1).maybeSingle();
   return NextResponse.json({ count: data?.count ?? 0 });
 }
 
-export async function POST(req) {
-  const { action } = await req.json(); // 'like' | 'unlike'
+export async function POST() {
   const db = supabaseAdmin();
   const { data: row } = await db.from('homepage_likes').select('count').eq('id', 1).maybeSingle();
-  const current = row?.count ?? 0;
-  const next = action === 'unlike' ? Math.max(0, current - 1) : current + 1;
+  const next = (row?.count ?? 0) + 1;
 
   const { data, error } = await db
     .from('homepage_likes')

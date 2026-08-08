@@ -18,7 +18,7 @@ export default function HomePage() {
   const [recruitOpen, setRecruitOpen] = useState(false);
   const [marketOpen, setMarketOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
-  const [liked, setLiked] = useState(false);
+  const [justLiked, setJustLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(null);
   const [shareNote, setShareNote] = useState('');
   const [shareOpen, setShareOpen] = useState(false);
@@ -36,22 +36,18 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    setLiked(window.localStorage.getItem('askshree_liked') === 'true');
     fetch('/api/homepage/likes').then((r) => r.json()).then((d) => setLikeCount(d.count)).catch(() => setLikeCount(0));
   }, []);
 
-  async function toggleLike() {
-    const next = !liked;
-    setLiked(next);
-    window.localStorage.setItem('askshree_liked', next ? 'true' : 'false');
+  async function handleLike() {
+    setJustLiked(true);
+    setTimeout(() => setJustLiked(false), 400);
+    setLikeCount((c) => (typeof c === 'number' ? c + 1 : c)); // instant feedback, corrected below
     try {
-      const res = await fetch('/api/homepage/likes', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: next ? 'like' : 'unlike' }),
-      });
+      const res = await fetch('/api/homepage/likes', { method: 'POST' });
       const data = await res.json();
       if (typeof data.count === 'number') setLikeCount(data.count);
-    } catch (e) { /* count refresh isn't critical to the click itself */ }
+    } catch (e) { /* optimistic count already shown */ }
   }
 
   function shareVia(kind) {
@@ -159,8 +155,8 @@ export default function HomePage() {
           </div>
 
           <div className="engage-row">
-            <button className={`engage-btn ${liked ? 'liked' : ''}`} onClick={toggleLike}>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <button className={`engage-btn ${justLiked ? 'liked' : ''}`} onClick={handleLike}>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill={justLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2 4.8 5.6 4c2-.4 3.9.5 5 2 1.1-1.5 3-2.4 5-2 3.6.8 5 4.4 3.6 7.7-2.5 4.7-10 9.3-10 9.3z" />
               </svg>
               Like{likeCount !== null ? ` · ${likeCount}` : ''}
