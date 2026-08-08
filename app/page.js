@@ -6,6 +6,7 @@ import AskShreeChat from '../components/AskShreeChat';
 const TOOL_LINKS = {
   'job posting.ai': '/tools/job-posting-ai',
   'smart source.ai': '/tools/smart-source-ai',
+  'smart screen.ai': '/tools/smart-screen-ai',
 };
 const TOOL_NAMES = [
   'Job posting.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
@@ -111,7 +112,7 @@ export default function HomePage() {
             <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
               <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/job-posting-ai'}>Job posting.ai</span>
               <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-source-ai'}>Smart Source.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Smart screen.ai</span>
+              <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-screen-ai'}>Smart screen.ai</span>
               <span style={{ opacity: 0.45, marginRight: 16 }}>Interview.ai</span>
               <span style={{ opacity: 0.45, marginRight: 16 }}>Assessment.ai</span>
               <span style={{ opacity: 0.45, marginRight: 16 }}>Offer.ai</span>
