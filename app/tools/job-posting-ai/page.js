@@ -11,11 +11,11 @@ function fileToBase64(file) {
   });
 }
 
-function TermsCheckbox({ checked, onChange, label }) {
+function TermsCheckbox({ checked, onChange }) {
   return (
     <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 11.5, color: 'var(--slate)', marginTop: 14, cursor: 'pointer' }}>
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} style={{ marginTop: 2 }} />
-      <span>{label} <a href="/terms" target="_blank" style={{ color: 'var(--amber-dim)' }}>Terms &amp; Conditions</a>.</span>
+      <span>I accept the <a href="/terms" target="_blank" style={{ color: 'var(--amber-dim)' }}>Terms &amp; Conditions</a>.</span>
     </label>
   );
 }
@@ -170,7 +170,7 @@ export default function JobPostingAI() {
           <input id="jd-file-input" type="file" multiple accept=".pdf,.doc,.docx" style={{ display: 'none' }}
             onChange={(e) => setPostFiles(Array.from(e.target.files).slice(0, 10))} />
           <div className="file-hint">Up to 10 job descriptions per batch.</div>
-          <TermsCheckbox checked={postTermsAccepted} onChange={setPostTermsAccepted} label="I confirm I'm authorized to post this on behalf of the company, and I agree to the" />
+          <TermsCheckbox checked={postTermsAccepted} onChange={setPostTermsAccepted} />
           <button className="primary-btn" onClick={runPost} disabled={postFiles.length === 0 || !postTermsAccepted}>Post jobs</button>
           {postStatus && <div className="file-hint" style={{ marginTop: 14 }}>{postStatus}</div>}
 
@@ -203,7 +203,7 @@ export default function JobPostingAI() {
             <input type="checkbox" checked={whatsappOptIn} onChange={(e) => setWhatsappOptIn(e.target.checked)} style={{ marginTop: 2 }} />
             <span>Send me application updates via WhatsApp, if a number is found on this CV (optional — off by default).</span>
           </label>
-          <TermsCheckbox checked={applyTermsAccepted} onChange={setApplyTermsAccepted} label="This CV is mine, or I have permission to submit it on this person's behalf. I agree to the" />
+          <TermsCheckbox checked={applyTermsAccepted} onChange={setApplyTermsAccepted} />
 
           {subMode === 'auto' && (
             <>
