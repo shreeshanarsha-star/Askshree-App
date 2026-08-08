@@ -10,7 +10,7 @@ const TOOL_LINKS = {
 };
 const TOOL_NAMES = [
   'Job posting.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
-  'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Analytics.ai', 'Dashboard.ai',
+  'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Campus.ai', 'Analytics.ai', 'Dashboard.ai',
 ];
 export default function HomePage() {
   const [query, setQuery] = useState('');
@@ -111,6 +111,7 @@ export default function HomePage() {
               <span style={{ opacity: 0.45, marginRight: 16 }}>Offer.ai</span>
               <span style={{ opacity: 0.45, marginRight: 16 }}>Refer.ai</span>
               <span style={{ opacity: 0.45, marginRight: 16 }}>Onboard.ai</span>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Campus.ai</span>
               <span style={{ opacity: 0.45, marginRight: 16 }}>Analytics.ai</span>
               <span style={{ opacity: 0.45 }}>Dashboard.ai</span>
             </div>
