@@ -11,6 +11,15 @@ function fileToBase64(file) {
   });
 }
 
+function TermsCheckbox({ checked, onChange, label }) {
+  return (
+    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 11.5, color: 'var(--slate)', marginTop: 14, cursor: 'pointer' }}>
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} style={{ marginTop: 2 }} />
+      <span>{label} <a href="/terms" target="_blank" style={{ color: 'var(--amber-dim)' }}>Terms &amp; Conditions</a>.</span>
+    </label>
+  );
+}
+
 function JobCard({ job, showStatus }) {
   const pending = !job.approved;
   return (
@@ -53,6 +62,7 @@ export default function JobPostingAI() {
   const [postedJobs, setPostedJobs] = useState([]);
   const [posterEmail, setPosterEmail] = useState('');
   const [verifyNote, setVerifyNote] = useState('');
+  const [postTermsAccepted, setPostTermsAccepted] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -62,23 +72,17 @@ export default function JobPostingAI() {
   }, []);
 
   async function runPost() {
-    if (postFiles.length === 0) return;
+    if (postFiles.length === 0 || !postTermsAccepted) return;
     setPostStatus('Reading JDs and structuring listings…');
     const files = await Promise.all(postFiles.map(async (f) => ({ name: f.name, mimeType: f.type, base64: await fileToBase64(f) })));
     const res = await fetch('/api/tools/job-posting/post', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ files }),
+      body: JSON.stringify({ files, termsAccepted: postTermsAccepted }),
     });
     const data = await res.json();
-    if (data.locked) {
-      setPostStatus(data.message);
-      return;
-    }
-    if (data.error) {
-      setPostStatus(data.error);
-      return;
-    }
+    if (data.locked) { setPostStatus(data.message); return; }
+    if (data.error) { setPostStatus(data.error); return; }
     setPostedJobs(data.postings);
     setPostStatus('Submitted for admin approval.');
   }
@@ -104,6 +108,8 @@ export default function JobPostingAI() {
   const [applyStatus, setApplyStatus] = useState('');
   const [applyResults, setApplyResults] = useState([]);
   const [search, setSearch] = useState('');
+  const [applyTermsAccepted, setApplyTermsAccepted] = useState(false);
+  const [whatsappOptIn, setWhatsappOptIn] = useState(false);
 
   useEffect(() => {
     fetch('/api/tools/job-posting/list').then((r) => r.json()).then((d) => setListings(d.postings || []));
@@ -117,6 +123,7 @@ export default function JobPostingAI() {
 
   async function runApply(applyMode, jobIds) {
     if (!resumeFile) { setApplyStatus('Upload your CV first.'); return; }
+    if (!applyTermsAccepted) { setApplyStatus('Please accept the Terms & Conditions first.'); return; }
     setApplyStatus('Reading your CV and matching against roles…');
     const base64 = await fileToBase64(resumeFile);
     const res = await fetch('/api/tools/job-posting/apply', {
@@ -126,6 +133,8 @@ export default function JobPostingAI() {
         resumeFile: { base64, mimeType: resumeFile.type },
         jobPostingIds: jobIds,
         mode: applyMode,
+        whatsappOptIn,
+        termsAccepted: applyTermsAccepted,
       }),
     });
     const data = await res.json();
@@ -134,6 +143,8 @@ export default function JobPostingAI() {
     setApplyResults(data.applied || []);
     setApplyStatus('');
   }
+
+  const canApply = !!resumeFile && applyTermsAccepted;
 
   return (
     <div style={{ position: 'relative' }}>
@@ -159,7 +170,8 @@ export default function JobPostingAI() {
           <input id="jd-file-input" type="file" multiple accept=".pdf,.doc,.docx" style={{ display: 'none' }}
             onChange={(e) => setPostFiles(Array.from(e.target.files).slice(0, 10))} />
           <div className="file-hint">Up to 10 job descriptions per batch.</div>
-          <button className="primary-btn" onClick={runPost} disabled={postFiles.length === 0}>Post jobs</button>
+          <TermsCheckbox checked={postTermsAccepted} onChange={setPostTermsAccepted} label="I confirm I'm authorized to post this on behalf of the company, and I agree to the" />
+          <button className="primary-btn" onClick={runPost} disabled={postFiles.length === 0 || !postTermsAccepted}>Post jobs</button>
           {postStatus && <div className="file-hint" style={{ marginTop: 14 }}>{postStatus}</div>}
 
           {postedJobs.length > 0 && (
@@ -186,11 +198,16 @@ export default function JobPostingAI() {
           <input id="resume-file-input" type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
             onChange={(e) => setResumeFile(e.target.files[0])} />
           <div className="file-hint">Your CV also joins our passive matching pool for future roles.</div>
-          <div className="file-hint">If we find a phone number on your CV, updates go out on WhatsApp automatically.</div>
+
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 11.5, color: 'var(--slate)', marginTop: 10, cursor: 'pointer' }}>
+            <input type="checkbox" checked={whatsappOptIn} onChange={(e) => setWhatsappOptIn(e.target.checked)} style={{ marginTop: 2 }} />
+            <span>Send me application updates via WhatsApp, if a number is found on this CV (optional — off by default).</span>
+          </label>
+          <TermsCheckbox checked={applyTermsAccepted} onChange={setApplyTermsAccepted} label="This CV is mine, or I have permission to submit it on this person's behalf. I agree to the" />
 
           {subMode === 'auto' && (
             <>
-              <button className="primary-btn" onClick={() => runApply('auto_apply', [])}>Find & apply for me</button>
+              <button className="primary-btn" onClick={() => runApply('auto_apply', [])} disabled={!canApply}>Find & apply for me</button>
               {applyStatus && <div className="file-hint" style={{ marginTop: 14 }}>{applyStatus}</div>}
               {applyResults.map((r) => (
                 <div key={r.jobId} className="jp-row">
@@ -210,7 +227,7 @@ export default function JobPostingAI() {
                 value={search} onChange={(e) => setSearch(e.target.value)} />
               {applyStatus && <div className="file-hint" style={{ marginTop: 14 }}>{applyStatus}</div>}
               {selected.length > 0 && (
-                <button className="primary-btn" onClick={() => runApply('search', selected)}>Apply to selected ({selected.length})</button>
+                <button className="primary-btn" onClick={() => runApply('search', selected)} disabled={!canApply}>Apply to selected ({selected.length})</button>
               )}
               {filtered.map((j) => (
                 <div key={j.id} className="jp-row">
@@ -220,7 +237,7 @@ export default function JobPostingAI() {
                     <h4>{j.title} — {j.company}</h4>
                     <div className="meta">{j.location}</div>
                   </div>
-                  <button className="apply-btn" onClick={() => runApply('search', [j.id])}>Apply</button>
+                  <button className="apply-btn" onClick={() => runApply('search', [j.id])} disabled={!canApply}>Apply</button>
                 </div>
               ))}
               {filtered.length === 0 && <p style={{ color: 'var(--slate)', fontSize: 13, marginTop: 20 }}>No open listings match yet.</p>}

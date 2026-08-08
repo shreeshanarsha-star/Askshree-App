@@ -24,7 +24,10 @@ export async function POST(req) {
   }
   await logToolRun(ip, 'job_posting_apply');
 
-  const { resumeFile, jobPostingIds, mode } = await req.json();
+  const { resumeFile, jobPostingIds, mode, whatsappOptIn, termsAccepted } = await req.json();
+  if (!termsAccepted) {
+    return NextResponse.json({ error: 'You must accept the Terms & Conditions to apply.' }, { status: 400 });
+  }
   if (!resumeFile?.base64) {
     return NextResponse.json({ error: 'Upload your CV.' }, { status: 400 });
   }
@@ -63,6 +66,8 @@ export async function POST(req) {
         resume_text: resumeText,
         skills: parsed.skills || candidate.skills,
         years_experience: parsed.years_experience ?? candidate.years_experience,
+        whatsapp_opt_in: !!whatsappOptIn || candidate.whatsapp_opt_in,
+        terms_accepted_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
       .eq('id', candidate.id);
@@ -78,6 +83,8 @@ export async function POST(req) {
         skills: parsed.skills || [],
         resume_text: resumeText,
         source: mode === 'auto_apply' ? 'auto_apply' : 'job_posting_apply',
+        whatsapp_opt_in: !!whatsappOptIn,
+        terms_accepted_at: new Date().toISOString(),
       })
       .select()
       .single();

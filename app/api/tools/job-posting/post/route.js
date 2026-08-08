@@ -16,7 +16,10 @@ export async function POST(req) {
     return NextResponse.json({ locked: true, message: gate.message }, { status: 402 });
   }
 
-  const { files } = await req.json(); // [{ base64, mimeType, name }]
+  const { files, termsAccepted } = await req.json(); // [{ base64, mimeType, name }]
+  if (!termsAccepted) {
+    return NextResponse.json({ error: 'You must accept the Terms & Conditions to post a job.' }, { status: 400 });
+  }
   if (!Array.isArray(files) || files.length === 0) {
     return NextResponse.json({ error: 'Provide at least one job description file.' }, { status: 400 });
   }
@@ -43,6 +46,7 @@ export async function POST(req) {
           raw_jd_text: jdText,
           poster_email: '',
           posted_ip: ip,
+          terms_accepted_at: new Date().toISOString(),
         })
         .select()
         .single();
