@@ -12,8 +12,6 @@ const TOOL_NAMES = [
   'Job posting.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
   'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Analytics.ai', 'Dashboard.ai',
 ];
-const PARTNER_LOGOS = ['Company A', 'Company B', 'Company C', 'Company D', 'Company E'];
-
 export default function HomePage() {
   const [query, setQuery] = useState('');
   const [hintIndex, setHintIndex] = useState(0);
@@ -54,12 +52,6 @@ export default function HomePage() {
             </div>
           )}
         </div>
-      </div>
-
-      <div style={{ display: 'flex', overflow: 'hidden', gap: 24, padding: '18px 56px', borderBottom: '1px solid var(--line)', position: 'relative', zIndex: 2 }}>
-        {[...PARTNER_LOGOS, ...PARTNER_LOGOS].map((name, i) => (
-          <div key={i} style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--slate)', whiteSpace: 'nowrap' }}>{name}</div>
-        ))}
       </div>
 
       <div className="hero">
