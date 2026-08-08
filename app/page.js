@@ -40,17 +40,29 @@ export default function HomePage() {
         <div>
           <div className="logo">Ask <span>Shree</span></div>
         </div>
-        <div className="links" style={{ position: 'relative' }}>
-          <span onClick={() => setContactOpen((o) => !o)} style={{ cursor: 'pointer' }}>my contact</span>
-          {contactOpen && (
-            <div style={{ position: 'absolute', top: 28, right: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px 18px', fontSize: 12.5, color: 'var(--cream)', minWidth: 220, zIndex: 10 }}>
-              <div><a href="tel:+919606591623" style={{ color: 'inherit', textDecoration: 'none' }}>+91 96065 91623</a></div>
-              <div style={{ margin: '8px 0', borderTop: '1px solid var(--line)' }}></div>
-              <div><a href="mailto:shreesha.narsha@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>shreesha.narsha@gmail.com</a></div>
-              <div style={{ margin: '8px 0', borderTop: '1px solid var(--line)' }}></div>
-              <div><a href="https://www.linkedin.com/in/shreesha09/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>linkedin.com/in/shreesha09</a></div>
+        <div className="nav-right">
+          <div className="links" style={{ position: 'relative' }}>
+            <span onClick={() => setContactOpen((o) => !o)} style={{ cursor: 'pointer' }}>my contact</span>
+            {contactOpen && (
+              <div style={{ position: 'absolute', top: 28, right: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px 18px', fontSize: 12.5, color: 'var(--cream)', minWidth: 220, zIndex: 10 }}>
+                <div><a href="tel:+919606591623" style={{ color: 'inherit', textDecoration: 'none' }}>+91 96065 91623</a></div>
+                <div style={{ margin: '8px 0', borderTop: '1px solid var(--line)' }}></div>
+                <div><a href="mailto:shreesha.narsha@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>shreesha.narsha@gmail.com</a></div>
+                <div style={{ margin: '8px 0', borderTop: '1px solid var(--line)' }}></div>
+                <div><a href="https://www.linkedin.com/in/shreesha09/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>linkedin.com/in/shreesha09</a></div>
+              </div>
+            )}
+          </div>
+          <div className="profile">
+            <div className="tags">
+              <div>Head-Global Talent Acquisition &#9679;</div>
+              <div>AI Builder &#9679;</div>
+              <div>Bengaluru &#9679;</div>
             </div>
-          )}
+            <div className="ring">
+              <img src="/profile-photo.jpg" alt="Shreesha Narsha" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -75,17 +87,6 @@ export default function HomePage() {
               onKeyDown={(e) => e.key === 'Enter' && runQuery()}
             />
             <button className="run" onClick={runQuery}>run query</button>
-          </div>
-        </div>
-
-        <div className="side-card">
-          <div className="ring">
-            <img src="/profile-photo.jpg" alt="Shreesha Narsha" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-          </div>
-          <div className="tags">
-            <div><span className="dot">&#9679;</span> Head-Global Talent Acquisition</div>
-            <div><span className="dot">&#9679;</span> AI Builder</div>
-            <div><span className="dot">&#9679;</span> Bengaluru</div>
           </div>
         </div>
       </div>

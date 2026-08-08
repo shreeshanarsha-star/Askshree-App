@@ -42,10 +42,16 @@
   .nav .logo{font-family:'Fraunces',serif; font-weight:600; font-size:20px; color:var(--cream); letter-spacing:-0.01em;}
   .nav .logo span{color:var(--amber);}
   .nav .links{display:flex; gap:40px; font-size:13.5px; color:var(--slate); font-weight:400;}
+  .nav-right{display:flex; flex-direction:column; align-items:flex-end; gap:14px;}
+  .profile{display:flex; align-items:center; gap:12px;}
+  .profile .tags{text-align:right; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--amber-dim); line-height:1.9;}
+  .profile .ring{
+    width:56px; height:56px; border-radius:50%; border:1px solid var(--amber-dim);
+    overflow:hidden; background:var(--navy-2); display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
 
   .hero{
     position:relative; z-index:2; max-width:1180px; margin:0 auto; padding:72px 56px 44px;
-    display:grid; grid-template-columns:1.15fr 0.85fr; gap:64px; align-items:center;
   }
   .eyebrow{
     font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--amber-dim); margin-bottom:18px;
