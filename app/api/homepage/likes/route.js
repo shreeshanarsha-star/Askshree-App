@@ -1,17 +1,12 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../lib/supabase';
 
-// Always run fresh — this counter changes on every click, so it must never
-// be statically cached (Next.js will otherwise cache a GET route handler
-// with no per-request data and keep serving a stale snapshot).
 export const dynamic = 'force-dynamic';
 
-// A single global counter for the homepage Like button. Every click
-// increments it — no toggle/unlike, no per-visitor cap.
 export async function GET() {
   const db = supabaseAdmin();
-  const { data } = await db.from('homepage_likes').select('count').eq('id', 1).maybeSingle();
-  return NextResponse.json({ count: data?.count ?? 0 });
+  const { data, error } = await db.from('homepage_likes').select('count').eq('id', 1).maybeSingle();
+  return NextResponse.json({ count: data?.count ?? 0, debugError: error?.message || null, debugData: data });
 }
 
 export async function POST() {
