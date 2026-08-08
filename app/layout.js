@@ -2,7 +2,7 @@ import './globals.css';
 
 export const metadata = {
   title: 'Ask Shree — AI-native recruiting toolkit',
-  description: 'Eight AI-native recruiting tools, built from a real talent acquisition workflow.',
+  description: 'AI-native recruiting tools: post a job or find and apply for free, with AI screening, matching, and an assistant that knows this site.',
 };
 
 export default function RootLayout({ children }) {
