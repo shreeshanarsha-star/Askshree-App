@@ -37,7 +37,7 @@
   #landing{position:relative;}
   .nav{
     position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between;
-    padding:24px 56px; border-bottom:1px solid var(--line);
+    max-width:800px; margin:0 auto; padding:24px 32px; border-bottom:1px solid var(--line);
   }
   .nav .logo{font-family:'Fraunces',serif; font-weight:600; font-size:20px; color:var(--cream); letter-spacing:-0.01em;}
   .nav .logo span{color:var(--amber);}
@@ -51,7 +51,7 @@
   }
 
   .hero{
-    position:relative; z-index:2; max-width:1180px; margin:0 auto; padding:72px 56px 44px;
+    position:relative; z-index:2; max-width:800px; margin:0 auto; padding:72px 32px 44px;
   }
   .eyebrow{
     font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--amber-dim); margin-bottom:18px;
@@ -111,7 +111,7 @@
   .side-card .tags div{display:flex; align-items:center; gap:9px;}
   .side-card .tags .dot{color:var(--amber); font-size:9px;}
 
-  .section{position:relative; z-index:2; max-width:1180px; margin:0 auto; padding:60px 56px;}
+  .section{position:relative; z-index:2; max-width:800px; margin:0 auto; padding:60px 32px;}
   .section h2{font-family:'Fraunces',serif; font-weight:500; font-size:25px; color:var(--cream); margin-bottom:8px; letter-spacing:-0.005em;}
   .section .lead{font-size:13.5px; color:var(--slate); margin-bottom:36px; max-width:520px;}
   .tool-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px;}
@@ -131,7 +131,7 @@
   .tool-card p{font-size:12.5px; color:var(--slate); line-height:1.55; margin:0;}
 
   .trial-strip{
-    border:1px solid var(--line); border-radius:12px; padding:28px 36px; max-width:1180px; margin:0 auto 64px;
+    border:1px solid var(--line); border-radius:12px; padding:28px 36px; max-width:800px; margin:0 auto 64px;
     display:flex; justify-content:space-between; align-items:center; position:relative; z-index:2;
     background:rgba(232,163,61,0.03);
   }
