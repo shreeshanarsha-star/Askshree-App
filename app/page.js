@@ -36,7 +36,7 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    fetch('/api/homepage/likes').then((r) => r.json()).then((d) => setLikeCount(d.count)).catch(() => setLikeCount(0));
+    fetch('/api/homepage/likes', { cache: 'no-store' }).then((r) => r.json()).then((d) => setLikeCount(d.count)).catch(() => setLikeCount(0));
   }, []);
 
   async function handleLike() {
@@ -44,7 +44,7 @@ export default function HomePage() {
     setTimeout(() => setJustLiked(false), 400);
     setLikeCount((c) => (typeof c === 'number' ? c + 1 : c)); // instant feedback, corrected below
     try {
-      const res = await fetch('/api/homepage/likes', { method: 'POST' });
+      const res = await fetch('/api/homepage/likes', { method: 'POST', cache: 'no-store' });
       const data = await res.json();
       if (typeof data.count === 'number') setLikeCount(data.count);
     } catch (e) { /* optimistic count already shown */ }
