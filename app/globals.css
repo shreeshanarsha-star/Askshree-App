@@ -68,6 +68,14 @@
   .hero h1 em{font-style:italic; color:var(--amber); font-weight:500;}
   .hero p.sub{font-size:16px; color:var(--slate); line-height:1.65; margin:20px 0 30px; max-width:440px;}
 
+  .ai-group{padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.15);}
+  .ai-badge{
+    width:22px; height:22px; border-radius:50%; border:1px solid var(--amber-dim); color:var(--amber-dim);
+    font-family:'IBM Plex Mono',monospace; font-size:11px; display:flex; align-items:center; justify-content:center;
+  }
+  .ai-name{font-family:'Fraunces',serif; font-size:15px; color:var(--cream);}
+
+
   .terminal{
     border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,0.025);
     display:flex; align-items:center; padding:15px 18px; gap:12px; transition:border-color 0.2s ease;

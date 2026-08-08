@@ -94,88 +94,75 @@ export default function HomePage() {
       <div className="section">
         <div className="eyebrow">AI SYSTEMS</div>
         <div style={{ marginTop: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer' }} onClick={() => setRecruitOpen((o) => !o)}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>A</span>
-              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Recruit.ai</span>
+          <div className="ai-group">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setRecruitOpen((o) => !o)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span className="ai-badge">A</span>
+                <span className="ai-name">Recruit.ai</span>
+              </div>
+              <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{recruitOpen ? '▾' : '▸'}</span>
             </div>
-            <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{recruitOpen ? '▾' : '▸'}</span>
-          </div>
-          {recruitOpen && (
-            <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
-              <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/job-posting-ai'}>Job posting.ai</span>
-              <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-source-ai'}>Smart Source.ai</span>
-              <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-screen-ai'}>Smart screen.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Smart hunt.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Interview.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Assessment.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Offer.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Refer.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Onboard.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Induction.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Campus.ai</span>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Analytics.ai</span>
-              <span style={{ opacity: 0.45 }}>Dashboard.ai</span>
-            </div>
-          )}
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>B</span>
-              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Talent.ai</span>
-            </div>
+            {recruitOpen && (
+              <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
+                <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/job-posting-ai'}>Job posting.ai</span>
+                <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-source-ai'}>Smart Source.ai</span>
+                <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-screen-ai'}>Smart screen.ai</span>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Smart hunt.ai</span>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Interview.ai</span>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Assessment.ai</span>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Offer.ai</span>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Refer.ai</span>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Onboard.ai</span>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Induction.ai</span>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Campus.ai</span>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Analytics.ai</span>
+                <span style={{ opacity: 0.45 }}>Dashboard.ai</span>
+              </div>
+            )}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer' }} onClick={() => setMarketOpen((o) => !o)}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>C</span>
-              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Market.ai</span>
+          <div className="ai-group">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span className="ai-badge">B</span>
+                <span className="ai-name">Talent.ai</span>
+              </div>
             </div>
-            <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{marketOpen ? '▾' : '▸'}</span>
           </div>
-          {marketOpen && (
-            <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
-              <span style={{ opacity: 0.45, marginRight: 16 }}>Leads.ai</span>
-              <span style={{ opacity: 0.45 }}>Research.ai</span>
-            </div>
-          )}
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>D</span>
-              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Learn.ai</span>
+          <div className="ai-group">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setMarketOpen((o) => !o)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span className="ai-badge">C</span>
+                <span className="ai-name">Market.ai</span>
+              </div>
+              <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{marketOpen ? '▾' : '▸'}</span>
             </div>
+            {marketOpen && (
+              <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
+                <span style={{ opacity: 0.45, marginRight: 16 }}>Leads.ai</span>
+                <span style={{ opacity: 0.45 }}>Research.ai</span>
+              </div>
+            )}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>E</span>
-              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Rewards.ai</span>
+
+          {[
+            ['D', 'Learn.ai'],
+            ['E', 'Rewards.ai'],
+            ['F', 'Finance.ai'],
+            ['G', 'Brand.ai'],
+            ['H', 'Sales.ai'],
+            ['I', 'Research.ai'],
+          ].map(([letter, name]) => (
+            <div className="ai-group" key={letter}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span className="ai-badge">{letter}</span>
+                  <span className="ai-name">{name}</span>
+                </div>
+              </div>
             </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>F</span>
-              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Finance.ai</span>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>G</span>
-              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Brand.ai</span>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>H</span>
-              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Sales.ai</span>
-            </div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>I</span>
-              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Research.ai</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
