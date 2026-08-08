@@ -18,6 +18,7 @@ export default function HomePage() {
   const [recruitOpen, setRecruitOpen] = useState(false);
   const [marketOpen, setMarketOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [writingsOpen, setWritingsOpen] = useState(false);
   const [justLiked, setJustLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(null);
   const [shareNote, setShareNote] = useState('');
@@ -106,8 +107,21 @@ export default function HomePage() {
           </span>
         </div>
         <div className="nav-right">
-          <div className="links" style={{ position: 'relative' }}>
-            <span onClick={() => setContactOpen((o) => !o)} style={{ cursor: 'pointer' }}>my contact</span>
+          <div className="links" style={{ position: 'relative', display: 'flex', gap: 40 }}>
+            <div style={{ position: 'relative' }}>
+              <span onClick={() => { setWritingsOpen((o) => !o); setContactOpen(false); }} style={{ cursor: 'pointer' }}>my writings</span>
+              {writingsOpen && (
+                <div style={{ position: 'absolute', top: 28, left: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '10px 0', fontSize: 12.5, color: 'var(--cream)', minWidth: 200, zIndex: 10 }}>
+                  <a href="/writings/purpose" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Purpose</a>
+                  <a href="/writings/leadership" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Leadership</a>
+                  <a href="/writings/strategy" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Strategy</a>
+                  <a href="/writings/artificial-intelligence" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Artificial Intelligence</a>
+                  <a href="/writings/spirituality" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Spirituality</a>
+                </div>
+              )}
+            </div>
+            <div style={{ position: 'relative' }}>
+            <span onClick={() => { setContactOpen((o) => !o); setWritingsOpen(false); }} style={{ cursor: 'pointer' }}>my contact</span>
             {contactOpen && (
               <div style={{ position: 'absolute', top: 28, right: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px 18px', fontSize: 12.5, color: 'var(--cream)', minWidth: 220, zIndex: 10 }}>
                 <div><a href="tel:+919606591623" style={{ color: 'inherit', textDecoration: 'none' }}>+91 96065 91623</a></div>
@@ -117,6 +131,7 @@ export default function HomePage() {
                 <div><a href="https://www.linkedin.com/in/shreesha09/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>linkedin.com/in/shreesha09</a></div>
               </div>
             )}
+            </div>
           </div>
           <div className="profile">
             <div className="tags">
