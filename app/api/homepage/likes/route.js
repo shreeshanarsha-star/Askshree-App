@@ -1,26 +1,14 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '../../../../lib/supabase';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
-  const db = supabaseAdmin();
-  const { data, error } = await db.from('homepage_likes').select('count').eq('id', 1).maybeSingle();
-  return NextResponse.json({ count: data?.count ?? 0, debugError: error?.message || null, debugData: data });
+  return NextResponse.json({ count: 999999, marker: 'diagnostic-v1' }, {
+    headers: { 'Cache-Control': 'no-store, max-age=0' },
+  });
 }
 
 export async function POST() {
-  const db = supabaseAdmin();
-  const { data: row } = await db.from('homepage_likes').select('count').eq('id', 1).maybeSingle();
-  const next = (row?.count ?? 0) + 1;
-
-  const { data, error } = await db
-    .from('homepage_likes')
-    .update({ count: next, updated_at: new Date().toISOString() })
-    .eq('id', 1)
-    .select('count')
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ count: data.count });
+  return NextResponse.json({ count: 999999 });
 }
