@@ -106,6 +106,7 @@ export default function HomePage() {
               <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/job-posting-ai'}>Job posting.ai</span>
               <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-source-ai'}>Smart Source.ai</span>
               <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-screen-ai'}>Smart screen.ai</span>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Smart hunt.ai</span>
               <span style={{ opacity: 0.45, marginRight: 16 }}>Interview.ai</span>
               <span style={{ opacity: 0.45, marginRight: 16 }}>Assessment.ai</span>
               <span style={{ opacity: 0.45, marginRight: 16 }}>Offer.ai</span>
