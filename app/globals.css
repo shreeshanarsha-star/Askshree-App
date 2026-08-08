@@ -82,9 +82,14 @@
   .engage-btn:hover{border-color:var(--amber-dim); color:var(--amber);}
   .engage-btn.liked{border-color:var(--amber-dim); color:var(--amber);}
 
+  .scroll-indicator-wrap{
+    position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:5;
+    transition:opacity 0.3s ease; opacity:1;
+  }
+  .scroll-indicator-wrap.hidden{opacity:0; pointer-events:none;}
   .scroll-indicator{
     width:38px; height:38px; border-radius:50%; border:1px solid var(--amber-dim); color:var(--amber-dim);
-    background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer;
+    background:var(--navy); display:flex; align-items:center; justify-content:center; cursor:pointer;
     animation:scroll-bounce 1.8s ease-in-out infinite;
   }
   .scroll-indicator:hover{color:var(--amber); border-color:var(--amber); background:rgba(232,163,61,0.08);}

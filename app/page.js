@@ -20,6 +20,15 @@ export default function HomePage() {
   const [contactOpen, setContactOpen] = useState(false);
   const [liked, setLiked] = useState(false);
   const [shareNote, setShareNote] = useState('');
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
+  useEffect(() => {
+    function onScroll() {
+      setShowScrollHint(window.scrollY < 120);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   function toggleLike() {
     setLiked((v) => !v);
@@ -138,14 +147,15 @@ export default function HomePage() {
             {shareNote && <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 36 }}>
-            <button className="scroll-indicator" onClick={scrollToNext} aria-label="Scroll down">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
-          </div>
         </div>
+      </div>
+
+      <div className={`scroll-indicator-wrap ${showScrollHint ? '' : 'hidden'}`}>
+        <button className="scroll-indicator" onClick={scrollToNext} aria-label="Scroll down">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </button>
       </div>
 
       <div className="section">
