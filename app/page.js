@@ -139,6 +139,43 @@ export default function HomePage() {
               <span style={{ opacity: 0.45 }}>Research.ai</span>
             </div>
           )}
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>D</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Learn.ai</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>E</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Rewards.ai</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>F</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Finance.ai</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>G</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Brand.ai</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>H</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Sales.ai</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>I</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Research.ai</span>
+            </div>
+          </div>
         </div>
       </div>
 
