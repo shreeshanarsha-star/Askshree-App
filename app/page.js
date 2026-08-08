@@ -68,7 +68,7 @@ export default function HomePage() {
 
       <div className="hero">
         <div>
-          <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', color: 'var(--amber)', fontSize: 14, marginBottom: 10 }}>
+          <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', color: 'var(--amber)', fontSize: 16, marginBottom: 10 }}>
             <span style={{ color: 'var(--cream)', fontStyle: 'normal' }}>Hiring is evolving.</span> So am I.
           </div>
           <h1>

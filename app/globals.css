@@ -62,11 +62,11 @@
     letter-spacing:0.02em; background:rgba(255,255,255,0.02);
   }
   .hero h1{
-    font-family:'Fraunces',serif; font-weight:500; font-size:27px; line-height:1.38; color:var(--cream); margin:0;
-    letter-spacing:-0.008em;
+    font-family:'Fraunces',serif; font-weight:500; font-size:16px; line-height:1.5; color:var(--cream); margin:0;
+    letter-spacing:-0.008em; max-width:560px;
   }
   .hero h1 em{font-style:italic; color:var(--amber); font-weight:500;}
-  .hero p.sub{font-size:15px; color:var(--slate); line-height:1.65; margin:20px 0 30px; max-width:440px;}
+  .hero p.sub{font-size:16px; color:var(--slate); line-height:1.65; margin:20px 0 30px; max-width:440px;}
 
   .terminal{
     border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,0.025);
