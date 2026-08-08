@@ -1,11 +1,13 @@
 'use client';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function AskShreeChat() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: 'Hi — ask me anything about talent acquisition, this site\'s tools, or search the web and my reference docs.' },
+    { role: 'assistant', text: "Hi, I'm Ask Shree. I can answer questions about this site and its tools — what would you like to know?" },
   ]);
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +21,7 @@ export default function AskShreeChat() {
       const res = await fetch('/api/ask-shree', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg }),
+        body: JSON.stringify({ message: userMsg, page: pathname }),
       });
       const data = await res.json();
       setMessages((m) => [...m, { role: 'assistant', text: data.reply || data.error || 'No response.' }]);
@@ -39,7 +41,7 @@ export default function AskShreeChat() {
             <span className="x" onClick={() => setOpen(false)}>&times;</span>
           </div>
           <div className="chat-body" style={{ maxHeight: 280, overflowY: 'auto' }}>
-            <span className="chat-tag">unrestricted &middot; searches public web + admin repository</span>
+            <span className="chat-tag">answers only from this site&apos;s own content — no open web search</span>
             {messages.map((m, i) => (
               <div key={i} className="chat-msg" style={{ opacity: m.role === 'user' ? 0.8 : 1 }}>
                 {m.text}

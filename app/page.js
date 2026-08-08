@@ -1,32 +1,36 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import NeuralBackground from '../components/NeuralBackground';
 import AskShreeChat from '../components/AskShreeChat';
 
-const TOOLS = [
-  { slug: 'fit-check', name: 'Fit Check', tag: 'Screening', desc: '8-factor weighted scorecard across up to 20 CVs at once.', flagship: true },
-  { slug: 'smart-source', name: 'Smart Source', tag: 'Sourcing', desc: 'Upload a JD, get AI-driven candidate sourcing suggestions.' },
-  { slug: 'smart-hunt', name: 'Smart Hunt', tag: 'Sourcing', desc: 'Manual X-ray search across public candidate data.' },
-  { slug: 'welcome-flyer', name: 'Welcome Flyer', tag: 'Branding', desc: 'Six branded templates, generated in one click.' },
-  { slug: 'get-jd', name: 'Get JD', tag: 'Drafting', desc: 'Pulls comparable roles and market data to help draft a job description.' },
-  { slug: 'get-ats-resume', name: 'Get ATS Friendly Resume', tag: 'Candidate side', desc: 'Reformats a resume so it parses cleanly through ATS software.' },
-  { slug: 'market-search', name: 'Run Market Search', tag: 'Research', desc: 'Broader compensation and market research beyond a single JD.' },
-  { slug: 'generate-lead', name: 'Generate Lead', tag: 'Sourcing', desc: 'Surfaces potential candidate or business leads for outreach.' },
+const TOOL_LINKS = {
+  'job posting.ai': '/tools/job-posting-ai',
+  'smart source.ai': '/tools/smart-source-ai',
+};
+const TOOL_NAMES = [
+  'Job posting.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
+  'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Analytics.ai', 'Dashboard.ai',
 ];
+const PARTNER_LOGOS = ['Company A', 'Company B', 'Company C', 'Company D', 'Company E'];
 
 export default function HomePage() {
   const [query, setQuery] = useState('');
   const [hintIndex, setHintIndex] = useState(0);
-  const hints = TOOLS.map((t) => t.name.toLowerCase());
+  const [recruitOpen, setRecruitOpen] = useState(false);
+  const [marketOpen, setMarketOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
 
   useEffect(() => {
-    const id = setInterval(() => setHintIndex((i) => (i + 1) % hints.length), 2200);
+    const id = setInterval(() => setHintIndex((i) => (i + 1) % TOOL_NAMES.length), 2200);
     return () => clearInterval(id);
-  }, [hints.length]);
+  }, []);
 
   function runQuery() {
-    const match = TOOLS.find((t) => query.toLowerCase().includes(t.name.toLowerCase()) || t.name.toLowerCase().includes(query.toLowerCase()));
-    if (match) window.location.href = `/tools/${match.slug}`;
+    const q = query.trim().toLowerCase();
+    if (!q) return;
+    const match = Object.keys(TOOL_LINKS).find((name) => name.includes(q) || q.includes(name));
+    if (match) window.location.href = TOOL_LINKS[match];
+    else document.querySelector('.chat-launcher')?.click();
   }
 
   return (
@@ -36,13 +40,32 @@ export default function HomePage() {
       <div className="nav">
         <div>
           <div className="logo">Ask <span>Shree</span></div>
-          <div className="pill" style={{ display: 'inline-block', marginTop: 6 }}>&#9679; ai-assisted profile</div>
         </div>
-        <div className="links"><span>my projects</span><span>my toolkit</span><span>my writings</span><span>my contact</span></div>
+        <div className="links" style={{ position: 'relative' }}>
+          <span onClick={() => setContactOpen((o) => !o)} style={{ cursor: 'pointer' }}>my contact</span>
+          {contactOpen && (
+            <div style={{ position: 'absolute', top: 28, right: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px 18px', fontSize: 12.5, color: 'var(--cream)', minWidth: 220, zIndex: 10 }}>
+              <div><a href="tel:+919606591623" style={{ color: 'inherit', textDecoration: 'none' }}>+91 96065 91623</a></div>
+              <div style={{ margin: '8px 0', borderTop: '1px solid var(--line)' }}></div>
+              <div><a href="mailto:shreesha.narsha@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>shreesha.narsha@gmail.com</a></div>
+              <div style={{ margin: '8px 0', borderTop: '1px solid var(--line)' }}></div>
+              <div><a href="https://www.linkedin.com/in/shreesha09/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>linkedin.com/in/shreesha09</a></div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', overflow: 'hidden', gap: 24, padding: '18px 56px', borderBottom: '1px solid var(--line)', position: 'relative', zIndex: 2 }}>
+        {[...PARTNER_LOGOS, ...PARTNER_LOGOS].map((name, i) => (
+          <div key={i} style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--slate)', whiteSpace: 'nowrap' }}>{name}</div>
+        ))}
       </div>
 
       <div className="hero">
         <div>
+          <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', color: 'var(--amber)', fontSize: 14, marginBottom: 10 }}>
+            <span style={{ color: 'var(--cream)', fontStyle: 'normal' }}>Hiring is evolving.</span> So am I.
+          </div>
           <h1>
             A talent acquisition specialist who architected the solution, then coded it with AI to fix
             his own talent acquisition challenges — until <em>delegating tasks to AI became the solution itself.</em>
@@ -53,14 +76,13 @@ export default function HomePage() {
             <span className="chev">&gt;</span>
             <input
               type="text"
-              placeholder="Try a tool name..."
+              placeholder={`Try a tool name... ${TOOL_NAMES[hintIndex]}`}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && runQuery()}
             />
             <button className="run" onClick={runQuery}>run query</button>
           </div>
-          <div className="try-hint">Try &quot;{hints[hintIndex]}&quot;</div>
         </div>
 
         <div className="side-card">
@@ -76,17 +98,50 @@ export default function HomePage() {
       </div>
 
       <div className="section">
-        <h2>Built from the actual workflow, not around it</h2>
-        <p className="lead">Eight tools, each matching a real step in sourcing, screening, and closing.</p>
-        <div className="tool-grid">
-          {TOOLS.map((t) => (
-            <a key={t.slug} href={`/tools/${t.slug}`} className="tool-card"
-              style={{ textDecoration: 'none', display: 'block', border: t.flagship ? '1px solid var(--amber-dim)' : undefined }}>
-              <span className="tag">{t.tag}</span>
-              <h3>{t.name}</h3>
-              <p>{t.desc}</p>
-            </a>
-          ))}
+        <div className="eyebrow">AI SYSTEMS</div>
+        <div style={{ marginTop: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer' }} onClick={() => setRecruitOpen((o) => !o)}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>A</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Recruit.ai</span>
+            </div>
+            <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{recruitOpen ? '▾' : '▸'}</span>
+          </div>
+          {recruitOpen && (
+            <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
+              <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/job-posting-ai'}>Job posting.ai</span>
+              <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-source-ai'}>Smart Source.ai</span>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Smart screen.ai</span>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Interview.ai</span>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Assessment.ai</span>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Offer.ai</span>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Refer.ai</span>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Onboard.ai</span>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Analytics.ai</span>
+              <span style={{ opacity: 0.45 }}>Dashboard.ai</span>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>B</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Talent.ai</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 0', borderBottom: '1px solid rgba(255,255,255,0.15)', cursor: 'pointer' }} onClick={() => setMarketOpen((o) => !o)}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 22, height: 22, borderRadius: '50%', border: '1px solid var(--amber-dim)', color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>C</span>
+              <span style={{ fontFamily: 'Fraunces, serif', fontSize: 15, color: 'var(--cream)' }}>Market.ai</span>
+            </div>
+            <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{marketOpen ? '▾' : '▸'}</span>
+          </div>
+          {marketOpen && (
+            <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
+              <span style={{ opacity: 0.45, marginRight: 16 }}>Leads.ai</span>
+              <span style={{ opacity: 0.45 }}>Research.ai</span>
+            </div>
+          )}
         </div>
       </div>
 

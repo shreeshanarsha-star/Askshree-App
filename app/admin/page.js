@@ -32,7 +32,8 @@ export default function AdminDashboard() {
         <div className="logo">Ask <span>Shree</span> admin</div>
         <div className="admin-nav">
           <a href="/admin" className="active">Overview</a>
-          <a href="/admin/data-sources">Ask Shree data sources</a>
+          <a href="/admin/job-postings">Job postings</a>
+          <a href="/admin/chatbot">Ask Shree chatbot</a>
         </div>
       </div>
       <div className="admin-main">

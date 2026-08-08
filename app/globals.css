@@ -235,3 +235,42 @@
     font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--amber-dim); margin-right:8px;
     border:1px solid var(--line); padding:1px 7px; border-radius:8px;
   }
+
+  /* ---------- JOB POSTING.AI ---------- */
+  .jp-tabs{display:flex; gap:8px; margin-bottom:22px;}
+  .jp-tab{font-family:'IBM Plex Mono',monospace; font-size:12px; padding:9px 20px; border-radius:20px; border:1px solid var(--line); background:transparent; color:var(--slate); cursor:pointer;}
+  .jp-tab.active{background:var(--amber); color:#1a1204; border-color:var(--amber);}
+  .jp-panel{display:none;}
+  .jp-panel.active{display:block;}
+  .jp-subtabs{display:flex; gap:8px; margin-bottom:18px;}
+  .jp-subtab{font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:7px 16px; border-radius:20px; border:1px solid var(--line); background:transparent; color:var(--slate); cursor:pointer;}
+  .jp-subtab.active{border-color:var(--amber-dim); color:var(--amber);}
+  .dropzone{border:1px dashed var(--line); border-radius:8px; padding:28px; text-align:center; color:var(--slate); font-size:13px; background:rgba(255,255,255,0.015); cursor:pointer;}
+  .dropzone:hover{border-color:var(--amber-dim); color:var(--cream);}
+  .file-hint{font-size:11.5px; color:var(--slate); margin-top:8px; line-height:1.6;}
+  .primary-btn{margin-top:18px; border:1px solid var(--amber-dim); color:var(--amber); background:transparent; font-family:'IBM Plex Mono',monospace; font-size:12px; padding:11px 26px; border-radius:6px; cursor:pointer;}
+  .primary-btn:disabled{opacity:0.5; cursor:not-allowed;}
+  .job-card{border:1px solid var(--line); border-radius:10px; padding:22px; background:rgba(255,255,255,0.015); margin-top:16px;}
+  .status-badge{display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:10px; border-radius:20px; padding:3px 10px; margin-bottom:14px; margin-right:8px;}
+  .status-badge.pending{color:var(--slate); border:1px solid var(--line);}
+  .status-badge.approved{color:var(--amber); border:1px solid var(--amber-dim);}
+  .status-badge.verified{color:var(--amber); border:1px solid var(--amber-dim);}
+  .status-badge.unverified{color:#e28080; border:1px solid rgba(220,80,80,0.4); background:rgba(220,80,80,0.08);}
+  .status-badge.vetted{color:var(--amber); border:1px solid var(--amber-dim); background:rgba(232,163,61,0.1);}
+  .job-card h3{font-family:'Fraunces',serif; font-size:17px; color:var(--cream); margin:0 0 8px;}
+  .job-company-row{font-size:12.5px; color:var(--slate); margin-bottom:18px;}
+  .skill-tags{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+  .skill-tag{font-family:'IBM Plex Mono',monospace; font-size:10.5px; border-radius:14px; padding:4px 11px;}
+  .skill-tag.must{color:var(--amber); border:1px solid var(--amber-dim); background:rgba(232,163,61,0.06);}
+  .skill-tag.good{color:var(--slate); border:1px solid var(--line);}
+  .jp-row{display:flex; align-items:center; gap:14px; padding:14px 4px; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;}
+  .jp-row .info h4{font-family:'Fraunces',serif; font-size:14.5px; color:var(--cream); margin:0 0 4px; font-weight:500;}
+  .jp-row .info .meta{font-size:12px; color:var(--slate);}
+  .apply-btn{border:1px solid var(--amber-dim); color:var(--amber); background:transparent; font-family:'IBM Plex Mono',monospace; font-size:11px; padding:8px 16px; border-radius:6px; cursor:pointer; white-space:nowrap;}
+  .apply-btn.applied{border-color:var(--line); color:var(--slate);}
+  .email-line{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:16px 0; font-size:12px; color:var(--slate); font-family:'IBM Plex Mono',monospace;}
+  .email-line input{background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:6px; padding:7px 10px; color:var(--cream); font-size:12px; outline:none; font-family:'Inter',sans-serif;}
+  .free-text-input{width:100%; background:rgba(255,255,255,0.025); border:1px solid var(--line); border-radius:8px; padding:14px; color:var(--cream); font-size:13px; font-family:'IBM Plex Mono',monospace; outline:none;}
+  .coming-soon-card{border:1px solid var(--line); border-radius:12px; padding:48px; text-align:center; margin-top:40px;}
+  .coming-soon-card h2{font-family:'Fraunces',serif; color:var(--cream); font-size:20px; margin-bottom:10px;}
+  .coming-soon-card p{color:var(--slate); font-size:13px;}
