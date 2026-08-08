@@ -81,6 +81,8 @@
   }
   .engage-btn:hover{border-color:var(--amber-dim); color:var(--amber);}
   .engage-btn.liked{border-color:var(--amber-dim); color:var(--amber);}
+  .share-menu-item{padding:9px 16px; cursor:pointer; color:var(--cream);}
+  .share-menu-item:hover{background:rgba(232,163,61,0.08); color:var(--amber);}
 
   .scroll-indicator-wrap{
     position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:5;

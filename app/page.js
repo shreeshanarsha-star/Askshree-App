@@ -19,8 +19,13 @@ export default function HomePage() {
   const [marketOpen, setMarketOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(null);
   const [shareNote, setShareNote] = useState('');
+  const [shareOpen, setShareOpen] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
+
+  const SHARE_URL = 'https://askshree.com';
+  const SHARE_TEXT = 'AI-native recruiting tools by Shreesha Narsha';
 
   useEffect(() => {
     function onScroll() {
@@ -30,19 +35,45 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  function toggleLike() {
-    setLiked((v) => !v);
+  useEffect(() => {
+    setLiked(window.localStorage.getItem('askshree_liked') === 'true');
+    fetch('/api/homepage/likes').then((r) => r.json()).then((d) => setLikeCount(d.count)).catch(() => setLikeCount(0));
+  }, []);
+
+  async function toggleLike() {
+    const next = !liked;
+    setLiked(next);
+    window.localStorage.setItem('askshree_liked', next ? 'true' : 'false');
+    try {
+      const res = await fetch('/api/homepage/likes', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: next ? 'like' : 'unlike' }),
+      });
+      const data = await res.json();
+      if (typeof data.count === 'number') setLikeCount(data.count);
+    } catch (e) { /* count refresh isn't critical to the click itself */ }
   }
 
-  async function handleShare() {
-    const shareData = { title: 'Ask Shree', text: 'AI-native recruiting tools by Shreesha Narsha', url: 'https://askshree.com' };
-    if (navigator.share) {
-      try { await navigator.share(shareData); } catch (e) { /* user cancelled — no-op */ }
-    } else if (navigator.clipboard) {
-      await navigator.clipboard.writeText(shareData.url);
+  function shareVia(kind) {
+    const url = encodeURIComponent(SHARE_URL);
+    const text = encodeURIComponent(SHARE_TEXT);
+    const links = {
+      whatsapp: `https://wa.me/?text=${text}%20${url}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+      twitter: `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+      email: `mailto:?subject=${encodeURIComponent('Ask Shree')}&body=${text}%20${url}`,
+    };
+    if (links[kind]) window.open(links[kind], '_blank', 'noopener,noreferrer');
+    setShareOpen(false);
+  }
+
+  async function copyShareLink() {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(SHARE_URL);
       setShareNote('Link copied');
       setTimeout(() => setShareNote(''), 2000);
     }
+    setShareOpen(false);
   }
 
   function scrollToNext() {
@@ -132,18 +163,30 @@ export default function HomePage() {
               <svg viewBox="0 0 24 24" width="14" height="14" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2 4.8 5.6 4c2-.4 3.9.5 5 2 1.1-1.5 3-2.4 5-2 3.6.8 5 4.4 3.6 7.7-2.5 4.7-10 9.3-10 9.3z" />
               </svg>
-              Like
+              Like{likeCount !== null ? ` · ${likeCount}` : ''}
             </button>
-            <button className="engage-btn" onClick={handleShare}>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="18" cy="5" r="3" />
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="19" r="3" />
-                <line x1="8.6" y1="10.6" x2="15.4" y2="6.4" />
-                <line x1="8.6" y1="13.4" x2="15.4" y2="17.6" />
-              </svg>
-              Share
-            </button>
+
+            <div style={{ position: 'relative' }}>
+              <button className="engage-btn" onClick={() => setShareOpen((o) => !o)}>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.6" y1="10.6" x2="15.4" y2="6.4" />
+                  <line x1="8.6" y1="13.4" x2="15.4" y2="17.6" />
+                </svg>
+                Share
+              </button>
+              {shareOpen && (
+                <div style={{ position: 'absolute', top: 40, left: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '8px 0', fontSize: 12.5, color: 'var(--cream)', minWidth: 170, zIndex: 10 }}>
+                  <div className="share-menu-item" onClick={() => shareVia('whatsapp')}>WhatsApp</div>
+                  <div className="share-menu-item" onClick={() => shareVia('linkedin')}>LinkedIn</div>
+                  <div className="share-menu-item" onClick={() => shareVia('twitter')}>X / Twitter</div>
+                  <div className="share-menu-item" onClick={() => shareVia('email')}>Email</div>
+                  <div className="share-menu-item" onClick={copyShareLink}>Copy link</div>
+                </div>
+              )}
+            </div>
             {shareNote && <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
           </div>
 
