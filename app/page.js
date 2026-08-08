@@ -36,6 +36,10 @@ export default function HomePage() {
     }
   }
 
+  function scrollToNext() {
+    document.querySelector('.section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   useEffect(() => {
     const id = setInterval(() => setHintIndex((i) => (i + 1) % TOOL_NAMES.length), 2200);
     return () => clearInterval(id);
@@ -132,6 +136,14 @@ export default function HomePage() {
               Share
             </button>
             {shareNote && <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 36 }}>
+            <button className="scroll-indicator" onClick={scrollToNext} aria-label="Scroll down">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
