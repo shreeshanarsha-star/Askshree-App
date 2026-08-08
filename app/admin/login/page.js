@@ -7,6 +7,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [resetNote, setResetNote] = useState(null);
 
   async function signIn() {
     setLoading(true);
@@ -19,6 +20,19 @@ export default function AdminLoginPage() {
       return;
     }
     window.location.href = '/admin';
+  }
+
+  async function forgotPassword() {
+    if (!email) {
+      setError('Enter your email above first, then click "Forgot password?"');
+      return;
+    }
+    setError(null);
+    const supabase = supabasePublic();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/update-password`,
+    });
+    setResetNote(error ? error.message : `Reset link sent to ${email}.`);
   }
 
   return (
@@ -34,7 +48,8 @@ export default function AdminLoginPage() {
           onKeyDown={(e) => e.key === 'Enter' && signIn()} />
         <button onClick={signIn} disabled={loading}>{loading ? 'Signing in…' : 'Sign in'}</button>
         {error && <div style={{ color: '#e28080', fontSize: 12, marginTop: 10 }}>{error}</div>}
-        <div className="login-note">Set up your admin account in Supabase Dashboard → Authentication → Users</div>
+        {resetNote && <div style={{ color: 'var(--amber)', fontSize: 12, marginTop: 10 }}>{resetNote}</div>}
+        <div className="login-note" style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={forgotPassword}>Forgot password?</div>
       </div>
     </div>
   );
