@@ -72,7 +72,7 @@ export default function HomePage() {
             <span style={{ color: 'var(--cream)', fontStyle: 'normal' }}>Hiring is evolving.</span> So am I.
           </div>
           <h1>
-            A talent acquisition specialist who architected the solution, then coded it with AI to fix
+            A talent acquisition leader who architected the solution, then coded it with AI to fix
             his own talent acquisition challenges — until <em>delegating tasks to AI became the solution itself.</em>
           </h1>
           <p className="sub">Talent acquisition, based in Bengaluru — building AI-native tools for sourcing and hiring in my own time.</p>
