@@ -18,6 +18,23 @@ export default function HomePage() {
   const [recruitOpen, setRecruitOpen] = useState(false);
   const [marketOpen, setMarketOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [shareNote, setShareNote] = useState('');
+
+  function toggleLike() {
+    setLiked((v) => !v);
+  }
+
+  async function handleShare() {
+    const shareData = { title: 'Ask Shree', text: 'AI-native recruiting tools by Shreesha Narsha', url: 'https://askshree.com' };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch (e) { /* user cancelled — no-op */ }
+    } else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(shareData.url);
+      setShareNote('Link copied');
+      setTimeout(() => setShareNote(''), 2000);
+    }
+  }
 
   useEffect(() => {
     const id = setInterval(() => setHintIndex((i) => (i + 1) % TOOL_NAMES.length), 2200);
@@ -37,8 +54,16 @@ export default function HomePage() {
       <NeuralBackground />
 
       <div className="nav">
-        <div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <div className="logo">Ask <span>Shree</span></div>
+          <span className="mic-badge" title="Voice — coming soon">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="2" width="6" height="12" rx="3" />
+              <path d="M5 11a7 7 0 0 0 14 0" />
+              <line x1="12" y1="18" x2="12" y2="22" />
+              <line x1="8" y1="22" x2="16" y2="22" />
+            </svg>
+          </span>
         </div>
         <div className="nav-right">
           <div className="links" style={{ position: 'relative' }}>
@@ -87,6 +112,26 @@ export default function HomePage() {
               onKeyDown={(e) => e.key === 'Enter' && runQuery()}
             />
             <button className="run" onClick={runQuery}>run query</button>
+          </div>
+
+          <div className="engage-row">
+            <button className={`engage-btn ${liked ? 'liked' : ''}`} onClick={toggleLike}>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill={liked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2 4.8 5.6 4c2-.4 3.9.5 5 2 1.1-1.5 3-2.4 5-2 3.6.8 5 4.4 3.6 7.7-2.5 4.7-10 9.3-10 9.3z" />
+              </svg>
+              Like
+            </button>
+            <button className="engage-btn" onClick={handleShare}>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="18" cy="5" r="3" />
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="18" cy="19" r="3" />
+                <line x1="8.6" y1="10.6" x2="15.4" y2="6.4" />
+                <line x1="8.6" y1="13.4" x2="15.4" y2="17.6" />
+              </svg>
+              Share
+            </button>
+            {shareNote && <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
           </div>
         </div>
       </div>
