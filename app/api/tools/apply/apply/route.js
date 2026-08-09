@@ -22,7 +22,7 @@ export async function POST(req) {
   if (!gate.allowed) {
     return NextResponse.json({ locked: true, message: gate.message }, { status: 402 });
   }
-  await logToolRun(ip, 'job_posting_apply');
+  await logToolRun(ip, 'apply_ai');
 
   const { resumeFile, jobPostingIds, mode, whatsappOptIn, termsAccepted } = await req.json();
   if (!termsAccepted) {

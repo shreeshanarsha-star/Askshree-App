@@ -5,7 +5,7 @@ import { getDomain } from '../../../../../lib/domain';
 // GET because this is what the link in the email actually opens.
 export async function GET(req) {
   const token = new URL(req.url).searchParams.get('token');
-  if (!token) return NextResponse.redirect(new URL('/tools/job-posting-ai?verify=missing_token', req.url));
+  if (!token) return NextResponse.redirect(new URL('/tools/job-postings-ai?verify=missing_token', req.url));
 
   const db = supabaseAdmin();
   const { data: v } = await db
@@ -15,7 +15,7 @@ export async function GET(req) {
     .maybeSingle();
 
   if (!v || v.verified || new Date(v.expires_at) < new Date()) {
-    return NextResponse.redirect(new URL('/tools/job-posting-ai?verify=invalid', req.url));
+    return NextResponse.redirect(new URL('/tools/job-postings-ai?verify=invalid', req.url));
   }
 
   const posterDomain = getDomain(v.email);
@@ -32,5 +32,5 @@ export async function GET(req) {
 
   await db.from('email_verifications').update({ verified: true }).eq('token', token);
 
-  return NextResponse.redirect(new URL('/tools/job-posting-ai?verify=success', req.url));
+  return NextResponse.redirect(new URL('/tools/job-postings-ai?verify=success', req.url));
 }

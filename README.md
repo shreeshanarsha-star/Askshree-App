@@ -1,7 +1,7 @@
 # Ask Shree
 
-AI-native recruiting tools: Job posting.ai (two-sided job board) and the
-Ask Shree chatbot, both with real backends. Smart Source.ai is in progress.
+AI-native recruiting tools: Job Postings.ai (post a role, get a shortlisted CV list by email), Apply.ai (search and apply to open roles), and the
+Ask Shree chatbot, all with real backends. Smart Source.ai is in progress.
 
 ## Setup
 
@@ -24,9 +24,9 @@ Ask Shree chatbot, both with real backends. Smart Source.ai is in progress.
 
 ## What's real vs. still pending
 
-- **Real and working**: Job posting.ai (post, email verification with
-  domain-match check, admin approval, apply/auto-apply, AI screening,
-  capped AI shortlist emailing), Ask Shree chatbot v2 (answers only from
+- **Real and working**: Job Postings.ai (post, email verification with
+  domain-match check, admin approval, capped AI shortlist emailing) and
+  Apply.ai (apply/auto-apply, AI screening against open roles), Ask Shree chatbot v2 (answers only from
   admin-curated `chatbot_sources`, no open web search, every conversation
   logged), admin pages for both, IP-based free-use gating (shared gate for
   seekers/tool usage, separate 3-free-postings gate for employers).

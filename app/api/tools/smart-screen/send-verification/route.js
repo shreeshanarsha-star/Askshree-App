@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { sendEmail } from '../../../../../lib/email';
 
-// Same pattern as Job posting.ai's send-verification, adapted for screening
+// Same pattern as Job Postings.ai's send-verification, adapted for screening
 // batches. This is a non-blocking follow-up (results already exist) — it
 // exists for accountability, since these CVs are recruiter-sourced rather
 // than self-submitted, not to gate the tool itself.

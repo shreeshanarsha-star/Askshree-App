@@ -10,7 +10,7 @@ export default function TermsPage() {
         <div className="eyebrow">Legal</div>
         <h1 className="serif" style={{ fontSize: 24, margin: '8px 0 20px' }}>Terms & Conditions</h1>
         <div style={{ fontSize: 13, color: 'var(--slate)', lineHeight: 1.75 }}>
-          <p>These terms cover your use of Job posting.ai and Smart Source.ai on askshree.com. By posting a job or applying to one, you agree to the following.</p>
+          <p>These terms cover your use of Job Postings.ai, Apply.ai and Smart Source.ai on askshree.com. By posting a job or applying to one, you agree to the following.</p>
 
           <h3 style={{ color: 'var(--cream)', fontFamily: 'Fraunces, serif', fontSize: 15, marginTop: 24 }}>If you're applying to a job</h3>
           <p>You confirm that the CV/resume you upload is your own, or that you have the person's explicit permission to submit it on their behalf. You are responsible for the accuracy of the information you submit. WhatsApp application updates are sent only if you explicitly opt in — we never message a number found on a CV without that consent, regardless of whose CV it is.</p>

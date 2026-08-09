@@ -22,7 +22,7 @@ export async function POST(req) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   const origin = req.headers.get('origin') || 'https://askshree.com';
-  const verifyLink = `${origin}/api/tools/job-posting/verify-email?token=${token}`;
+  const verifyLink = `${origin}/api/tools/job-postings/verify-email?token=${token}`;
 
   const result = await sendEmail({
     to: email,

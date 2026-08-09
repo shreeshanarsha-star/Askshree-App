@@ -86,7 +86,7 @@ export async function POST(req) {
       const p = screen.profile || {};
 
       // Dedupe by exact email/phone match, same v1 approach used by the
-      // Job posting.ai apply flow. Fuzzy matching is a planned refinement.
+      // Apply.ai apply flow. Fuzzy matching is a planned refinement.
       let candidate = null;
       if (p.email || p.phone) {
         const orFilters = [];

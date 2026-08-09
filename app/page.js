@@ -4,12 +4,13 @@ import NeuralBackground from '../components/NeuralBackground';
 import AskShreeChat from '../components/AskShreeChat';
 
 const TOOL_LINKS = {
-  'job posting.ai': '/tools/job-posting-ai',
+  'job postings.ai': '/tools/job-postings-ai',
+  'apply.ai': '/tools/apply-ai',
   'smart source.ai': '/tools/smart-source-ai',
   'smart screen.ai': '/tools/smart-screen-ai',
 };
 const TOOL_NAMES = [
-  'Job posting.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
+  'Job Postings.ai', 'Apply.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
   'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Induction.ai', 'Campus.ai', 'Analytics.ai', 'Dashboard.ai',
 ];
 export default function HomePage() {
@@ -234,7 +235,8 @@ export default function HomePage() {
             </div>
             {recruitOpen && (
               <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
-                <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/job-posting-ai'}>Job posting.ai</span>
+                <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/job-postings-ai'}>Job Postings.ai</span>
+                <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/apply-ai'}>Apply.ai</span>
                 <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-source-ai'}>Smart Source.ai</span>
                 <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-screen-ai'}>Smart screen.ai</span>
                 <span style={{ opacity: 0.45, marginRight: 16 }}>Smart hunt.ai</span>
