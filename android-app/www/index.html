@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Ask Shree</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="splash-fallback" class="splash-fallback">
+    <div class="mark">Ask <span>Shree</span></div>
+    <div class="tag">AI NATIVE TOOLKIT</div>
+  </div>
+
+  <div class="app">
+
+    <!-- HOME VIEW -->
+    <section class="view" id="view-home" data-view>
+      <div class="neural-bg"></div>
+      <div class="topbar">
+        <div class="logo">Ask <span>Shree</span></div>
+        <button class="mic" id="micBtn" aria-label="Voice — coming soon">&#127908;</button>
+      </div>
+      <div class="home-content">
+        <div class="greet" id="greetLine">Good morning</div>
+        <div class="hero-line">Where thought flows <em>like light.</em></div>
+
+        <div class="cmdbar" id="cmdBar">
+          <span class="chev">&gt;</span>
+          <span class="ph">Try: "post a backend role"…</span>
+          <span class="mic-sm">&#127908;</span>
+        </div>
+
+        <div class="riddle-card" id="riddleCard">
+          <span class="spark">&#10024;</span>
+          <div class="riddle-clue" id="riddleClue">&ldquo;I post your job myself and get you a shortlist &mdash; you just enjoy your coffee.&rdquo;</div>
+          <div class="riddle-footer" style="justify-content:flex-end;">
+            <button class="reveal-btn" id="revealBtn">tap to reveal</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOOLS VIEW -->
+    <section class="view hidden" id="view-tools" data-view>
+      <div class="topbar"><div class="logo">Tools</div></div>
+      <iframe class="frame" src="about:blank" data-src="https://askshree.com/#ai-systems" loading="lazy" title="Ask Shree tools"></iframe>
+    </section>
+
+    <!-- CHAT VIEW -->
+    <section class="view hidden" id="view-chat" data-view>
+      <div class="topbar"><div class="logo">Ask <span>Shree</span></div></div>
+      <iframe class="frame" src="about:blank" data-src="https://askshree.com/" loading="lazy" title="Ask Shree chat"></iframe>
+    </section>
+
+    <!-- WRITINGS VIEW -->
+    <section class="view hidden" id="view-writings" data-view>
+      <div class="topbar"><div class="logo">Writings</div></div>
+      <iframe class="frame" src="about:blank" data-src="https://askshree.com/writings/purpose" loading="lazy" title="Ask Shree writings"></iframe>
+    </section>
+
+    <!-- PROFILE VIEW -->
+    <section class="view hidden" id="view-profile" data-view>
+      <div class="topbar"><div class="logo">Profile</div></div>
+      <div class="profile-card">
+        <div class="pc-ring"><img src="https://askshree.com/profile-photo.jpg" alt="Shreesha Narsha"></div>
+        <div class="pc-name">Shreesha Narsha</div>
+        <div class="pc-tags">Head-Global Talent Acquisition &#9679; AI Builder &#9679; Bengaluru</div>
+        <div class="pc-links">
+          <a href="tel:+919606591623">+91 96065 91623</a>
+          <a href="mailto:shreesha.narsha@gmail.com">shreesha.narsha@gmail.com</a>
+          <a href="https://www.linkedin.com/in/shreesha09/" target="_blank" rel="noopener">linkedin.com/in/shreesha09</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottomnav">
+      <button class="navitem active" data-target="view-home"><span class="ic"></span><span>HOME</span></button>
+      <button class="navitem" data-target="view-tools"><span class="ic"></span><span>TOOLS</span></button>
+      <button class="navitem" data-target="view-chat"><span class="ic"></span><span>CHAT</span></button>
+      <button class="navitem" data-target="view-writings"><span class="ic"></span><span>WRITINGS</span></button>
+      <button class="navitem" data-target="view-profile"><span class="ic"></span><span>PROFILE</span></button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

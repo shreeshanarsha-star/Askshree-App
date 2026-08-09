@@ -1,0 +1,18 @@
+{
+  "appId": "com.askshree.app",
+  "appName": "Ask Shree",
+  "webDir": "www",
+  "backgroundColor": "#0B0F1A",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1400,
+      "backgroundColor": "#0B0F1A",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0B0F1A"
+    }
+  }
+}

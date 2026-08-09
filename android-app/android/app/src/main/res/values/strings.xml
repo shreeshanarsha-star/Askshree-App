@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Ask Shree</string>
+    <string name="title_activity_main">Ask Shree</string>
+    <string name="package_name">com.askshree.app</string>
+    <string name="custom_url_scheme">com.askshree.app</string>
+</resources>
