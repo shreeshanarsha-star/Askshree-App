@@ -1,14 +1,17 @@
 # Ask Shree
 
-AI-native recruiting tools: Job Postings.ai (post a role, get a shortlisted CV list by email), Apply.ai (search and apply to open roles), and the
-Ask Shree chatbot, all with real backends. Smart Source.ai is in progress.
+AI-native recruiting tools: Job Postings.ai (post a role, get a shortlisted CV list by email), Apply.ai (search and apply to open roles),
+Smart screen.ai (batch-screen CVs against a JD), Assessment.ai (assign Big Five / PULSE&trade; / IMPACT&trade; psychometric assessments from a CV
+and get a scored breakdown), and the Ask Shree chatbot, all with real backends. Smart Source.ai is in progress.
 
 ## Setup
 
 1. **Database** — this repo's `supabase/schema.sql` reflects the historical
    base tables; the newer tables (`job_postings`, `applications`,
    `candidates`, `job_posting_usage`, `chatbot_sources`, `chat_logs`,
-   `email_verifications`) were added directly via migration and already
+   `email_verifications`, `screening_batches`, `screening_results`,
+   `assessment_usage`, `assessment_assignments`, `assessment_responses`,
+   `assessment_results`) were added directly via migration and already
    exist on the connected Supabase project.
 2. **Environment variables** (Vercel → Settings → Environment Variables):
    `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
@@ -29,7 +32,13 @@ Ask Shree chatbot, all with real backends. Smart Source.ai is in progress.
   Apply.ai (apply/auto-apply, AI screening against open roles), Ask Shree chatbot v2 (answers only from
   admin-curated `chatbot_sources`, no open web search, every conversation
   logged), admin pages for both, IP-based free-use gating (shared gate for
-  seekers/tool usage, separate 3-free-postings gate for employers).
+  seekers/tool usage, separate 3-free-postings gate for employers, separate
+  3-free-assignments gate for Assessment.ai), and Assessment.ai (CV upload ->
+  AI-extracted role/email/contact with per-field Auto/Manual override,
+  candidate de-dup against the existing `candidates` table, tokenised
+  candidate link, randomised untimed 50/90-item assessment, one attempt per
+  link enforced server-side, weighted scoring with cached AI narrative on the
+  recruiter's result view).
 - **Still pending**: Google OAuth login for end users once the free-use
   limit is hit (needs a Google Cloud OAuth client to be configured),
   Smart Source.ai's real backend (needs Serper + SignalHire API keys),
