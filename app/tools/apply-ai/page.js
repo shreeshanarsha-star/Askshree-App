@@ -80,9 +80,8 @@ export default function ApplyAI() {
       <div style={{ padding: '44px 56px 80px', maxWidth: 920, margin: '0 auto' }}>
         <div className="eyebrow">Recruit.ai</div>
         <h1 className="serif" style={{ fontSize: 26, color: 'var(--cream)', margin: '8px 0 12px' }}>Apply.ai</h1>
-        <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 560, marginBottom: 28 }}>
-          Find and apply to a role, free — AI matches your CV against open listings and applies on your behalf, or you pick the ones you want.
-          Looking to post a job instead? That's <a href="/tools/job-postings-ai" style={{ color: 'var(--amber-dim)' }}>Job Postings.ai</a>.
+        <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 560, marginBottom: 28, textAlign: 'justify' }}>
+          Search and apply to a role, free — AI matches your CV against open listings and applies on your behalf, or you pick the ones you want.
         </p>
 
         <div className="jp-panel active">
@@ -98,11 +97,11 @@ export default function ApplyAI() {
             onChange={(e) => setResumeFile(e.target.files[0])} />
           <div className="file-hint">Your CV also joins our passive matching pool for future roles.</div>
 
-          <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 11.5, color: 'var(--slate)', marginTop: 10, cursor: 'pointer' }}>
+          <TermsCheckbox checked={applyTermsAccepted} onChange={setApplyTermsAccepted} />
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 11.5, color: 'var(--slate)', marginTop: 8, cursor: 'pointer' }}>
             <input type="checkbox" checked={whatsappOptIn} onChange={(e) => setWhatsappOptIn(e.target.checked)} style={{ marginTop: 2 }} />
             <span>Send me application updates via WhatsApp, if a number is found on this CV (optional — off by default).</span>
           </label>
-          <TermsCheckbox checked={applyTermsAccepted} onChange={setApplyTermsAccepted} />
 
           {subMode === 'auto' && (
             <>
