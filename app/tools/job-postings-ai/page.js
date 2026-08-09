@@ -109,7 +109,7 @@ export default function JobPostingsAI() {
       <div style={{ padding: '44px 56px 80px', maxWidth: 920, margin: '0 auto' }}>
         <div className="eyebrow">Recruit.ai</div>
         <h1 className="serif" style={{ fontSize: 26, color: 'var(--cream)', margin: '8px 0 12px' }}>Job Postings.ai</h1>
-        <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 560, marginBottom: 28 }}>
+        <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 560, marginBottom: 28, textAlign: 'justify' }}>
           Post a role for free. AI structures the listing, screens everyone who applies, and emails you a shortlist of only the genuinely qualifying candidates — nothing else to manage. Every posting is reviewed by admin before it goes live.
           Looking to apply to a job instead? That's <a href="/tools/apply-ai" style={{ color: 'var(--amber-dim)' }}>Apply.ai</a>.
         </p>
