@@ -10,7 +10,27 @@
     // lazy-load the iframe for this tab only once, the first time it's opened
     var view = document.getElementById(targetId);
     var frame = view && view.querySelector('iframe.frame');
+    var loadingEl = view && view.querySelector('.frame-loading');
     if (frame && frame.dataset.src && frame.src === 'about:blank') {
+      var timeoutId = setTimeout(function () {
+        if (loadingEl) {
+          loadingEl.innerHTML = '<span class="err">Taking longer than expected to reach askshree.com.<br>Check your connection and reopen this tab.</span>';
+        }
+      }, 12000);
+
+      frame.addEventListener('load', function onLoad() {
+        clearTimeout(timeoutId);
+        if (loadingEl) loadingEl.classList.add('hide');
+        frame.removeEventListener('load', onLoad);
+      });
+      frame.addEventListener('error', function onErr() {
+        clearTimeout(timeoutId);
+        if (loadingEl) {
+          loadingEl.innerHTML = '<span class="err">Could not load askshree.com.<br>Check your internet connection.</span>';
+        }
+        frame.removeEventListener('error', onErr);
+      });
+
       frame.src = frame.dataset.src;
     }
   }

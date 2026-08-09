@@ -26,12 +26,12 @@ button{font-family:inherit; background:none; border:none; cursor:pointer;}
 .mic{width:32px; height:32px; border-radius:50%; border:1px solid var(--amber-dim); color:var(--amber); font-size:14px; display:flex; align-items:center; justify-content:center;}
 
 .neural-bg{
-  position:absolute; inset:0; z-index:0; opacity:.5;
+  position:absolute; inset:0; z-index:0; opacity:.5; pointer-events:none;
   background-image:radial-gradient(rgba(232,163,61,.35) 1px, transparent 1.4px),
                     radial-gradient(rgba(237,232,220,.14) 1px, transparent 1.4px);
   background-size:34px 34px, 22px 22px; background-position:0 0, 11px 17px;
 }
-.home-content{flex:1; overflow:auto; padding:4px 20px 20px; position:relative; z-index:1; display:flex; flex-direction:column;}
+.home-content{flex:1; overflow:auto; padding:4px 20px 20px; position:relative; z-index:1; display:flex; flex-direction:column; justify-content:center; gap:2px;}
 .greet{font-size:12px; color:var(--slate); margin-bottom:4px;}
 .hero-line{font-family:'Fraunces',serif; font-size:19px; color:var(--cream); line-height:1.4; margin:6px 0 20px;}
 .hero-line em{color:var(--amber); font-style:italic;}
@@ -62,3 +62,12 @@ button{font-family:inherit; background:none; border:none; cursor:pointer;}
 .navitem.active{color:var(--amber);}
 .navitem .ic{width:18px; height:18px; border-radius:5px; border:1.4px solid currentColor;}
 .navitem span:last-child{font-family:'IBM Plex Mono',monospace; font-size:9px;}
+
+
+.frame-wrap{flex:1; position:relative; display:flex;}
+.frame-loading{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+  background:var(--navy); color:var(--slate); font-family:'IBM Plex Mono',monospace; font-size:11px; z-index:0;
+}
+.frame-loading.hide{display:none;}
+.frame-loading .err{color:var(--amber); text-align:center; padding:0 30px; line-height:1.6;}
