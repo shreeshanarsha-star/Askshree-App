@@ -401,9 +401,15 @@ export default function OfferAI() {
 
               <div className="as-field">
                 <div className="as-field-head"><label>Hike % (drives the proposed figures below)</label></div>
-                <input type="number" placeholder="e.g. 20" value={hikePercent}
-                  onChange={(e) => setHikePercent(e.target.value)}
-                  onBlur={() => recalc(components, hikePercent)} />
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <input type="number" placeholder="e.g. 20" value={hikePercent} style={{ flex: 1 }}
+                    onChange={(e) => setHikePercent(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') recalc(components, hikePercent); }} />
+                  <button className="primary-btn" style={{ marginTop: 0, whiteSpace: 'nowrap' }}
+                    onClick={() => recalc(components, hikePercent)} disabled={recalculating || hikePercent === ''}>
+                    {recalculating ? 'Calculating…' : 'Calculate'}
+                  </button>
+                </div>
                 <div className="as-note">Applies to every "Auto" row — rows you've set to Manual are left exactly as you entered them.</div>
               </div>
 
