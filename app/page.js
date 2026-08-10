@@ -101,7 +101,10 @@ export default function HomePage() {
 
       <div className="nav">
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div className="logo">Ask <span>Shree</span></div>
+          <div className="logo-wrap">
+            <div className="logo">Ask <span>Shree</span></div>
+            <div className="logo-tooltip">I fall, but I still stand up and show up!</div>
+          </div>
           <span className="mic-badge" title="Voice — coming soon">
             <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <rect x="9" y="2" width="6" height="12" rx="3" />
@@ -329,7 +332,7 @@ export default function HomePage() {
             </div>
             {financeOpen && (
               <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
-                <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/admin/margin-ai'}>Margin.ai</span>
+                <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/margin-ai'}>Margin.ai</span>
               </div>
             )}
           </div>
