@@ -22,31 +22,6 @@ function money(n) {
   return Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 }
 
-// A single upload slot — one document type, click or drop to attach.
-function DocSlot({ label, sub, hint, file, onChange, multiple }) {
-  const inputId = `doc-${label.replace(/\s+/g, '-').toLowerCase()}`;
-  const hasFile = multiple ? (file && file.length > 0) : !!file;
-  return (
-    <div style={{ marginBottom: 12 }}>
-      <div className="dropzone" onClick={() => document.getElementById(inputId).click()}>
-        {hasFile ? (
-          <span style={{ color: 'var(--amber)' }}>
-            {multiple ? `✓ ${file.length} file${file.length > 1 ? 's' : ''} selected` : `✓ ${file.name}`}
-          </span>
-        ) : (
-          <>
-            <b style={{ color: 'var(--cream)' }}>{label}</b>
-            {sub && <div style={{ marginTop: 4, fontSize: 11.5 }}>{sub}</div>}
-          </>
-        )}
-      </div>
-      <input id={inputId} type="file" multiple={!!multiple} accept=".pdf,.doc,.docx,.txt" style={{ display: 'none' }}
-        onChange={(e) => onChange(multiple ? Array.from(e.target.files) : e.target.files[0])} />
-      {hint && <div className="file-hint">{hint}</div>}
-    </div>
-  );
-}
-
 // The Auto/Manual field pattern from Assessment.ai — Auto shows what AI read
 // from the documents, Manual opens the editable form underneath it.
 function AutoManualField({ label, mode, setMode, autoDisplay, children, note }) {
@@ -73,11 +48,23 @@ export default function OfferAI() {
   const [tab, setTab] = useState('new');
 
   // --- Upload ---
-  const [slots, setSlots] = useState({ cv: null, appointment_letter: null, payslip: [], education: [], jd: null, budget: null });
+  const [files, setFiles] = useState([]); // File[] — one dropzone, AI sorts them
   const [extracting, setExtracting] = useState(false);
   const [extractNote, setExtractNote] = useState('');
   const [proposalId, setProposalId] = useState(null);
   const [documents, setDocuments] = useState([]);
+  const [docListOpen, setDocListOpen] = useState(false);
+  const STATUS_STEPS = [
+    'Documents detected',
+    'Analysing the CV',
+    'Analysing the payslips',
+    'Analysing the appointment letter',
+    'Analysing the educational documents',
+    'Analysing the job description & budget approval',
+    'Candidate identified',
+  ];
+  const [statusStep, setStatusStep] = useState(-1); // -1 = not started, STATUS_STEPS.length = all done
+  const [identified, setIdentified] = useState(null); // { name, role } once known
 
   // --- Candidate details ---
   const [candMode, setCandMode] = useState('auto');
@@ -118,29 +105,51 @@ export default function OfferAI() {
   const hikeCtc = totals.totalCtcCurrent && totals.totalCtcProposed
     ? (((totals.totalCtcProposed - totals.totalCtcCurrent) / totals.totalCtcCurrent) * 100).toFixed(1) : null;
 
-  async function runExtract() {
-    const files = [];
-    if (slots.cv) files.push({ docType: 'cv', ...(await fileMeta(slots.cv)) });
-    if (slots.appointment_letter) files.push({ docType: 'appointment_letter', ...(await fileMeta(slots.appointment_letter)) });
-    if (slots.jd) files.push({ docType: 'jd', ...(await fileMeta(slots.jd)) });
-    if (slots.budget) files.push({ docType: 'budget', ...(await fileMeta(slots.budget)) });
-    for (const f of slots.payslip) files.push({ docType: 'payslip', ...(await fileMeta(f)) });
-    for (const f of slots.education) files.push({ docType: 'education', ...(await fileMeta(f)) });
+  function addFiles(newFiles) {
+    setFiles((f) => [...f, ...newFiles]);
+  }
+  function removeFile(idx) {
+    setFiles((f) => f.filter((_, i) => i !== idx));
+  }
 
+  async function runExtract() {
     if (!files.length) { setExtractNote('Upload at least one document.'); return; }
     setExtracting(true);
-    setExtractNote('Reading the documents and identifying the candidate…');
+    setExtractNote('');
+    setStatusStep(0);
+
+    // Staggered status reveal — same beat as the approved mockup. Runs
+    // alongside the real request rather than gating on it, so it always
+    // finishes at a natural pace regardless of how fast AI responds.
+    let cancelled = false;
+    const stepTimer = (async () => {
+      for (let i = 1; i < STATUS_STEPS.length - 1; i++) {
+        await new Promise((r) => setTimeout(r, 550));
+        if (!cancelled) setStatusStep(i);
+      }
+    })();
+
     try {
+      const payload = await Promise.all(files.map(async (file) => {
+        const base64 = await fileToBase64(file);
+        return { base64, mimeType: file.type, fileName: file.name };
+      }));
       const res = await fetch('/api/tools/offer/extract', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ files }),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ files: payload }),
       });
       const data = await res.json();
-      if (data.locked) { setExtractNote(data.message); setExtracting(false); return; }
-      if (data.error) { setExtractNote(data.error); setExtracting(false); return; }
+      cancelled = true;
+      await stepTimer;
+
+      if (data.locked) { setExtractNote(data.message); setExtracting(false); setStatusStep(-1); return; }
+      if (data.error) { setExtractNote(data.error); setExtracting(false); setStatusStep(-1); return; }
+
+      setStatusStep(STATUS_STEPS.length); // all done
 
       setProposalId(data.proposalId);
       setDocuments(data.documents || []);
       const e = data.extracted || {};
+      setIdentified({ name: e.candidate_name || 'Candidate', role: e.proposed_designation || e.role_title || 'the role' });
       setCand({
         candidate_name: e.candidate_name || '', current_designation: e.current_designation || '',
         proposed_designation: e.proposed_designation || '', grade: e.grade || '', division: e.division || '',
@@ -151,18 +160,15 @@ export default function OfferAI() {
       setComponents((e.components || []).map((c) => ({ ...c, mode: 'auto' })));
       setExtractNote(
         data.existingCandidate
-          ? 'Read. This candidate is already in your database — attaching to their existing record.'
-          : 'Read. New candidate added to your database.'
+          ? 'This candidate is already in your database — attaching to their existing record.'
+          : 'New candidate added to your database.'
       );
     } catch {
+      cancelled = true;
       setExtractNote('Something went wrong reading those documents.');
+      setStatusStep(-1);
     }
     setExtracting(false);
-  }
-
-  async function fileMeta(file) {
-    const base64 = await fileToBase64(file);
-    return { base64, mimeType: file.type, fileName: file.name };
   }
 
   async function saveField(patch) {
@@ -279,31 +285,71 @@ export default function OfferAI() {
         <div className={`jp-panel ${tab === 'new' ? 'active' : ''}`}>
           {!proposalId && (
             <>
-              <DocSlot label="CV" sub="Click to upload — PDF or Word" file={slots.cv} onChange={(f) => setSlots((s) => ({ ...s, cv: f }))} />
-              <DocSlot label="Previous appointment letter" sub="Click to upload — PDF or Word" file={slots.appointment_letter} onChange={(f) => setSlots((s) => ({ ...s, appointment_letter: f }))} />
-              <DocSlot label="Payslip(s)" sub="Click to upload — one or more" multiple file={slots.payslip} onChange={(f) => setSlots((s) => ({ ...s, payslip: f }))}
-                hint="Upload the most recent one at least — AI reads every component on it." />
-              <DocSlot label="Education certificates (optional)" sub="Click to upload — one or more" multiple file={slots.education} onChange={(f) => setSlots((s) => ({ ...s, education: f }))} />
-              <DocSlot label="Job description" sub="Click to upload — PDF or Word" file={slots.jd} onChange={(f) => setSlots((s) => ({ ...s, jd: f }))} />
-              <DocSlot label="Budget approval" sub="Click to upload — PDF or Word" file={slots.budget} onChange={(f) => setSlots((s) => ({ ...s, budget: f }))}
-                hint="PDF or Word only for now — a spreadsheet upload here gets flagged for you to confirm the budget band manually." />
-              <button className="primary-btn" onClick={runExtract} disabled={extracting}>
-                {extracting ? 'Reading…' : 'Analyze documents'}
+              <div className="field-label" style={{ margin: '0 0 8px' }}>Documents</div>
+              <div className="dropzone" onClick={() => document.getElementById('offer-file-input').click()}>
+                Drag &amp; drop files, or <b style={{ color: 'var(--cream)' }}>browse</b> · appointment letter, payslips, education certificates, CV, JD, budget approval — any order, AI sorts them
+              </div>
+              <input id="offer-file-input" type="file" multiple accept=".pdf,.doc,.docx,.txt" style={{ display: 'none' }}
+                onChange={(e) => { addFiles(Array.from(e.target.files)); e.target.value = ''; }} />
+
+              {files.length > 0 && (
+                <div className="doc-summary" onClick={() => setDocListOpen((o) => !o)}>
+                  <span>{files.length} file{files.length > 1 ? 's' : ''} selected — {files.map((f) => f.name).join(', ')}</span>
+                  <span className="doc-toggle">{docListOpen ? 'Hide files ▴' : 'Show files ▾'}</span>
+                </div>
+              )}
+              {docListOpen && files.length > 0 && (
+                <div className="doc-list">
+                  {files.map((f, i) => (
+                    <div className="doc-row" key={i}>
+                      <span className="dicon">{(f.name.split('.').pop() || 'file').slice(0, 3)}</span>
+                      <span className="dname">{f.name}</span>
+                      <span className="view-link" style={{ cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)' }} onClick={(e) => { e.stopPropagation(); removeFile(i); }}>✕ Remove</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button className="primary-btn" onClick={runExtract} disabled={extracting || !files.length}>
+                {extracting ? 'Analysing…' : 'Analyze documents'}
               </button>
+
+              {statusStep >= 0 && (
+                <div className="status-log">
+                  {STATUS_STEPS.map((label, i) => {
+                    const isLast = i === STATUS_STEPS.length - 1;
+                    const cls = statusStep > i || (isLast && statusStep >= STATUS_STEPS.length) ? 'done' : statusStep === i ? 'active' : '';
+                    const text = isLast && identified ? <>Candidate identified: <b>{identified.name}</b> — applied for <b>{identified.role}</b></> : label;
+                    return <div className={`status-row ${cls}`} key={i}><span className="sdot"></span> {text}</div>;
+                  })}
+                </div>
+              )}
               {extractNote && <div className="file-hint" style={{ marginTop: 12 }}>{extractNote}</div>}
             </>
           )}
 
           {proposalId && (
-            <div style={{ marginTop: extractNote ? 0 : 8 }}>
-              {extractNote && <div className="file-hint" style={{ marginBottom: 18 }}>{extractNote}</div>}
+            <div style={{ marginTop: 8 }}>
+              {identified && (
+                <div className="offer-ai-identified">
+                  <b>{identified.name}</b> — applied for {identified.role}
+                </div>
+              )}
+              {extractNote && <div className="file-hint" style={{ marginTop: 10, marginBottom: 8 }}>{extractNote}</div>}
 
               {documents.length > 0 && (
-                <div style={{ marginBottom: 18 }}>
+                <div className="doc-summary" onClick={() => setDocListOpen((o) => !o)} style={{ marginTop: 14 }}>
+                  <span>{documents.length} document{documents.length > 1 ? 's' : ''} uploaded — {Object.entries(documents.reduce((m, d) => ({ ...m, [d.docType]: (m[d.docType] || 0) + 1 }), {})).map(([t, n]) => `${t}${n > 1 ? ` (${n})` : ''}`).join(', ')}</span>
+                  <span className="doc-toggle">{docListOpen ? 'Hide files ▴' : 'Show files ▾'}</span>
+                </div>
+              )}
+              {docListOpen && (
+                <div className="doc-list">
                   {documents.map((d, i) => (
-                    <div className="doc-chip-row" key={i}>
-                      <span>{d.fileName || d.docType}</span>
-                      <span className={`dtype ${d.needsReview ? 'review' : ''}`}>{d.needsReview ? `${d.docType} — confirm?` : d.docType}</span>
+                    <div className="doc-row" key={i}>
+                      <span className="dicon">{d.docType.slice(0, 3)}</span>
+                      <span className="dname">{d.fileName || d.docType}</span>
+                      <span className={`dtype ${d.needsReview ? 'needs-review' : ''}`}>{d.needsReview ? `${d.docType} — confirm?` : d.docType}</span>
                     </div>
                   ))}
                 </div>

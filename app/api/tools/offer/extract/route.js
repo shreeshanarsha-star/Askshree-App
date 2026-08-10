@@ -3,7 +3,7 @@ import { getClientIp, logToolRun } from '../../../../../lib/gating';
 import { checkAndRecordOfferUsage } from '../../../../../lib/offerGating';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { extractText } from '../../../../../lib/extractText';
-import { extractOfferDocuments } from '../../../../../lib/offerAI';
+import { extractOfferDocuments, classifyOfferDocuments } from '../../../../../lib/offerAI';
 
 const SUPPORTED_MIME = new Set([
   'application/pdf',
@@ -12,11 +12,11 @@ const SUPPORTED_MIME = new Set([
   'text/plain',
 ]);
 
-// Recruiter uploads everything they have on one candidate (appointment letter,
-// payslip(s), education certs, CV, JD, budget approval). We extract text from
-// whatever we can read (pdf/word/txt — spreadsheets like a .xlsx budget aren't
-// parsed, they're flagged needs_review instead), hand the combined text to AI,
-// and create a draft proposal the recruiter builds on from here.
+// Recruiter drags in everything they have on one candidate — appointment
+// letter, payslip(s), education certs, CV, JD, budget approval, any order.
+// We extract whatever text we can read, ask AI to sort each file into a doc
+// type (no manual tagging from the recruiter), then hand the combined text
+// to AI for the actual candidate/comp extraction and create a draft proposal.
 export async function POST(req) {
   const ip = getClientIp(req);
   const gate = await checkAndRecordOfferUsage(ip);
@@ -30,10 +30,8 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Upload at least one document.' }, { status: 400 });
   }
 
-  const db = supabaseAdmin();
-  const docTexts = { cv: '', appointmentLetter: '', payslip: '', jd: '', budget: '' };
-  const docRecords = [];
-
+  // Pass 1 — read whatever text we can from each file.
+  const readFiles = [];
   for (const f of files) {
     const supported = SUPPORTED_MIME.has(f.mimeType);
     let text = '';
@@ -45,17 +43,28 @@ export async function POST(req) {
         needsReview = true;
       }
     }
-    const key = {
-      cv: 'cv',
-      appointment_letter: 'appointmentLetter',
-      payslip: 'payslip',
-      jd: 'jd',
-      budget: 'budget',
-    }[f.docType];
-    if (key && text) docTexts[key] += (docTexts[key] ? '\n\n---\n\n' : '') + text;
-
-    docRecords.push({ doc_type: f.docType || 'other', file_name: f.fileName || null, extracted_text: text || null, needs_review: needsReview });
+    readFiles.push({ fileName: f.fileName || 'file', text, needsReview });
   }
+
+  // Pass 2 — AI sorts every file into a doc type, so the recruiter never has
+  // to tag anything themselves.
+  let classified;
+  try {
+    classified = await classifyOfferDocuments(readFiles.map((f) => ({ fileName: f.fileName, text: f.text })));
+  } catch {
+    classified = readFiles.map((f) => ({ fileName: f.fileName, docType: 'other' }));
+  }
+
+  const db = supabaseAdmin();
+  const docTexts = { cv: '', appointmentLetter: '', payslip: '', jd: '', budget: '' };
+  const docRecords = [];
+
+  readFiles.forEach((f, i) => {
+    const docType = classified[i]?.docType || 'other';
+    const key = { cv: 'cv', appointment_letter: 'appointmentLetter', payslip: 'payslip', jd: 'jd', budget: 'budget' }[docType];
+    if (key && f.text) docTexts[key] += (docTexts[key] ? '\n\n---\n\n' : '') + f.text;
+    docRecords.push({ doc_type: docType, file_name: f.fileName, extracted_text: f.text || null, needs_review: f.needsReview });
+  });
 
   let extracted;
   try {
@@ -115,6 +124,9 @@ export async function POST(req) {
 
   await logToolRun(ip, 'offer-ai');
 
+  const typeCounts = {};
+  docRecords.forEach((d) => { typeCounts[d.doc_type] = (typeCounts[d.doc_type] || 0) + 1; });
+
   return NextResponse.json({
     ok: true,
     proposalId: proposal.id,
@@ -122,5 +134,6 @@ export async function POST(req) {
     existingCandidate,
     extracted,
     documents: docRecords.map((d) => ({ docType: d.doc_type, fileName: d.file_name, needsReview: d.needs_review })),
+    typeCounts,
   });
 }
