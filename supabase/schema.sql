@@ -128,3 +128,85 @@ alter table assessment_usage enable row level security;
 alter table assessment_assignments enable row level security;
 alter table assessment_responses enable row level security;
 alter table assessment_results enable row level security;
+
+-- ---------------------------------------------------------------------------
+-- Offer.ai — document-upload -> AI proposal -> sequential approval -> download.
+-- Already applied to the connected Supabase project via migration
+-- `offer_ai_tables`; kept here so the repo reflects the real schema.
+-- Letter generation / candidate e-sign are parked for a later phase.
+-- ---------------------------------------------------------------------------
+
+create table if not exists offer_usage (
+  id uuid primary key default gen_random_uuid(),
+  ip_address text not null unique,
+  create_count int not null default 0,
+  status text not null default 'free',
+  last_created_at timestamptz not null default now()
+);
+create index if not exists idx_offer_usage_ip on offer_usage(ip_address);
+
+create table if not exists offer_proposals (
+  id uuid primary key default gen_random_uuid(),
+  candidate_id uuid references candidates(id),
+  candidate_name text,
+  current_designation text,
+  proposed_designation text,
+  grade text,
+  division text,
+  department text,
+  notice_period text,
+  tentative_joining_date text,
+  currency text not null default 'INR',
+  hike_percent numeric,
+  components jsonb not null default '[]'::jsonb,
+  gross_current numeric,
+  gross_proposed numeric,
+  total_ctc_current numeric,
+  total_ctc_proposed numeric,
+  other_benefits text,
+  justification text,
+  justification_chat jsonb not null default '[]'::jsonb,
+  budget_band text,
+  role_title text,
+  job_role text,
+  recruiter_email text,
+  status text not null default 'draft',
+  current_approval_step int not null default 0,
+  ip_address text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists idx_offer_proposals_recruiter on offer_proposals(recruiter_email);
+create index if not exists idx_offer_proposals_status on offer_proposals(status);
+create index if not exists idx_offer_proposals_candidate on offer_proposals(candidate_id);
+
+create table if not exists offer_documents (
+  id uuid primary key default gen_random_uuid(),
+  proposal_id uuid not null references offer_proposals(id) on delete cascade,
+  doc_type text not null,
+  file_name text,
+  extracted_text text,
+  needs_review boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_offer_documents_proposal on offer_documents(proposal_id);
+
+create table if not exists offer_approvals (
+  id uuid primary key default gen_random_uuid(),
+  proposal_id uuid not null references offer_proposals(id) on delete cascade,
+  sequence_order int not null,
+  approver_email text not null,
+  token text not null unique,
+  status text not null default 'pending',
+  comment text,
+  decided_at timestamptz,
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_offer_approvals_proposal on offer_approvals(proposal_id);
+create index if not exists idx_offer_approvals_token on offer_approvals(token);
+
+alter table offer_usage enable row level security;
+alter table offer_proposals enable row level security;
+alter table offer_documents enable row level security;
+alter table offer_approvals enable row level security;

@@ -242,7 +242,7 @@ export default function HomePage() {
                 <span style={{ opacity: 0.45, marginRight: 16 }}>Smart hunt.ai</span>
                 <span style={{ opacity: 0.45, marginRight: 16 }}>Interview.ai</span>
                 <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/assessment-ai'}>Assessment.ai</span>
-                <span style={{ opacity: 0.45, marginRight: 16 }}>Offer.ai</span>
+                <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/offer-ai'}>Offer.ai</span>
                 <span style={{ opacity: 0.45, marginRight: 16 }}>Refer.ai</span>
                 <span style={{ opacity: 0.45, marginRight: 16 }}>Onboard.ai</span>
                 <span style={{ opacity: 0.45, marginRight: 16 }}>Induction.ai</span>
