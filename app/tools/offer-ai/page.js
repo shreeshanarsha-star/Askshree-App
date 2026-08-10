@@ -23,12 +23,22 @@ function money(n) {
 }
 
 // A single upload slot — one document type, click or drop to attach.
-function DocSlot({ label, hint, file, onChange, multiple }) {
+function DocSlot({ label, sub, hint, file, onChange, multiple }) {
   const inputId = `doc-${label.replace(/\s+/g, '-').toLowerCase()}`;
+  const hasFile = multiple ? (file && file.length > 0) : !!file;
   return (
     <div style={{ marginBottom: 12 }}>
       <div className="dropzone" onClick={() => document.getElementById(inputId).click()}>
-        {file ? (multiple ? `${file.length} file(s) selected` : file.name) : label}
+        {hasFile ? (
+          <span style={{ color: 'var(--amber)' }}>
+            {multiple ? `✓ ${file.length} file${file.length > 1 ? 's' : ''} selected` : `✓ ${file.name}`}
+          </span>
+        ) : (
+          <>
+            <b style={{ color: 'var(--cream)' }}>{label}</b>
+            {sub && <div style={{ marginTop: 4, fontSize: 11.5 }}>{sub}</div>}
+          </>
+        )}
       </div>
       <input id={inputId} type="file" multiple={!!multiple} accept=".pdf,.doc,.docx,.txt" style={{ display: 'none' }}
         onChange={(e) => onChange(multiple ? Array.from(e.target.files) : e.target.files[0])} />
@@ -269,13 +279,13 @@ export default function OfferAI() {
         <div className={`jp-panel ${tab === 'new' ? 'active' : ''}`}>
           {!proposalId && (
             <>
-              <DocSlot label="CV" file={slots.cv} onChange={(f) => setSlots((s) => ({ ...s, cv: f }))} />
-              <DocSlot label="Previous appointment letter" file={slots.appointment_letter} onChange={(f) => setSlots((s) => ({ ...s, appointment_letter: f }))} />
-              <DocSlot label="Payslip(s)" multiple file={slots.payslip} onChange={(f) => setSlots((s) => ({ ...s, payslip: f }))}
+              <DocSlot label="CV" sub="Click to upload — PDF or Word" file={slots.cv} onChange={(f) => setSlots((s) => ({ ...s, cv: f }))} />
+              <DocSlot label="Previous appointment letter" sub="Click to upload — PDF or Word" file={slots.appointment_letter} onChange={(f) => setSlots((s) => ({ ...s, appointment_letter: f }))} />
+              <DocSlot label="Payslip(s)" sub="Click to upload — one or more" multiple file={slots.payslip} onChange={(f) => setSlots((s) => ({ ...s, payslip: f }))}
                 hint="Upload the most recent one at least — AI reads every component on it." />
-              <DocSlot label="Education certificates (optional)" multiple file={slots.education} onChange={(f) => setSlots((s) => ({ ...s, education: f }))} />
-              <DocSlot label="Job description" file={slots.jd} onChange={(f) => setSlots((s) => ({ ...s, jd: f }))} />
-              <DocSlot label="Budget approval" file={slots.budget} onChange={(f) => setSlots((s) => ({ ...s, budget: f }))}
+              <DocSlot label="Education certificates (optional)" sub="Click to upload — one or more" multiple file={slots.education} onChange={(f) => setSlots((s) => ({ ...s, education: f }))} />
+              <DocSlot label="Job description" sub="Click to upload — PDF or Word" file={slots.jd} onChange={(f) => setSlots((s) => ({ ...s, jd: f }))} />
+              <DocSlot label="Budget approval" sub="Click to upload — PDF or Word" file={slots.budget} onChange={(f) => setSlots((s) => ({ ...s, budget: f }))}
                 hint="PDF or Word only for now — a spreadsheet upload here gets flagged for you to confirm the budget band manually." />
               <button className="primary-btn" onClick={runExtract} disabled={extracting}>
                 {extracting ? 'Reading…' : 'Analyze documents'}
