@@ -210,3 +210,58 @@ alter table offer_usage enable row level security;
 alter table offer_proposals enable row level security;
 alter table offer_documents enable row level security;
 alter table offer_approvals enable row level security;
+
+-- ---------------------------------------------------------------------------
+-- Margin.ai — real-time margin leak detection (Finance.ai). CEO-only, gated
+-- via the existing admin Supabase Auth. Single-company internal tool,
+-- record-only actions (nothing auto-executes). Applied via migration
+-- `margin_ai_tables`.
+-- ---------------------------------------------------------------------------
+
+create table if not exists margin_uploads (
+  id uuid primary key default gen_random_uuid(),
+  source_label text,
+  sales_row_count int,
+  cost_row_count int,
+  status text not null default 'processing',
+  error_message text,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists margin_products (
+  id uuid primary key default gen_random_uuid(),
+  product_name text not null,
+  customer_name text,
+  category text,
+  revenue_monthly numeric,
+  cost_monthly numeric,
+  margin_pct numeric,
+  prev_margin_pct numeric,
+  cost_breakdown jsonb not null default '[]'::jsonb,
+  root_cause text,
+  status text not null default 'healthy',
+  first_flagged_at timestamptz,
+  last_upload_id uuid references margin_uploads(id),
+  updated_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  unique(product_name, customer_name)
+);
+create index if not exists idx_margin_products_status on margin_products(status);
+
+create table if not exists margin_recommendations (
+  id uuid primary key default gen_random_uuid(),
+  product_id uuid not null references margin_products(id) on delete cascade,
+  recommendation_text text,
+  action_type text,
+  expected_impact_monthly numeric,
+  status text not null default 'pending',
+  decided_at timestamptz,
+  decided_by text,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_margin_rec_product on margin_recommendations(product_id);
+create index if not exists idx_margin_rec_status on margin_recommendations(status);
+
+alter table margin_uploads enable row level security;
+alter table margin_products enable row level security;
+alter table margin_recommendations enable row level security;

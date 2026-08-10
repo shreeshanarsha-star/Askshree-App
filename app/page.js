@@ -18,6 +18,7 @@ export default function HomePage() {
   const [hintIndex, setHintIndex] = useState(0);
   const [recruitOpen, setRecruitOpen] = useState(false);
   const [marketOpen, setMarketOpen] = useState(false);
+  const [financeOpen, setFinanceOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [writingsOpen, setWritingsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -307,7 +308,33 @@ export default function HomePage() {
           {[
             ['E', 'Learn.ai'],
             ['F', 'Rewards.ai'],
-            ['G', 'Finance.ai'],
+          ].map(([letter, name]) => (
+            <div className="ai-group" key={letter}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span className="ai-badge">{letter}</span>
+                  <span className="ai-name">{name}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <div className="ai-group">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setFinanceOpen((o) => !o)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span className="ai-badge">G</span>
+                <span className="ai-name">Finance.ai</span>
+              </div>
+              <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{financeOpen ? '▾' : '▸'}</span>
+            </div>
+            {financeOpen && (
+              <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
+                <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/admin/margin-ai'}>Margin.ai</span>
+              </div>
+            )}
+          </div>
+
+          {[
             ['H', 'Brand.ai'],
             ['I', 'Sales.ai'],
             ['J', 'Research.ai'],

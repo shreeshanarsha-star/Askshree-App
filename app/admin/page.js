@@ -34,6 +34,7 @@ export default function AdminDashboard() {
           <a href="/admin" className="active">Overview</a>
           <a href="/admin/job-postings">Job postings</a>
           <a href="/admin/chatbot">Ask Shree chatbot</a>
+          <a href="/admin/margin-ai">Margin.ai</a>
         </div>
       </div>
       <div className="admin-main">
