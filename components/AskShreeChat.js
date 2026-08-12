@@ -41,7 +41,6 @@ export default function AskShreeChat() {
             <span className="x" onClick={() => setOpen(false)}>&times;</span>
           </div>
           <div className="chat-body" style={{ maxHeight: 280, overflowY: 'auto' }}>
-            <span className="chat-tag">answers only from this site&apos;s own content — no open web search</span>
             {messages.map((m, i) => (
               <div key={i} className="chat-msg" style={{ opacity: m.role === 'user' ? 0.8 : 1 }}>
                 {m.text}
