@@ -5,6 +5,7 @@ import { extractText } from '../../../../../lib/extractText';
 import { structureCriteria, screenCandidateForBatch, summarizeBatch } from '../../../../../lib/smartScreen';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
+import { getAuthedUser } from '../../../../../lib/authedUser';
 
 const MAX_CVS = 20;
 
@@ -17,8 +18,9 @@ const MAX_CVS = 20;
 // self-submitted by the candidate.
 export async function POST(req) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
+  const user = await getAuthedUser(req);
   const ip = getClientIp(req);
-  const gate = await checkAndRecordSmartScreenUsage(ip);
+  const gate = await checkAndRecordSmartScreenUsage(ip, user?.id);
   if (!gate.allowed) {
     return NextResponse.json({ locked: true, message: gate.message }, { status: 402 });
   }

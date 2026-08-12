@@ -6,6 +6,7 @@ import { sendEmail } from '../../../../../lib/email';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { askClaude } from '../../../../../lib/anthropic';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
+import { getAuthedUser } from '../../../../../lib/authedUser';
 
 const SHORTLIST_THRESHOLD = 70;
 const SHORTLIST_CAP = 5;
@@ -19,8 +20,9 @@ Respond as JSON only: { "name": string, "email": string or null, "phone": string
 // have their own separate 3-free-postings counter in jobPostingGating.js).
 export async function POST(req) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
+  const user = await getAuthedUser(req);
   const ip = getClientIp(req);
-  const gate = await checkAndRecordUsage(ip);
+  const gate = await checkAndRecordUsage(ip, user?.id);
   if (!gate.allowed) {
     return NextResponse.json({ locked: true, message: gate.message }, { status: 402 });
   }

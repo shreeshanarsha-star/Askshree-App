@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
 import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
+import { useOptionalSession } from '../../../lib/useOptionalSession';
+import { AccountBadge } from '../../../components/AccountBadge';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -29,6 +31,7 @@ function TermsCheckbox({ checked, onChange }) {
 // what it actually did.
 export default function ApplyAI() {
   const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/apply/list');
+  const { token: authToken } = useOptionalSession();
   const [subMode, setSubMode] = useState('auto');
 
   const [listings, setListings] = useState([]);
@@ -58,7 +61,7 @@ export default function ApplyAI() {
     const base64 = await fileToBase64(resumeFile);
     const res = await siteFetch('/api/tools/apply/apply', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
       body: JSON.stringify({
         resumeFile: { base64, mimeType: resumeFile.type },
         jobPostingIds: jobIds,
@@ -85,6 +88,7 @@ export default function ApplyAI() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <AccountBadge />
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
       </div>

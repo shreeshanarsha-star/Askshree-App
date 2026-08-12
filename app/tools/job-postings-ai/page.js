@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
 import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
+import { useOptionalSession } from '../../../lib/useOptionalSession';
+import { AccountBadge } from '../../../components/AccountBadge';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -60,6 +62,7 @@ function JobCard({ job, showStatus }) {
 // bundling both into one tool was confusing people about what it actually did.
 export default function JobPostingsAI() {
   const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
+  const { token: authToken } = useOptionalSession();
   const [postFiles, setPostFiles] = useState([]);
   const [postStatus, setPostStatus] = useState('');
   const [postedJobs, setPostedJobs] = useState([]);
@@ -81,7 +84,7 @@ export default function JobPostingsAI() {
     const files = await Promise.all(postFiles.map(async (f) => ({ name: f.name, mimeType: f.type, base64: await fileToBase64(f) })));
     const res = await siteFetch('/api/tools/job-postings/post', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
       body: JSON.stringify({ files, termsAccepted: postTermsAccepted }),
     });
     const data = await res.json();
@@ -114,6 +117,7 @@ export default function JobPostingsAI() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <AccountBadge />
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
       </div>

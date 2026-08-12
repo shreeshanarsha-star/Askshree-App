@@ -3,6 +3,8 @@ import { useState } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
 import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
+import { useOptionalSession } from '../../../lib/useOptionalSession';
+import { AccountBadge } from '../../../components/AccountBadge';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -48,6 +50,7 @@ function AutoManualField({ label, mode, setMode, autoDisplay, children, note }) 
 
 export default function OfferAI() {
   const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
+  const { token: authToken } = useOptionalSession();
   const [tab, setTab] = useState('new');
 
   // --- Upload ---
@@ -138,7 +141,7 @@ export default function OfferAI() {
         return { base64, mimeType: file.type, fileName: file.name };
       }));
       const res = await siteFetch('/api/tools/offer/extract', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ files: payload }),
+        method: 'POST', headers: authToken ? { Authorization: `Bearer ${authToken}` } : {}, body: JSON.stringify({ files: payload }),
       });
       const data = await res.json();
       cancelled = true;
@@ -276,6 +279,7 @@ export default function OfferAI() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <AccountBadge />
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
       </div>

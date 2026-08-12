@@ -3,6 +3,8 @@ import { useState, useEffect, useMemo } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
 import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
+import { useOptionalSession } from '../../../lib/useOptionalSession';
+import { AccountBadge } from '../../../components/AccountBadge';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -70,6 +72,7 @@ const NOTICE_OPTIONS = ['Immediate', '15 days', '30 days', '45 days', '60 days',
 
 export default function SmartScreenAI() {
   const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
+  const { token: authToken } = useOptionalSession();
   const [mode, setMode] = useState('jd');
   const [jdFile, setJdFile] = useState(null);
   const [manual, setManual] = useState({ roleTitle: '', minYears: '', ctcBudget: '', mustHave: '', goodToHave: '', notes: '' });
@@ -123,7 +126,7 @@ export default function SmartScreenAI() {
       else body.manual = manual;
 
       const res = await siteFetch('/api/tools/smart-screen/run', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+        method: 'POST', headers: authToken ? { Authorization: `Bearer ${authToken}` } : {}, body: JSON.stringify(body),
       });
       const data = await res.json();
       clearInterval(stepTimer);
@@ -261,6 +264,7 @@ export default function SmartScreenAI() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <AccountBadge />
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
       </div>

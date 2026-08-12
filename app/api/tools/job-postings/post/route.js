@@ -5,6 +5,7 @@ import { structureJD } from '../../../../../lib/aiScreen';
 import { extractText } from '../../../../../lib/extractText';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
+import { getAuthedUser } from '../../../../../lib/authedUser';
 
 // Posts up to 10 JDs at once (PDF/Word, base64-encoded from the browser). AI
 // structures each into a listing. No email is required at this step —
@@ -12,8 +13,9 @@ import { requireSiteKey } from '../../../../../lib/siteAuth';
 // separate step right after, per the agreed flow.
 export async function POST(req) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
+  const user = await getAuthedUser(req);
   const ip = getClientIp(req);
-  const gate = await checkAndRecordPostingUsage(ip);
+  const gate = await checkAndRecordPostingUsage(ip, user?.id);
   if (!gate.allowed) {
     return NextResponse.json({ locked: true, message: gate.message }, { status: 402 });
   }

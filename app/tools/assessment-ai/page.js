@@ -4,6 +4,8 @@ import AskShreeChat from '../../../components/AskShreeChat';
 import { ROLE_LADDER, autoAssessmentForRole } from '../../../lib/assessments/roles';
 import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
+import { useOptionalSession } from '../../../lib/useOptionalSession';
+import { AccountBadge } from '../../../components/AccountBadge';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -51,6 +53,7 @@ function AutoManualField({ label, mode, setMode, autoValue, autoDisplay, childre
 // PULSE™ (individual/leadership potential) and IMPACT™ (executive).
 export default function AssessmentAI() {
   const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
+  const { token: authToken } = useOptionalSession();
   const [tab, setTab] = useState('assign');
 
   // --- Assign tab ---
@@ -131,7 +134,7 @@ export default function AssessmentAI() {
     setAssignLink('');
     const res = await siteFetch('/api/tools/assessment/assign', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
       body: JSON.stringify({
         candidateId,
         candidateName,
@@ -181,6 +184,7 @@ export default function AssessmentAI() {
 
   return (
     <div style={{ position: 'relative' }}>
+      <AccountBadge />
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
       </div>

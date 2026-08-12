@@ -5,6 +5,7 @@ import { supabaseAdmin } from '../../../../../lib/supabase';
 import { extractText } from '../../../../../lib/extractText';
 import { extractOfferDocuments, classifyOfferDocuments } from '../../../../../lib/offerAI';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
+import { getAuthedUser } from '../../../../../lib/authedUser';
 
 const SUPPORTED_MIME = new Set([
   'application/pdf',
@@ -20,8 +21,9 @@ const SUPPORTED_MIME = new Set([
 // to AI for the actual candidate/comp extraction and create a draft proposal.
 export async function POST(req) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
+  const user = await getAuthedUser(req);
   const ip = getClientIp(req);
-  const gate = await checkAndRecordOfferUsage(ip);
+  const gate = await checkAndRecordOfferUsage(ip, user?.id);
   if (!gate.allowed) {
     return NextResponse.json({ locked: true, message: gate.message }, { status: 402 });
   }

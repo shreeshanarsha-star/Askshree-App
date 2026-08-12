@@ -7,14 +7,16 @@ import { sendEmail } from '../../../../../lib/email';
 import { getAssessment, ASSESSMENT_TYPES } from '../../../../../lib/assessments';
 import { ROLE_LADDER, autoAssessmentForRole } from '../../../../../lib/assessments/roles';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
+import { getAuthedUser } from '../../../../../lib/authedUser';
 
 // Creates the assignment, mints a token, and emails the candidate their link —
 // same token pattern as job-postings/send-verification, adapted for a
 // candidate-facing assessment rather than a poster confirming their own email.
 export async function POST(req) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
+  const user = await getAuthedUser(req);
   const ip = getClientIp(req);
-  const gate = await checkAndRecordAssessmentUsage(ip);
+  const gate = await checkAndRecordAssessmentUsage(ip, user?.id);
   if (!gate.allowed) {
     return NextResponse.json({ locked: true, message: gate.message }, { status: 402 });
   }
