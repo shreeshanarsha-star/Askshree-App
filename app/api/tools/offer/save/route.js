@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Generic field-save for everything on the proposal builder that isn't the
 // comp table itself (candidate details, currency, other benefits, the
@@ -11,6 +12,7 @@ const ALLOWED = [
 ];
 
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { proposalId, patch } = await req.json();
   if (!proposalId || !patch) return NextResponse.json({ error: 'Missing proposalId or patch.' }, { status: 400 });
 

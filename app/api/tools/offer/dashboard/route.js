@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Per-recruiter dashboard — mirrors Assessment.ai's dashboard route. Shows
 // every proposal created under the given email, with where it stands in the
 // approval chain.
 export async function GET(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { searchParams } = new URL(req.url);
   const email = (searchParams.get('email') || '').trim().toLowerCase();
   const jobRole = searchParams.get('jobRole') || '';

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { offerChatReply } from '../../../../../lib/offerAI';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 function buildContext(p) {
   const compLines = (p.components || [])
@@ -19,6 +20,7 @@ ${compLines || '(none)'}`;
 // current market comp (web search) and either asks the recruiter one
 // clarifying question or drafts the justification once it has enough.
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { proposalId, message } = await req.json();
   if (!proposalId) return NextResponse.json({ error: 'Missing proposalId.' }, { status: 400 });
 

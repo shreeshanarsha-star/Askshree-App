@@ -2,12 +2,14 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { sendEmail } from '../../../../../lib/email';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Same pattern as Job Postings.ai's send-verification, adapted for screening
 // batches. This is a non-blocking follow-up (results already exist) — it
 // exists for accountability, since these CVs are recruiter-sourced rather
 // than self-submitted, not to gate the tool itself.
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { email, batchIds } = await req.json();
   if (!email || !email.includes('@')) {
     return NextResponse.json({ error: 'Enter a valid email.' }, { status: 400 });

@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import AskShreeChat from '../../../../../components/AskShreeChat';
+import { useSiteKey } from '../../../../../lib/useSiteKey';
+import { KeyGate } from '../../../../../components/KeyGate';
 
 function DimensionBar({ dim, evaluative }) {
   return (
@@ -27,19 +29,27 @@ function DimensionBar({ dim, evaluative }) {
 // AI narrative. Candidates never see this view — they only get their own
 // overall score and band on submit.
 export default function AssessmentResult() {
+  const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
   const { assignmentId } = useParams();
   const [data, setData] = useState(null);
   const [err, setErr] = useState('');
 
   useEffect(() => {
-    if (!assignmentId) return;
-    fetch(`/api/tools/assessment/result/${assignmentId}`)
+    if (!assignmentId || !unlocked) return;
+    siteFetch(`/api/tools/assessment/result/${assignmentId}`)
       .then((r) => r.json())
       .then((d) => { if (d.error) setErr(d.error); else setData(d); })
       .catch(() => setErr('Could not load that result.'));
-  }, [assignmentId]);
+  }, [assignmentId, unlocked]);
 
   const evaluative = data?.assessment?.evaluative;
+
+  if (checking) return null;
+  if (!unlocked) {
+    return (
+      <KeyGate error={error} keyVal={siteKeyVal} setKey={setKey} submit={submit} checking={checking} label="Assessment.ai — enter key" />
+    );
+  }
 
   return (
     <div style={{ position: 'relative' }}>

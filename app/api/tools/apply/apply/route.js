@@ -5,6 +5,7 @@ import { screenCandidate } from '../../../../../lib/aiScreen';
 import { sendEmail } from '../../../../../lib/email';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { askClaude } from '../../../../../lib/anthropic';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 const SHORTLIST_THRESHOLD = 70;
 const SHORTLIST_CAP = 5;
@@ -17,6 +18,7 @@ Respond as JSON only: { "name": string, "email": string or null, "phone": string
 // Candidate seekers reuse the existing site-wide free-use gate as-is (job posters
 // have their own separate 3-free-postings counter in jobPostingGating.js).
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const ip = getClientIp(req);
   const gate = await checkAndRecordUsage(ip);
   if (!gate.allowed) {

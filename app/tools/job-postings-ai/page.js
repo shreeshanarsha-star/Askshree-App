@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
+import { useSiteKey } from '../../../lib/useSiteKey';
+import { KeyGate } from '../../../components/KeyGate';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -57,6 +59,7 @@ function JobCard({ job, showStatus }) {
 // side (search/auto-apply) now lives on its own as Apply.ai, on purpose —
 // bundling both into one tool was confusing people about what it actually did.
 export default function JobPostingsAI() {
+  const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
   const [postFiles, setPostFiles] = useState([]);
   const [postStatus, setPostStatus] = useState('');
   const [postedJobs, setPostedJobs] = useState([]);
@@ -65,17 +68,18 @@ export default function JobPostingsAI() {
   const [postTermsAccepted, setPostTermsAccepted] = useState(false);
 
   useEffect(() => {
+    if (!unlocked) return;
     const params = new URLSearchParams(window.location.search);
     const v = params.get('verify');
     if (v === 'success') setVerifyNote('Email confirmed — your posting(s) are now verified.');
     else if (v === 'invalid') setVerifyNote('That verification link is invalid or expired.');
-  }, []);
+  }, [unlocked]);
 
   async function runPost() {
     if (postFiles.length === 0 || !postTermsAccepted) return;
     setPostStatus('Reading JDs and structuring listings…');
     const files = await Promise.all(postFiles.map(async (f) => ({ name: f.name, mimeType: f.type, base64: await fileToBase64(f) })));
-    const res = await fetch('/api/tools/job-postings/post', {
+    const res = await siteFetch('/api/tools/job-postings/post', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ files, termsAccepted: postTermsAccepted }),
@@ -90,7 +94,7 @@ export default function JobPostingsAI() {
   async function sendVerification() {
     if (!posterEmail.includes('@') || postedJobs.length === 0) return;
     setVerifyNote('Sending confirmation link…');
-    const res = await fetch('/api/tools/job-postings/send-verification', {
+    const res = await siteFetch('/api/tools/job-postings/send-verification', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: posterEmail, jobPostingIds: postedJobs.map((j) => j.id) }),
@@ -99,6 +103,13 @@ export default function JobPostingsAI() {
     if (data.error) { setVerifyNote(data.error); return; }
     if (data.emailSent) setVerifyNote('Confirmation link sent to ' + posterEmail + '.');
     else setVerifyNote('Email sending isn\'t configured yet — here\'s your confirmation link: ' + data.verifyLink);
+  }
+
+  if (checking) return null;
+  if (!unlocked) {
+    return (
+      <KeyGate error={error} keyVal={siteKeyVal} setKey={setKey} submit={submit} checking={checking} label="Job Postings.ai — enter key" />
+    );
   }
 
   return (

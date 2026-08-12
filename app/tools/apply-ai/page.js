@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
+import { useSiteKey } from '../../../lib/useSiteKey';
+import { KeyGate } from '../../../components/KeyGate';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -26,6 +28,7 @@ function TermsCheckbox({ checked, onChange }) {
 // trying to serve both recruiters and candidates was confusing everyone about
 // what it actually did.
 export default function ApplyAI() {
+  const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/apply/list');
   const [subMode, setSubMode] = useState('auto');
 
   const [listings, setListings] = useState([]);
@@ -38,8 +41,9 @@ export default function ApplyAI() {
   const [whatsappOptIn, setWhatsappOptIn] = useState(false);
 
   useEffect(() => {
-    fetch('/api/tools/apply/list').then((r) => r.json()).then((d) => setListings(d.postings || []));
-  }, []);
+    if (!unlocked) return;
+    siteFetch('/api/tools/apply/list').then((r) => r.json()).then((d) => setListings(d.postings || []));
+  }, [unlocked]);
 
   const filtered = listings.filter((j) => {
     const q = search.toLowerCase();
@@ -52,7 +56,7 @@ export default function ApplyAI() {
     if (!applyTermsAccepted) { setApplyStatus('Please accept the Terms & Conditions first.'); return; }
     setApplyStatus('Reading your CV and matching against roles…');
     const base64 = await fileToBase64(resumeFile);
-    const res = await fetch('/api/tools/apply/apply', {
+    const res = await siteFetch('/api/tools/apply/apply', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -71,6 +75,13 @@ export default function ApplyAI() {
   }
 
   const canApply = !!resumeFile && applyTermsAccepted;
+
+  if (checking) return null;
+  if (!unlocked) {
+    return (
+      <KeyGate error={error} keyVal={siteKeyVal} setKey={setKey} submit={submit} checking={checking} label="Apply.ai — enter key" />
+    );
+  }
 
   return (
     <div style={{ position: 'relative' }}>

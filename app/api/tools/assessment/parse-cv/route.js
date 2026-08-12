@@ -3,6 +3,7 @@ import { extractText } from '../../../../../lib/extractText';
 import { extractCandidateFields } from '../../../../../lib/assessmentAI';
 import { autoAssessmentForRole } from '../../../../../lib/assessments/roles';
 import { supabaseAdmin } from '../../../../../lib/supabase';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Step 1 of the Assign flow: read the CV, AI-extract the four "Auto" fields,
 // and de-dup against the EXISTING candidates table (same table Apply.ai and
@@ -12,6 +13,7 @@ import { supabaseAdmin } from '../../../../../lib/supabase';
 // Not gated — the gate sits on the actual "Assign assessment" action, so a
 // recruiter can look at what was extracted before spending a free use.
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { file } = await req.json();
   if (!file?.base64) {
     return NextResponse.json({ error: 'Upload a CV first.' }, { status: 400 });

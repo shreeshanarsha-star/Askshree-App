@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
+import { useSiteKey } from '../../../lib/useSiteKey';
+import { KeyGate } from '../../../components/KeyGate';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -67,6 +69,7 @@ function ActionChip({ action }) {
 const NOTICE_OPTIONS = ['Immediate', '15 days', '30 days', '45 days', '60 days', '90 days', 'Custom'];
 
 export default function SmartScreenAI() {
+  const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
   const [mode, setMode] = useState('jd');
   const [jdFile, setJdFile] = useState(null);
   const [manual, setManual] = useState({ roleTitle: '', minYears: '', ctcBudget: '', mustHave: '', goodToHave: '', notes: '' });
@@ -119,7 +122,7 @@ export default function SmartScreenAI() {
       if (mode === 'jd') body.jdFile = { name: jdFile.name, mimeType: jdFile.type, base64: await fileToBase64(jdFile) };
       else body.manual = manual;
 
-      const res = await fetch('/api/tools/smart-screen/run', {
+      const res = await siteFetch('/api/tools/smart-screen/run', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       });
       const data = await res.json();
@@ -169,7 +172,7 @@ export default function SmartScreenAI() {
     const dbField = FIELD_MAP[field];
     if (!dbField) return;
     try {
-      await fetch('/api/tools/smart-screen/candidate', {
+      await siteFetch('/api/tools/smart-screen/candidate', {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ candidateId, fields: { [dbField]: value } }),
       });
@@ -177,7 +180,7 @@ export default function SmartScreenAI() {
   }
 
   async function viewCV(candidateId) {
-    const res = await fetch('/api/tools/smart-screen/cv-url?candidateId=' + candidateId);
+    const res = await siteFetch('/api/tools/smart-screen/cv-url?candidateId=' + candidateId);
     const data = await res.json();
     if (data.url) window.open(data.url, '_blank');
     else alert(data.error || 'CV not available for this candidate.');
@@ -240,13 +243,20 @@ export default function SmartScreenAI() {
   async function sendVerification() {
     if (!posterEmail.includes('@') || !batchId) return;
     setVerifyNote('Sending confirmation link…');
-    const res = await fetch('/api/tools/smart-screen/send-verification', {
+    const res = await siteFetch('/api/tools/smart-screen/send-verification', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: posterEmail, batchIds: [batchId] }),
     });
     const data = await res.json();
     if (data.error) { setVerifyNote(data.error); return; }
     if (data.emailSent) setVerifyNote('Confirmation link sent to ' + posterEmail + '.');
     else setVerifyNote("Email sending isn't configured yet — here's your confirmation link: " + data.verifyLink);
+  }
+
+  if (checking) return null;
+  if (!unlocked) {
+    return (
+      <KeyGate error={error} keyVal={siteKeyVal} setKey={setKey} submit={submit} checking={checking} label="Smart screen.ai — enter key" />
+    );
   }
 
   return (

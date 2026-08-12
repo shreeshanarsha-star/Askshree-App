@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Saves a recruiter's manual correction to an AI-extracted field back to the
 // candidate's record, so future searches benefit from the corrected data
@@ -10,6 +11,7 @@ const ALLOWED_FIELDS = [
 ];
 
 export async function PATCH(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { candidateId, fields } = await req.json();
   if (!candidateId || !fields || typeof fields !== 'object') {
     return NextResponse.json({ error: 'candidateId and fields are required.' }, { status: 400 });

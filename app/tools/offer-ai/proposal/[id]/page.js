@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useSiteKey } from '../../../../../lib/useSiteKey';
+import { KeyGate } from '../../../../../components/KeyGate';
 
 function money(n) {
   if (n == null) return '—';
@@ -7,16 +9,25 @@ function money(n) {
 }
 
 export default function ProposalView({ params }) {
+  const { unlocked, checking, error: keyError, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
   const [data, setData] = useState(null);
-  const [error, setError] = useState('');
+  const [fetchError, setFetchError] = useState('');
 
   useEffect(() => {
-    fetch(`/api/tools/offer/proposal/${params.id}`)
+    if (!unlocked) return;
+    siteFetch(`/api/tools/offer/proposal/${params.id}`)
       .then((r) => r.json())
-      .then((d) => (d.error ? setError(d.error) : setData(d)));
-  }, [params.id]);
+      .then((d) => (d.error ? setFetchError(d.error) : setData(d)));
+  }, [params.id, unlocked]);
 
-  if (error) return <div style={{ padding: 60, color: 'var(--slate)' }}>{error}</div>;
+  if (checking) return null;
+  if (!unlocked) {
+    return (
+      <KeyGate error={keyError} keyVal={siteKeyVal} setKey={setKey} submit={submit} checking={checking} label="Offer.ai — enter key" />
+    );
+  }
+
+  if (fetchError) return <div style={{ padding: 60, color: 'var(--slate)' }}>{fetchError}</div>;
   if (!data) return <div style={{ padding: 60, color: 'var(--slate)' }}>Loading…</div>;
 
   const p = data.proposal;

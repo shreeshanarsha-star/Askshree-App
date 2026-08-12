@@ -4,6 +4,7 @@ import { checkAndRecordSmartScreenUsage } from '../../../../../lib/smartScreenGa
 import { extractText } from '../../../../../lib/extractText';
 import { structureCriteria, screenCandidateForBatch, summarizeBatch } from '../../../../../lib/smartScreen';
 import { supabaseAdmin } from '../../../../../lib/supabase';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 const MAX_CVS = 20;
 
@@ -15,6 +16,7 @@ const MAX_CVS = 20;
 // for admin traceability, since these CVs are recruiter-sourced rather than
 // self-submitted by the candidate.
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const ip = getClientIp(req);
   const gate = await checkAndRecordSmartScreenUsage(ip);
   if (!gate.allowed) {

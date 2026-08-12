@@ -4,6 +4,7 @@ import { checkAndRecordOfferUsage } from '../../../../../lib/offerGating';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { extractText } from '../../../../../lib/extractText';
 import { extractOfferDocuments, classifyOfferDocuments } from '../../../../../lib/offerAI';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 const SUPPORTED_MIME = new Set([
   'application/pdf',
@@ -18,6 +19,7 @@ const SUPPORTED_MIME = new Set([
 // type (no manual tagging from the recruiter), then hand the combined text
 // to AI for the actual candidate/comp extraction and create a draft proposal.
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const ip = getClientIp(req);
   const gate = await checkAndRecordOfferUsage(ip);
   if (!gate.allowed) {

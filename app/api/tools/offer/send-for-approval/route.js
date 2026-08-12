@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { sendEmail } from '../../../../../lib/email';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 const APPROVAL_WINDOW_DAYS = 14;
 
@@ -20,6 +21,7 @@ function approverEmailHtml({ recruiterEmail, candidateName, roleTitle, ctc, curr
 // approver is emailed now — each later step gets emailed when the chain
 // reaches them (see approve/[token]/route.js).
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { proposalId, approverEmails, recruiterEmail } = await req.json();
   if (!proposalId) return NextResponse.json({ error: 'Missing proposalId.' }, { status: 400 });
   const emails = (approverEmails || []).map((e) => (e || '').trim()).filter((e) => e.includes('@'));

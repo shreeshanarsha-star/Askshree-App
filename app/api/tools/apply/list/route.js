@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Approved, not-yet-expired listings — what candidates see in Find & apply.
-export async function GET() {
+export async function GET(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const db = supabaseAdmin();
   const { data, error } = await db
     .from('job_postings')

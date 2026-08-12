@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Generates a short-lived signed URL for a candidate's stored CV file — never
 // a public URL, so files aren't guessable/scrapeable from outside.
 export async function GET(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const candidateId = new URL(req.url).searchParams.get('candidateId');
   if (!candidateId) return NextResponse.json({ error: 'candidateId is required.' }, { status: 400 });
 

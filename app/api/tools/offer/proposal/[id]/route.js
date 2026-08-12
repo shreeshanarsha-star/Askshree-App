@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../../lib/supabase';
+import { requireSiteKey } from '../../../../../../lib/siteAuth';
 
 // Full proposal snapshot — backs the recruiter's builder view (resuming a
 // draft) and the printable "download proposal" page. Same content an
 // approver sees, per the "proposal is exactly what the approver sees" rule.
 export async function GET(req, { params }) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const db = supabaseAdmin();
   const { data: p, error } = await db.from('offer_proposals').select('*').eq('id', params.id).maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

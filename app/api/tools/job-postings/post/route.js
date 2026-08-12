@@ -4,12 +4,14 @@ import { checkAndRecordPostingUsage } from '../../../../../lib/jobPostingGating'
 import { structureJD } from '../../../../../lib/aiScreen';
 import { extractText } from '../../../../../lib/extractText';
 import { supabaseAdmin } from '../../../../../lib/supabase';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Posts up to 10 JDs at once (PDF/Word, base64-encoded from the browser). AI
 // structures each into a listing. No email is required at this step —
 // postings go in as "pending", and the UI asks for email confirmation as a
 // separate step right after, per the agreed flow.
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const ip = getClientIp(req);
   const gate = await checkAndRecordPostingUsage(ip);
   if (!gate.allowed) {

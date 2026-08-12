@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../../lib/supabase';
 import { getAssessment } from '../../../../../../lib/assessments';
 import { generateNarrative } from '../../../../../../lib/assessmentAI';
+import { requireSiteKey } from '../../../../../../lib/siteAuth';
 
 // Full recruiter-facing result: dimension breakdown + AI narrative.
 // The narrative is generated ONCE on first view and cached on the result row —
@@ -9,6 +10,7 @@ import { generateNarrative } from '../../../../../../lib/assessmentAI';
 // so the interpretation a recruiter shared with a hiring manager doesn't quietly
 // change underneath them).
 export async function GET(req, { params }) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const db = supabaseAdmin();
   const assignmentId = params.assignmentId;
 

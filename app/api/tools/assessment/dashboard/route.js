@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { getAssessment } from '../../../../../lib/assessments';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Recruiter dashboard, scoped the same way the rest of the recruiter-side tools
 // scope "mine": by the recruiter's own email (the one they assigned under),
 // optionally narrowed further to a single job/role.
 export async function GET(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const url = new URL(req.url);
   const recruiterEmail = (url.searchParams.get('email') || '').trim().toLowerCase();
   const jobRole = url.searchParams.get('jobRole');

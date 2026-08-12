@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
+import { useSiteKey } from '../../../lib/useSiteKey';
+import { KeyGate } from '../../../components/KeyGate';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -45,6 +47,7 @@ function AutoManualField({ label, mode, setMode, autoDisplay, children, note }) 
 }
 
 export default function OfferAI() {
+  const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
   const [tab, setTab] = useState('new');
 
   // --- Upload ---
@@ -134,7 +137,7 @@ export default function OfferAI() {
         const base64 = await fileToBase64(file);
         return { base64, mimeType: file.type, fileName: file.name };
       }));
-      const res = await fetch('/api/tools/offer/extract', {
+      const res = await siteFetch('/api/tools/offer/extract', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ files: payload }),
       });
       const data = await res.json();
@@ -173,7 +176,7 @@ export default function OfferAI() {
 
   async function saveField(patch) {
     if (!proposalId) return;
-    await fetch('/api/tools/offer/save', {
+    await siteFetch('/api/tools/offer/save', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ proposalId, patch }),
     });
   }
@@ -181,7 +184,7 @@ export default function OfferAI() {
   async function recalc(nextComponents, nextHike) {
     if (!proposalId) return;
     setRecalculating(true);
-    const res = await fetch('/api/tools/offer/recalculate', {
+    const res = await siteFetch('/api/tools/offer/recalculate', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ proposalId, hikePercent: nextHike ?? hikePercent, components: nextComponents ?? components }),
     });
@@ -213,7 +216,7 @@ export default function OfferAI() {
   async function sendChat(message) {
     if (!proposalId) return;
     setChatBusy(true);
-    const res = await fetch('/api/tools/offer/chat', {
+    const res = await siteFetch('/api/tools/offer/chat', {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ proposalId, message }),
     });
     const data = await res.json();
@@ -235,7 +238,7 @@ export default function OfferAI() {
     setSending(true);
     setSendNote('Sending…');
     await saveField({ recruiter_email: recruiterEmail, job_role: jobRole });
-    const res = await fetch('/api/tools/offer/send-for-approval', {
+    const res = await siteFetch('/api/tools/offer/send-for-approval', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ proposalId, approverEmails: emails, recruiterEmail }),
     });
@@ -256,12 +259,19 @@ export default function OfferAI() {
     const q = new URLSearchParams({ email: e });
     const f = filter ?? dashFilter;
     if (f) q.set('jobRole', f);
-    const res = await fetch(`/api/tools/offer/dashboard?${q.toString()}`);
+    const res = await siteFetch(`/api/tools/offer/dashboard?${q.toString()}`);
     const data = await res.json();
     if (data.error) { setDashNote(data.error); return; }
     setDashRows(data.rows);
     setDashJobRoles(data.jobRoles || []);
     setDashNote(data.rows.length ? '' : 'No proposals created under that email yet.');
+  }
+
+  if (checking) return null;
+  if (!unlocked) {
+    return (
+      <KeyGate error={error} keyVal={siteKeyVal} setKey={setKey} submit={submit} checking={checking} label="Offer.ai — enter key" />
+    );
   }
 
   return (

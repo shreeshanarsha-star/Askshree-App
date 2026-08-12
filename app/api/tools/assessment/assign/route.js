@@ -6,11 +6,13 @@ import { supabaseAdmin } from '../../../../../lib/supabase';
 import { sendEmail } from '../../../../../lib/email';
 import { getAssessment, ASSESSMENT_TYPES } from '../../../../../lib/assessments';
 import { ROLE_LADDER, autoAssessmentForRole } from '../../../../../lib/assessments/roles';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Creates the assignment, mints a token, and emails the candidate their link —
 // same token pattern as job-postings/send-verification, adapted for a
 // candidate-facing assessment rather than a poster confirming their own email.
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const ip = getClientIp(req);
   const gate = await checkAndRecordAssessmentUsage(ip);
   if (!gate.allowed) {

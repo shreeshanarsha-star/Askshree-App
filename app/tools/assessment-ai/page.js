@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
 import { ROLE_LADDER, autoAssessmentForRole } from '../../../lib/assessments/roles';
+import { useSiteKey } from '../../../lib/useSiteKey';
+import { KeyGate } from '../../../components/KeyGate';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -48,6 +50,7 @@ function AutoManualField({ label, mode, setMode, autoValue, autoDisplay, childre
 // breakdown. Three instruments: Big Five (IPIP-50, a neutral trait profile),
 // PULSE™ (individual/leadership potential) and IMPACT™ (executive).
 export default function AssessmentAI() {
+  const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
   const [tab, setTab] = useState('assign');
 
   // --- Assign tab ---
@@ -95,7 +98,7 @@ export default function AssessmentAI() {
     setParseNote('Reading the CV and extracting details…');
     try {
       const base64 = await fileToBase64(cvFile);
-      const res = await fetch('/api/tools/assessment/parse-cv', {
+      const res = await siteFetch('/api/tools/assessment/parse-cv', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ file: { base64, mimeType: cvFile.type } }),
@@ -126,7 +129,7 @@ export default function AssessmentAI() {
     setAssigning(true);
     setAssignNote('Creating the assignment and sending the link…');
     setAssignLink('');
-    const res = await fetch('/api/tools/assessment/assign', {
+    const res = await siteFetch('/api/tools/assessment/assign', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -161,12 +164,19 @@ export default function AssessmentAI() {
     const q = new URLSearchParams({ email: e });
     const f = filter ?? dashFilter;
     if (f) q.set('jobRole', f);
-    const res = await fetch(`/api/tools/assessment/dashboard?${q.toString()}`);
+    const res = await siteFetch(`/api/tools/assessment/dashboard?${q.toString()}`);
     const data = await res.json();
     if (data.error) { setDashNote(data.error); return; }
     setDashRows(data.rows);
     setDashJobRoles(data.jobRoles || []);
     setDashNote(data.rows.length ? '' : 'No assessments assigned under that email yet.');
+  }
+
+  if (checking) return null;
+  if (!unlocked) {
+    return (
+      <KeyGate error={error} keyVal={siteKeyVal} setKey={setKey} submit={submit} checking={checking} label="Assessment.ai — enter key" />
+    );
   }
 
   return (

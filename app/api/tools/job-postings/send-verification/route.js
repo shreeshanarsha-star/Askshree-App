@@ -2,8 +2,10 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { sendEmail } from '../../../../../lib/email';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { email, jobPostingIds } = await req.json();
   if (!email || !email.includes('@')) {
     return NextResponse.json({ error: 'Enter a valid email.' }, { status: 400 });

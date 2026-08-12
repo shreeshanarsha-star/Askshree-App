@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { computeProposedComponents } from '../../../../../lib/offerAI';
+import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Recomputes proposed figures from the recruiter's hike % — auto rows scale
 // with the hike, manual rows (edited or added by the recruiter) are left
 // exactly as given. Runs on every hike-% change and every manual edit so the
 // Gross Salary / Total CTC subtotals never drift out of sync with the table.
 export async function POST(req) {
+  const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { proposalId, hikePercent, components } = await req.json();
   if (!proposalId) return NextResponse.json({ error: 'Missing proposalId.' }, { status: 400 });
 
