@@ -7,7 +7,7 @@ export default function AskShreeChat() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: "Hi, I'm Ask Shree. I can answer questions about this site and its tools — what would you like to know?" },
+    { role: 'assistant', text: "Hi, I'm Shree. I can answer questions about this site and its tools — what would you like to know?" },
   ]);
   const [loading, setLoading] = useState(false);
 
