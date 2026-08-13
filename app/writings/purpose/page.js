@@ -1,4 +1,6 @@
 'use client';
+import { useWritingsKey } from '../../../lib/useWritingsKey';
+import { WritingsGate } from '../../../components/WritingsGate';
 
 const TOPICS = [
   { label: 'Purpose', href: '/writings/purpose', active: true },
@@ -9,6 +11,10 @@ const TOPICS = [
 ];
 
 export default function PurposeWritingPage() {
+  const { unlocked, checking, error, key: keyVal, setKey, submit } = useWritingsKey();
+  if (checking) return null;
+  if (!unlocked) return <WritingsGate error={error} keyVal={keyVal} setKey={setKey} submit={submit} checking={checking} />;
+
   return (
     <div style={{ position: 'relative' }}>
       <div className="nav">
