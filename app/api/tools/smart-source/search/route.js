@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getClientIp, logToolRun } from '../../../../../lib/gating';
 import { checkAndRecordSmartSourceUsage } from '../../../../../lib/smartSourceGating';
-import { extractSearchCriteria, buildSearchQuery, searchSerper, scoreResults, findCachedSearch } from '../../../../../lib/smartSource';
+import { extractSearchCriteria, buildSearchQuery, searchSerperWithFallback, scoreResults, findCachedSearch } from '../../../../../lib/smartSource';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
 import { getAuthedUser } from '../../../../../lib/authedUser';
@@ -44,7 +44,7 @@ export async function POST(req) {
     return NextResponse.json({ ok: true, cached: true, searchId: cached.searchId, candidates: cached.candidates });
   }
 
-  const searchResult = await searchSerper(queryText);
+  const searchResult = await searchSerperWithFallback(criteria, queryText);
   if (!searchResult.ok) {
     return NextResponse.json({
       error: searchResult.reason === 'no_serper_key_configured'
