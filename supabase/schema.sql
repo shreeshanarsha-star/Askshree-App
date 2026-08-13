@@ -294,3 +294,13 @@ create table if not exists application_questionnaires (
 );
 create index if not exists idx_appq_application on application_questionnaires(application_id);
 create index if not exists idx_appq_token on application_questionnaires(token);
+
+-- Smart Source.ai free-use gate (mirrors the pattern in every other tool's
+-- *Gating.js — 3 free searches per IP, lifted for logged-in accounts).
+create table if not exists smart_source_usage (
+  ip_address text primary key,
+  search_count integer not null default 0,
+  status text not null default 'free',
+  last_used_at timestamptz default now()
+);
+alter table smart_source_usage enable row level security;
