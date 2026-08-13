@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getClientIp, logToolRun } from '../../../../../lib/gating';
 import { checkAndRecordSmartSourceUsage } from '../../../../../lib/smartSourceGating';
 import { extractSearchCriteria, buildSearchQuery, searchSerpApiWithFallback, scoreResults, findCachedSearch } from '../../../../../lib/smartSource';
+import { extractText } from '../../../../../lib/extractText';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
 import { getAuthedUser } from '../../../../../lib/authedUser';
@@ -16,7 +17,7 @@ export async function POST(req) {
   }
   await logToolRun(ip, 'smart_source_ai');
 
-  const { mode, jobDescription, skills, booleanQuery, location } = await req.json();
+  const { mode, jobDescription, jdFile, skills, booleanQuery, location } = await req.json();
 
   let criteria;
   if (mode === 'manual') {
@@ -25,11 +26,19 @@ export async function POST(req) {
     }
     criteria = { roleTitle: null, skills, location: location || null };
   } else {
-    if (!jobDescription || jobDescription.trim().length < 20) {
+    let jdText = jobDescription;
+    if (jdFile?.base64) {
+      try {
+        jdText = await extractText(jdFile.base64, jdFile.mimeType);
+      } catch (e) {
+        return NextResponse.json({ error: 'Could not read that file. Try a different PDF/Word file, or paste the text instead.' }, { status: 400 });
+      }
+    }
+    if (!jdText || jdText.trim().length < 20) {
       return NextResponse.json({ error: 'Paste a job description or role summary first.' }, { status: 400 });
     }
     try {
-      const extracted = await extractSearchCriteria(jobDescription);
+      const extracted = await extractSearchCriteria(jdText);
       criteria = { roleTitle: extracted.role_title, skills: extracted.skills || [], location: location || extracted.location };
     } catch (e) {
       return NextResponse.json({ error: 'Could not read that job description. Try rephrasing it.' }, { status: 400 });

@@ -6,6 +6,15 @@ import { KeyGate } from '../../../components/KeyGate';
 import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
 
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function scoreColor(score) {
   if (score == null) return 'var(--slate)';
   return score >= 70 ? 'var(--amber)' : score >= 40 ? 'var(--amber-dim)' : 'var(--slate)';
@@ -22,6 +31,8 @@ export default function SmartSourceAI() {
 
   const [mode, setMode] = useState('auto');
   const [jobDescription, setJobDescription] = useState('');
+  const [jdFile, setJdFile] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
   const [skillsInput, setSkillsInput] = useState('');
   const [booleanQuery, setBooleanQuery] = useState('');
   const [location, setLocation] = useState('');
@@ -34,9 +45,15 @@ export default function SmartSourceAI() {
     setRunning(true);
     setNote('Searching…');
     setCandidates(null);
-    const body = mode === 'manual'
-      ? { mode: 'manual', skills: skillsInput.split(',').map((s) => s.trim()).filter(Boolean), booleanQuery, location }
-      : { mode: 'auto', jobDescription, location };
+    let body;
+    if (mode === 'manual') {
+      body = { mode: 'manual', skills: skillsInput.split(',').map((s) => s.trim()).filter(Boolean), booleanQuery, location };
+    } else if (jdFile) {
+      const base64 = await fileToBase64(jdFile);
+      body = { mode: 'auto', jdFile: { name: jdFile.name, mimeType: jdFile.type, base64 }, location };
+    } else {
+      body = { mode: 'auto', jobDescription, location };
+    }
 
     const res = await siteFetch('/api/tools/smart-source/search', {
       method: 'POST',
@@ -52,7 +69,7 @@ export default function SmartSourceAI() {
     setNote(data.candidates?.length ? '' : 'No matching profiles found — try broadening the skills or dropping the location filter.');
   }
 
-  const canSearch = !running && (mode === 'manual' ? skillsInput.trim().length > 0 : jobDescription.trim().length > 20);
+  const canSearch = !running && (mode === 'manual' ? skillsInput.trim().length > 0 : (!!jdFile || jobDescription.trim().length > 20));
 
   if (checking) return null;
   if (!unlocked) {
@@ -83,9 +100,36 @@ export default function SmartSourceAI() {
           </div>
 
           {mode === 'auto' && (
-            <textarea className="free-text-input" style={{ minHeight: 140, resize: 'vertical' }}
-              placeholder="Paste the job description or a short role summary…"
-              value={jobDescription} onChange={(e) => setJobDescription(e.target.value)} />
+            <>
+              <div
+                className={`dropzone${dragActive ? ' drag-active' : ''}`}
+                onClick={() => document.getElementById('jd-file-input').click()}
+                onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+                onDragLeave={(e) => { e.preventDefault(); setDragActive(false); }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragActive(false);
+                  const f = e.dataTransfer.files?.[0];
+                  if (f) { setJdFile(f); setJobDescription(''); }
+                }}
+              >
+                {jdFile ? jdFile.name : 'Drag & drop a JD here, or click to browse (PDF / Word)'}
+              </div>
+              <input id="jd-file-input" type="file" accept=".pdf,.doc,.docx" style={{ display: 'none' }}
+                onChange={(e) => { const f = e.target.files[0]; if (f) { setJdFile(f); setJobDescription(''); } }} />
+              {jdFile && (
+                <div className="file-hint" style={{ marginTop: 6 }}>
+                  <a href="#" onClick={(e) => { e.preventDefault(); setJdFile(null); }} style={{ color: 'var(--amber)' }}>Remove file</a> — or paste text instead below.
+                </div>
+              )}
+
+              <div className="dropzone-divider">or</div>
+
+              <textarea className="free-text-input" style={{ minHeight: 140, resize: 'vertical' }}
+                placeholder="Paste the job description or a short role summary…"
+                value={jobDescription}
+                onChange={(e) => { setJobDescription(e.target.value); if (e.target.value) setJdFile(null); }} />
+            </>
           )}
 
           {mode === 'manual' && (

@@ -306,8 +306,11 @@
   .jp-subtabs{display:flex; gap:8px; margin-bottom:18px;}
   .jp-subtab{font-family:'IBM Plex Mono',monospace; font-size:11.5px; padding:7px 16px; border-radius:20px; border:1px solid var(--line); background:transparent; color:var(--slate); cursor:pointer;}
   .jp-subtab.active{border-color:var(--amber-dim); color:var(--amber);}
-  .dropzone{border:1px dashed var(--line); border-radius:8px; padding:28px; text-align:center; color:var(--slate); font-size:13px; background:rgba(255,255,255,0.015); cursor:pointer;}
+  .dropzone{border:1px dashed var(--line); border-radius:8px; padding:28px; text-align:center; color:var(--slate); font-size:13px; background:rgba(255,255,255,0.015); cursor:pointer; transition:border-color 0.15s, background 0.15s, color 0.15s;}
   .dropzone:hover{border-color:var(--amber-dim); color:var(--cream);}
+  .dropzone.drag-active{border-color:var(--amber); color:var(--cream); background:rgba(232,163,61,0.08);}
+  .dropzone-divider{display:flex; align-items:center; gap:12px; margin:16px 0; font-size:11px; color:var(--slate); font-family:'IBM Plex Mono',monospace;}
+  .dropzone-divider::before, .dropzone-divider::after{content:''; flex:1; height:1px; background:var(--line);}
   .file-hint{font-size:11.5px; color:var(--slate); margin-top:8px; line-height:1.6;}
   .primary-btn{margin-top:18px; border:1px solid var(--amber-dim); color:var(--amber); background:transparent; font-family:'IBM Plex Mono',monospace; font-size:12px; padding:11px 26px; border-radius:6px; cursor:pointer;}
   .primary-btn:disabled{opacity:0.5; cursor:not-allowed;}
