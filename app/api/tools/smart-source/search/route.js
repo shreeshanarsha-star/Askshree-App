@@ -54,7 +54,7 @@ export async function POST(req) {
   }
   if (searchResult.results.length === 0) {
     return NextResponse.json({
-      error: `DEBUG2: 0 linkedin.com/in results after filter | rawCount=${searchResult.rawCount ?? 'n/a'} query=${queryText}`,
+      error: `DEBUG3: rawCount=${searchResult.rawCount ?? 'n/a'} links=${JSON.stringify((searchResult.rawLinks || []).slice(0, 10))}`,
     }, { status: 503 });
   }
 
