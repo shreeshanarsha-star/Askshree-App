@@ -88,9 +88,8 @@ export default function SmartSourceAI() {
         <div className="eyebrow">Recruit.ai</div>
         <h1 className="serif" style={{ fontSize: 26, color: 'var(--cream)', margin: '8px 0 12px' }}>Smart Source.ai</h1>
         <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 620, marginBottom: 28, textAlign: 'justify' }}>
-          Find candidates from public LinkedIn profiles — paste a JD and AI builds the search, or type
-          the exact skills yourself. Every result is scored against the role so you see the strongest
-          matches first.
+          Drop a JD — AI builds the search, sources candidates from public LinkedIn profiles, and scores
+          every result against the role for you. Or type the exact skills yourself for a manual search.
         </p>
 
         <div className="jp-panel active">
