@@ -49,13 +49,14 @@ export async function POST(req) {
     return NextResponse.json({
       error: searchResult.reason === 'no_serper_key_configured'
         ? 'Search isn’t configured yet — ask the site owner to add a Serper API key.'
-        : `DEBUG2: serper failed status=${searchResult.status} detail=${searchResult.detail} query=${queryText}`,
+        : 'The search failed. Try again in a moment.',
     }, { status: 503 });
   }
   if (searchResult.results.length === 0) {
     return NextResponse.json({
-      error: `DEBUG3: rawCount=${searchResult.rawCount ?? 'n/a'} links=${JSON.stringify((searchResult.rawLinks || []).slice(0, 10))}`,
-    }, { status: 503 });
+      ok: true, cached: false, searchId: null, candidates: [],
+      note: 'no_linkedin_profiles_found',
+    });
   }
 
   let scored = [];
