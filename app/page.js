@@ -264,21 +264,21 @@ export default function HomePage() {
               <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{recruitOpen ? '▾' : '▸'}</span>
             </div>
             {recruitOpen && (
-              <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
-                <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/job-postings-ai'}>Job Postings.ai</span>
-                <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/apply-ai'}>Apply.ai</span>
-                <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-source-ai'}>Smart Source.ai</span>
-                <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/smart-screen-ai'}>Smart screen.ai</span>
-                <span style={{ opacity: 0.45, marginRight: 16 }}>Smart hunt.ai</span>
-                <span style={{ opacity: 0.45, marginRight: 16 }}>Interview.ai</span>
-                <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/assessment-ai'}>Assessment.ai</span>
-                <span style={{ cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/offer-ai'}>Offer.ai</span>
-                <span style={{ opacity: 0.45, marginRight: 16 }}>Refer.ai</span>
-                <span style={{ opacity: 0.45, marginRight: 16 }}>Onboard.ai</span>
-                <span style={{ opacity: 0.45, marginRight: 16 }}>Induction.ai</span>
-                <span style={{ opacity: 0.45, marginRight: 16 }}>Campus.ai</span>
-                <span style={{ opacity: 0.45, marginRight: 16 }}>Analytics.ai</span>
-                <span style={{ opacity: 0.45 }}>Dashboard.ai</span>
+              <div className="tool-grid">
+                <a className="live" href="/tools/job-postings-ai">Job Postings.ai</a>
+                <a className="live" href="/tools/apply-ai">Apply.ai</a>
+                <a className="live" href="/tools/smart-source-ai">Smart Source.ai</a>
+                <a className="live" href="/tools/smart-screen-ai">Smart screen.ai</a>
+                <a className="live" href="/tools/assessment-ai">Assessment.ai</a>
+                <a className="live" href="/tools/offer-ai">Offer.ai</a>
+                <span className="soon">Smart hunt.ai</span>
+                <span className="soon">Interview.ai</span>
+                <span className="soon">Refer.ai</span>
+                <span className="soon">Onboard.ai</span>
+                <span className="soon">Induction.ai</span>
+                <span className="soon">Campus.ai</span>
+                <span className="soon">Analytics.ai</span>
+                <span className="soon">Dashboard.ai</span>
               </div>
             )}
           </div>

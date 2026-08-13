@@ -108,6 +108,20 @@
   }
   .ai-name{font-family:'Fraunces',serif; font-size:15px; color:var(--cream);}
 
+  .tool-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:12px 20px;
+    margin-top:18px; font-size:11px; font-family:'IBM Plex Mono',monospace;
+  }
+  .tool-grid a, .tool-grid span{
+    color:var(--slate); cursor:default; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .tool-grid a.live{color:var(--cream); cursor:pointer; text-decoration:none;}
+  .tool-grid a.live:hover{color:var(--amber);}
+  .tool-grid span.soon{opacity:0.45;}
+  @media (max-width:640px){
+    .tool-grid{grid-template-columns:repeat(2, 1fr);}
+  }
+
 
   .terminal{
     border:1px solid var(--line); border-radius:8px; background:rgba(255,255,255,0.025);
