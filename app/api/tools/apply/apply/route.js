@@ -182,6 +182,7 @@ async function maybeSendShortlist(db, jobPostingId) {
 
   const result = await sendEmail({
     to: job.poster_email,
+    from: 'Ask Shree — Job Postings <Jobpostings@askshree.com>',
     subject: `Your shortlist for ${job.title} at ${job.company}`,
     html,
   });

@@ -28,6 +28,7 @@ export async function POST(req) {
 
   const result = await sendEmail({
     to: email,
+    from: 'Ask Shree — Job Postings <Jobpostings@askshree.com>',
     subject: 'Confirm your job posting — Ask Shree',
     html: `<p>Click the link below to confirm your email and verify your job posting${jobPostingIds.length > 1 ? 's' : ''}:</p>
            <p><a href="${verifyLink}">${verifyLink}</a></p>
