@@ -49,7 +49,7 @@ export async function POST(req) {
     return NextResponse.json({
       error: searchResult.reason === 'no_serper_key_configured'
         ? 'Search isn’t configured yet — ask the site owner to add a Serper API key.'
-        : 'The search failed. Try again in a moment.',
+        : `DEBUG4: status=${searchResult.status} detail=${searchResult.detail} query=${queryText}`,
     }, { status: 503 });
   }
   if (searchResult.results.length === 0) {
