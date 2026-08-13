@@ -49,15 +49,27 @@ export async function POST(req) {
     return NextResponse.json({
       error: searchResult.reason === 'no_serper_key_configured'
         ? 'Search isn’t configured yet — ask the site owner to add a Serper API key.'
-        : 'The search failed. Try again in a moment.',
+        : `DEBUG2: serper failed status=${searchResult.status} detail=${searchResult.detail} query=${queryText}`,
+    }, { status: 503 });
+  }
+  if (searchResult.results.length === 0) {
+    return NextResponse.json({
+      error: `DEBUG2: 0 linkedin.com/in results after filter | rawCount=${searchResult.rawCount ?? 'n/a'} query=${queryText}`,
     }, { status: 503 });
   }
 
   let scored = [];
+  let scoreErr = null;
   try {
     scored = await scoreResults(searchResult.results, criteria);
   } catch (e) {
+    scoreErr = String(e && e.message || e);
     scored = [];
+  }
+  if (scoreErr) {
+    return NextResponse.json({
+      error: `DEBUG2: scoreResults threw: ${scoreErr} | rawResults=${searchResult.results.length}`,
+    }, { status: 503 });
   }
 
   const db = supabaseAdmin();
