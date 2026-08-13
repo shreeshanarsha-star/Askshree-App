@@ -265,3 +265,32 @@ create index if not exists idx_margin_rec_status on margin_recommendations(statu
 alter table margin_uploads enable row level security;
 alter table margin_products enable row level security;
 alter table margin_recommendations enable row level security;
+
+-- Apply.ai questionnaire pipeline (stage 2/3 of matching): a candidate who
+-- clears the CV-based AI screen (stage 1, screenCandidate in lib/aiScreen.js)
+-- gets emailed this structured questionnaire; only a pass against the JD
+-- (lib/questionnaire.js) reaches the job poster.
+-- job_postings also gained: min_years_experience numeric, industry text,
+-- ctc_budget text — extracted by structureJD alongside the (now capped at
+-- exactly 3 each) must_have_skills / good_to_have_skills.
+create table if not exists application_questionnaires (
+  id uuid primary key default gen_random_uuid(),
+  application_id uuid references applications(id) not null,
+  token text unique not null,
+  status text not null default 'sent', -- sent | completed | expired
+  technical_skill_answers jsonb,
+  good_to_have_answers jsonb,
+  location text,
+  ctc text,
+  total_experience numeric,
+  qualification text,
+  current_industry text,
+  open_to_relocation boolean,
+  passed boolean,
+  verification_reasoning text,
+  sent_at timestamptz default now(),
+  completed_at timestamptz,
+  created_at timestamptz default now()
+);
+create index if not exists idx_appq_application on application_questionnaires(application_id);
+create index if not exists idx_appq_token on application_questionnaires(token);

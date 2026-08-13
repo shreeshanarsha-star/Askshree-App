@@ -3,6 +3,7 @@ import { getClientIp, checkAndRecordUsage, logToolRun } from '../../../../../lib
 import { extractText } from '../../../../../lib/extractText';
 import { screenCandidate } from '../../../../../lib/aiScreen';
 import { sendEmail } from '../../../../../lib/email';
+import { createQuestionnaire } from '../../../../../lib/questionnaire';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { askClaude } from '../../../../../lib/anthropic';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
@@ -144,54 +145,37 @@ export async function POST(req) {
     ? results.sort((a, b) => b.matchScore - a.matchScore).slice(0, AUTO_APPLY_CAP)
     : results;
 
-  // For every job just applied to, recompute and (re)send the shortlist if it
-  // now has genuinely qualifying candidates — capped at 5, never sent if empty.
+  // Clearing the CV-based bar doesn't reach the job poster directly anymore —
+  // it earns the candidate a questionnaire, confirming the job's actual
+  // requirements in their own words. Only a pass on that (see the
+  // apply-questionnaire submit route) gets emailed to the poster.
   for (const r of applied) {
-    await maybeSendShortlist(db, r.jobId);
+    if (r.matchScore >= SHORTLIST_THRESHOLD && candidate.email) {
+      try {
+        const q = await createQuestionnaire(r.application.id);
+        await sendQuestionnaireEmail(candidate, r, q.token);
+      } catch (e) {
+        continue;
+      }
+    }
   }
 
   return NextResponse.json({ candidateId: candidate.id, applied });
 }
 
-async function maybeSendShortlist(db, jobPostingId) {
-  const { data: job } = await db.from('job_postings').select('*').eq('id', jobPostingId).maybeSingle();
-  if (!job || !job.approved || !job.email_verified || !job.poster_email) return;
-
-  const { data: qualifying } = await db
-    .from('applications')
-    .select('*, candidates(name, email, phone)')
-    .eq('job_posting_id', jobPostingId)
-    .gte('match_score', SHORTLIST_THRESHOLD)
-    .order('match_score', { ascending: false })
-    .limit(SHORTLIST_CAP);
-
-  if (!qualifying || qualifying.length === 0) return; // nobody qualifies yet — send nothing
-
+async function sendQuestionnaireEmail(candidate, r, token) {
+  const link = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://askshree.com'}/apply-questionnaire/${token}`;
   const html = `
-    <p><strong>&#9733; Vetted by Shree</strong> &middot; AI-screened against your must-haves, qualification, and stated requirements.</p>
-    <h2>Your shortlist for ${job.title} at ${job.company} — ${qualifying.length} match${qualifying.length > 1 ? 'es' : ''} ready</h2>
-    ${qualifying.map((a) => `
-      <div style="margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #eee;">
-        <p><strong>${a.candidates?.name || 'Candidate'}</strong> — ${a.match_score}% match</p>
-        <p><em>Why they matched:</em> ${a.ai_evidence || ''}</p>
-        <p>"${a.ai_cover_note || ''}"</p>
-      </div>
-    `).join('')}
-    <p style="font-size:12px;color:#888;">Only genuinely qualifying candidates are sent — capped at top 5, or none if nobody clears the bar.</p>
+    <p>Hi ${candidate.name || 'there'},</p>
+    <p>Your CV looks like a strong fit for <strong>${r.jobTitle}</strong> at <strong>${r.company}</strong>.
+       Before we pass your profile to the employer, a quick 2-minute questionnaire confirms you meet
+       their actual requirements — it's what gets your profile in front of them, not lost in a pile.</p>
+    <p><a href="${link}">${link}</a></p>
   `;
-
-  const result = await sendEmail({
-    to: job.poster_email,
+  return sendEmail({
+    to: candidate.email,
     from: 'Ask Shree — Job Postings <Jobpostings@askshree.com>',
-    subject: `Your shortlist for ${job.title} at ${job.company}`,
+    subject: `Quick questionnaire — ${r.jobTitle} at ${r.company}`,
     html,
   });
-
-  const ids = qualifying.map((a) => a.id);
-  await db
-    .from('applications')
-    .update({ shortlisted: true, shortlist_sent_at: new Date().toISOString() })
-    .in('id', ids);
-
-  return result;
 }
