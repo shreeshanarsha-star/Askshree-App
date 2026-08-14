@@ -117,10 +117,23 @@ export default function SmartHuntAI() {
 
   async function runSearch() {
     setRunning(true);
-    setNote('Searching…');
     setCandidates(null);
     setSelected(new Set());
     setContactState({});
+
+    // Narrative status while the search runs — cycles on its own timer,
+    // independent of the actual request, so it always reads naturally
+    // whether the search takes one second or ten.
+    const steps = company.trim()
+      ? [`Exploring ${company.trim()}…`, 'Identifying candidates…', 'Scoring matches…', 'Here we go…']
+      : ['Casting the net…', 'Identifying candidates…', 'Scoring matches…', 'Here we go…'];
+    let stepIndex = 0;
+    setNote(steps[0]);
+    const stepTimer = setInterval(() => {
+      stepIndex = Math.min(stepIndex + 1, steps.length - 1);
+      setNote(steps[stepIndex]);
+    }, 1100);
+
     const body = {
       company, role, location,
       skills: skillsInput.split(',').map((s) => s.trim()).filter(Boolean),
@@ -132,11 +145,14 @@ export default function SmartHuntAI() {
       body: JSON.stringify(body),
     });
     const data = await res.json();
+    clearInterval(stepTimer);
     setRunning(false);
     if (data.locked) { setNote(data.message); return; }
     if (data.error) { setNote(data.error); return; }
     setCandidates(data.candidates || []);
-    setNote(data.candidates?.length ? '' : 'No matching profiles found — try broadening the keywords or dropping the location filter.');
+    setNote(data.candidates?.length
+      ? `Found ${data.candidates.length} candidate${data.candidates.length > 1 ? 's' : ''}.`
+      : "Came up empty — try loosening a field or two.");
   }
 
   const canSearch = !running && (company.trim() || role.trim() || location.trim() || skillsInput.trim() || keywords.trim());
@@ -158,10 +174,8 @@ export default function SmartHuntAI() {
         <div className="eyebrow">Recruit.ai</div>
         <h1 className="serif" style={{ fontSize: 26, color: 'var(--cream)', margin: '8px 0 12px' }}>Smart Hunt.ai</h1>
         <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 620, marginBottom: 28, textAlign: 'justify' }}>
-          Manual X-ray search across public candidate data. Fill in as many or as few as you like — AI
-          searches by company first, then narrows using role, location, skills, and keywords, in that
-          order. Reveal contact details, select candidates to share by email, or export the full list to
-          Excel.
+          You want to head hunt? Let AI do the job for you. Fill in as many or as few fields as you like —
+          reveal contact details, select candidates to share by email, or export the full list to Excel.
         </p>
 
         <div className="jp-panel active">
