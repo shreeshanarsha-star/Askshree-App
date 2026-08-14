@@ -50,12 +50,21 @@ export default function VoiceAI() {
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+      // Different browsers negotiate different codecs by default (Chrome/Edge:
+      // webm/opus, Safari: mp4/aac) — pick the best supported one explicitly so
+      // the Blob's type and the filename we send the server always match what
+      // was actually recorded, instead of assuming webm everywhere.
+      const preferredTypes = ['audio/webm', 'audio/mp4', 'audio/ogg', 'audio/wav'];
+      const supportedType = preferredTypes.find(
+        (t) => window.MediaRecorder?.isTypeSupported?.(t)
+      );
+      const recorder = supportedType ? new MediaRecorder(stream, { mimeType: supportedType }) : new MediaRecorder(stream);
+      const actualMimeType = recorder.mimeType || supportedType || 'audio/webm';
       audioChunksRef.current = [];
       recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
       recorder.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const blob = new Blob(audioChunksRef.current, { type: actualMimeType });
         setNote('Transcribing your recording…');
         const base64 = await new Promise((resolve, reject) => {
           const reader = new FileReader();
@@ -65,7 +74,7 @@ export default function VoiceAI() {
         });
         const res = await siteFetch('/api/tools/voice/transcribe-only', {
           method: 'POST',
-          body: JSON.stringify({ audioFile: { base64, mimeType: 'audio/webm' } }),
+          body: JSON.stringify({ audioFile: { base64, mimeType: actualMimeType } }),
         }).catch(() => null);
         // Fallback: if a dedicated transcribe-only endpoint isn't available,
         // just let the recorded clip go up with the main request instead.
