@@ -4,7 +4,7 @@ import NeuralBackground from '../components/NeuralBackground';
 import AskShreeChat from '../components/AskShreeChat';
 
 const TOOL_LINKS = {
-  'gauri.ai': '/tools/gauri-ai',
+  'gauri.ai': '/gauri',
   'job postings.ai': '/tools/job-postings-ai',
   'apply.ai': '/tools/apply-ai',
   'smart source.ai': '/tools/smart-source-ai',
@@ -249,7 +249,7 @@ export default function HomePage() {
         <div className="eyebrow">AI SYSTEMS</div>
         <div style={{ marginTop: 16 }}>
           <div className="ai-group">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => window.location.href = '/tools/gauri-ai'}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => window.location.href = '/gauri'}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span className="ai-badge">A</span>
                 <span className="ai-name">Gauri.ai</span>

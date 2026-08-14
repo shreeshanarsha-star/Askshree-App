@@ -18,6 +18,7 @@ export async function POST(req) {
     const result = await continueConversation({ transcript, cowDetails, language });
     return NextResponse.json({
       reply: result.reply,
+      detectedLanguage: result.detectedLanguage || null,
       ready: !!result.ready,
       surfaceDiagnosis: result.surfaceDiagnosis || null,
       suggestedProductName: result.suggestedProductRow?.name || null,
