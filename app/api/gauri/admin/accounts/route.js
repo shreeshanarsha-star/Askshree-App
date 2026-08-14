@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { getSessionAccount } from '../../../../../lib/gauriAuth';
 
-const VALID_ROLES = ['admin', 'vet', 'agent', 'stockist'];
+const VALID_ROLES = ['admin', 'vet', 'agent', 'stockist', 'paramed'];
 
 export async function GET(req) {
   const account = await getSessionAccount(req);

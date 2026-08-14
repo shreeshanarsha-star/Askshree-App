@@ -1,123 +1,185 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
-// Farmer intake — the front door of the cattle-health module. No login:
-// farmers never get an account. Describe the cow's issue by voice or text,
-// optionally give a name/phone/cow details, submit, get a case link to
-// check back on. AI drafts a triage note behind the scenes for a vet to
-// review — the farmer never sees it until a vet has approved it.
-export default function GauriFarmerIntake() {
+// The Gauri.ai expressive avatar — farmer intake, reimagined as a
+// conversation instead of a form. Greets the farmer, listens, asks
+// clarifying questions until confident, then gives a plain-language
+// surface-level read + a suggested product and asks permission to have a
+// vet call. Only on explicit "yes" does a case actually get created — the
+// conversation itself never claims to be a diagnosis, and the vet still
+// reviews and can correct everything before any product ships.
+const LANGUAGES = [
+  { code: 'English', speechLang: 'en-IN', label: 'English' },
+  { code: 'Hindi', speechLang: 'hi-IN', label: 'हिंदी' },
+  { code: 'Kannada', speechLang: 'kn-IN', label: 'ಕನ್ನಡ' },
+];
+const GREETING = {
+  English: "Namaste. I am Gauri. Please tell me what's happening with your cow — I'm listening.",
+  Hindi: 'नमस्ते। मैं गौरी हूँ। कृपया बताइए आपकी गाय को क्या हुआ है — मैं सुन रही हूँ।',
+  Kannada: 'ನಮಸ್ತೆ. ನಾನು ಗೌರಿ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಹಸುವಿಗೆ ಏನಾಗಿದೆ ಎಂದು ಹೇಳಿ — ನಾನು ಕೇಳುತ್ತಿದ್ದೇನೆ.',
+};
+
+export default function GauriAvatarPage() {
+  const [language, setLanguage] = useState('English');
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [mode, setMode] = useState(''); // '', 'listening', 'speaking'
+  const [busy, setBusy] = useState(false);
+  const [confirmData, setConfirmData] = useState(null); // {surfaceDiagnosis, suggestedProductName, urgency}
+  const [showConfirmForm, setShowConfirmForm] = useState(false);
   const [farmerName, setFarmerName] = useState('');
   const [farmerPhone, setFarmerPhone] = useState('');
+  const [farmerAddress, setFarmerAddress] = useState('');
   const [cowDetails, setCowDetails] = useState('');
-  const [issueText, setIssueText] = useState('');
-  const [recording, setRecording] = useState(false);
-  const [liveListening, setLiveListening] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [note, setNote] = useState('');
-  const [caseId, setCaseId] = useState(null);
+  const [caseCreated, setCaseCreated] = useState(null); // caseId
+  const [started, setStarted] = useState(false);
 
-  const mediaRecorderRef = useRef(null);
-  const audioChunksRef = useRef([]);
-  const recognitionRef = useRef(null);
+  const blinkTimer = useRef(null);
+  const chatRef = useRef(null);
 
-  async function toggleRecording() {
-    if (recording) {
-      mediaRecorderRef.current?.stop();
-      setRecording(false);
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const preferredTypes = ['audio/webm', 'audio/mp4', 'audio/ogg', 'audio/wav'];
-      const supportedType = preferredTypes.find((t) => window.MediaRecorder?.isTypeSupported?.(t));
-      const recorder = supportedType ? new MediaRecorder(stream, { mimeType: supportedType }) : new MediaRecorder(stream);
-      const actualMimeType = recorder.mimeType || supportedType || 'audio/webm';
-      audioChunksRef.current = [];
-      recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
-      recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(audioChunksRef.current, { type: actualMimeType });
-        setNote('Transcribing…');
-        const base64 = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(',')[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        const res = await fetch('/api/gauri/transcribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ audioFile: { base64, mimeType: actualMimeType } }),
-        }).catch(() => null);
-        if (res && res.ok) {
-          const data = await res.json();
-          if (data.transcript) { setIssueText((p) => (p ? p + ' ' : '') + data.transcript); setNote(''); return; }
-        }
-        setNote('');
-      };
-      recorder.start();
-      mediaRecorderRef.current = recorder;
-      setRecording(true);
-    } catch (e) {
-      setNote('Could not access your microphone. Check permissions, or type instead.');
-    }
+  useEffect(() => {
+    blinkTimer.current = setTimeout(function loop() {
+      setMode((m) => m); // no-op state touch not needed; blink handled via class toggle below
+      blinkNow();
+      blinkTimer.current = setTimeout(loop, 2800 + Math.random() * 4500);
+    }, 1800);
+    return () => clearTimeout(blinkTimer.current);
+  }, []);
+
+  function blinkNow() {
+    const stage = document.getElementById('gav-stage');
+    if (!stage) return;
+    stage.classList.add('gav-blink');
+    setTimeout(() => stage.classList.remove('gav-blink'), 145);
   }
 
-  function toggleLiveSpeech() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      setNote('Live speech isn’t supported in this browser — try Chrome, or type instead.');
-      return;
-    }
-    if (liveListening) {
-      recognitionRef.current?.stop();
-      setLiveListening(false);
-      return;
-    }
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = false;
-    recognition.onresult = (e) => {
-      const text = Array.from(e.results).map((r) => r[0].transcript).join(' ');
-      setIssueText((p) => (p ? p + ' ' : '') + text);
+  useEffect(() => {
+    if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
+  }, [messages]);
+
+  function speak(text) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const langInfo = LANGUAGES.find((l) => l.code === language);
+    const vs = window.speechSynthesis.getVoices();
+    const langPrefix = langInfo.speechLang.split('-')[0];
+    u.voice = vs.find((v) => v.lang?.toLowerCase().startsWith(langPrefix)) || vs.find((v) => /female|samantha|zira/i.test(v.name)) || vs[0];
+    u.lang = langInfo.speechLang;
+    u.rate = 0.88; u.pitch = 0.98; u.volume = 1;
+    u.onstart = () => setMode('speaking');
+    u.onend = () => setMode('');
+    window.speechSynthesis.speak(u);
+  }
+
+  function startListening() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { setNote('Voice isn’t supported in this browser — type instead.'); return; }
+    const langInfo = LANGUAGES.find((l) => l.code === language);
+    const r = new SR();
+    r.lang = langInfo.speechLang;
+    r.interimResults = true;
+    r.onstart = () => setMode('listening');
+    r.onresult = (e) => {
+      let s = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) s += e.results[i][0].transcript;
+      setInput(s);
     };
-    recognition.onend = () => setLiveListening(false);
-    recognition.start();
-    recognitionRef.current = recognition;
-    setLiveListening(true);
+    r.onend = () => setMode('');
+    r.start();
   }
 
-  async function submitCase() {
-    if (!issueText.trim()) { setNote('Describe the issue first, by voice or text.'); return; }
-    setSubmitting(true);
-    setNote('Submitting…');
+  async function beginConversation() {
+    setStarted(true);
+    const greetMsg = { role: 'gauri', text: GREETING[language] };
+    setMessages([greetMsg]);
+    speak(greetMsg.text);
+  }
+
+  async function sendMessage(overrideText) {
+    const text = (overrideText ?? input).trim();
+    if (!text || busy) return;
+    const newMessages = [...messages, { role: 'farmer', text }];
+    setMessages(newMessages);
+    setInput('');
+    setBusy(true);
+    setNote('');
+
+    const res = await fetch('/api/gauri/converse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript: newMessages, cowDetails, language }),
+    }).catch(() => null);
+
+    setBusy(false);
+    if (!res || !res.ok) {
+      setNote('Gauri couldn’t respond just now — please try again.');
+      return;
+    }
+    const data = await res.json();
+    const gauriMsg = { role: 'gauri', text: data.reply };
+    setMessages((m) => [...m, gauriMsg]);
+    speak(data.reply);
+
+    if (data.ready) {
+      setConfirmData({
+        surfaceDiagnosis: data.surfaceDiagnosis,
+        suggestedProductName: data.suggestedProductName,
+        suggestedProductId: data.suggestedProductId,
+        urgency: data.urgency,
+      });
+      setShowConfirmForm(true);
+    }
+  }
+
+  async function confirmYes() {
+    if (!farmerPhone.trim()) { setNote('A phone number is needed so the vet can call you.'); return; }
+    setBusy(true);
+    setNote('');
     const res = await fetch('/api/gauri/cases', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ farmerName, farmerPhone, cowDetails, issueText }),
+      body: JSON.stringify({
+        conversationTranscript: messages,
+        farmerName, farmerPhone, farmerAddress, cowDetails,
+        surfaceDiagnosis: confirmData?.surfaceDiagnosis,
+        suggestedProductId: confirmData?.suggestedProductId,
+        urgency: confirmData?.urgency,
+      }),
     });
     const data = await res.json();
-    setSubmitting(false);
+    setBusy(false);
     if (data.ok) {
-      setCaseId(data.caseId);
-      setNote('');
+      setCaseCreated(data.caseId);
+      const bye = `Thank you. A vet will call you at ${farmerPhone} shortly. You can also check this link anytime for updates.`;
+      setMessages((m) => [...m, { role: 'gauri', text: bye }]);
+      speak(bye);
     } else {
-      setNote(data.error || 'Could not submit. Try again.');
+      setNote(data.error || 'Could not submit that. Try again.');
     }
   }
 
-  if (caseId) {
+  function confirmNo() {
+    setShowConfirmForm(false);
+    setConfirmData(null);
+    const bye = 'No problem. Feel free to tell me more, or come back anytime.';
+    setMessages((m) => [...m, { role: 'gauri', text: bye }]);
+    speak(bye);
+  }
+
+  if (caseCreated) {
     return (
-      <div style={{ padding: '60px 24px', maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
-        <h1 className="serif" style={{ fontSize: 24, color: 'var(--cream)' }}>Submitted</h1>
+      <div style={{ padding: '44px 24px 80px', maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
+        <div className="eyebrow">Gauri.ai</div>
+        <h1 className="serif" style={{ fontSize: 24, color: 'var(--cream)', margin: '8px 0 12px' }}>A vet will call you shortly</h1>
         <p style={{ color: 'var(--slate)', fontSize: 14, lineHeight: 1.7, marginTop: 12 }}>
-          A vet will review your case and you'll get a recommendation soon. Save this link to check back:
+          Save this link to check status and see what's happening with your delivery:
         </p>
         <div className="file-hint" style={{ marginTop: 16, wordBreak: 'break-all' }}>
-          <a href={`/gauri/status/${caseId}`} style={{ color: 'var(--amber)' }}>askshree.com/gauri/status/{caseId}</a>
+          <a href={`/gauri/status/${caseCreated}`} style={{ color: 'var(--amber)' }}>askshree.com/gauri/status/{caseCreated}</a>
         </div>
-        <button className="primary-btn" style={{ marginTop: 24 }} onClick={() => { setCaseId(null); setIssueText(''); setFarmerName(''); setFarmerPhone(''); setCowDetails(''); }}>
+        <button className="primary-btn" style={{ marginTop: 24 }} onClick={() => window.location.reload()}>
           Report another issue
         </button>
       </div>
@@ -125,45 +187,77 @@ export default function GauriFarmerIntake() {
   }
 
   return (
-    <div style={{ padding: '44px 24px 80px', maxWidth: 640, margin: '0 auto' }}>
-      <div className="eyebrow">Gauri.ai</div>
-      <h1 className="serif" style={{ fontSize: 26, color: 'var(--cream)', margin: '8px 0 12px' }}>Tell us what's wrong with your cow</h1>
-      <p style={{ fontSize: 13.5, color: 'var(--slate)', marginBottom: 28, lineHeight: 1.7 }}>
-        Speak or type what's happening — a vet will review and get back to you with what to do next.
-      </p>
+    <div style={{ padding: '36px 24px 80px', maxWidth: 640, margin: '0 auto' }}>
+      <div className="eyebrow" style={{ textAlign: 'center' }}>Gauri.ai</div>
+      <h1 className="serif" style={{ fontSize: 24, color: 'var(--cream)', margin: '8px 0 6px', textAlign: 'center' }}>Talk to Gauri about your cow</h1>
 
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
-        <button type="button" onClick={toggleRecording}
-          style={{
-            border: '1px solid ' + (recording ? 'var(--amber)' : 'var(--line)'), color: recording ? 'var(--amber)' : 'var(--slate)',
-            background: 'transparent', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, padding: '9px 16px', borderRadius: 20, cursor: 'pointer',
-          }}>
-          {recording ? '● Stop recording' : '🎙 Record voice'}
-        </button>
-        <button type="button" onClick={toggleLiveSpeech}
-          style={{
-            border: '1px solid ' + (liveListening ? 'var(--amber)' : 'var(--line)'), color: liveListening ? 'var(--amber)' : 'var(--slate)',
-            background: 'transparent', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, padding: '9px 16px', borderRadius: 20, cursor: 'pointer',
-          }}>
-          {liveListening ? '● Listening — tap to stop' : '🎤 Speak live'}
-        </button>
+      {!started && (
+        <div className="gav-lang-row">
+          {LANGUAGES.map((l) => (
+            <button key={l.code} className={`gav-lang-btn ${language === l.code ? 'active' : ''}`} onClick={() => setLanguage(l.code)}>{l.label}</button>
+          ))}
+        </div>
+      )}
+
+      <div id="gav-stage" className={`gav-stage ${mode === 'speaking' ? 'gav-speaking' : ''} ${mode === 'listening' ? 'gav-listening' : ''}`}>
+        <img className="gav-face" src="/gauri/avatar-face.jpg" alt="Gauri" />
+        <div className="gav-fx">
+          <div className="gav-eyeL"></div><div className="gav-eyeR"></div>
+          <div className="gav-eyeGlowL"></div><div className="gav-eyeGlowR"></div>
+          <div className="gav-mouth"></div><div className="gav-smile"></div>
+        </div>
+        <div className="gav-status">{mode === 'speaking' ? 'Gauri is speaking…' : mode === 'listening' ? 'Listening…' : 'Ready'}</div>
       </div>
 
-      <textarea className="free-text-input" style={{ minHeight: 120, resize: 'vertical' }}
-        placeholder="What's going on with your cow? You can edit this before submitting…"
-        value={issueText} onChange={(e) => setIssueText(e.target.value)} />
+      {!started ? (
+        <div style={{ textAlign: 'center', marginTop: 20 }}>
+          <button className="primary-btn" onClick={beginConversation}>Start talking to Gauri</button>
+        </div>
+      ) : (
+        <>
+          <div className="gav-chat" ref={chatRef}>
+            {messages.map((m, i) => (
+              <div key={i} className={`gav-bubble ${m.role}`}>{m.text}</div>
+            ))}
+            {busy && <div className="gav-bubble gauri" style={{ opacity: 0.6 }}>…</div>}
+          </div>
 
-      <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="Cow details — breed, age, how long has this been going on"
-        value={cowDetails} onChange={(e) => setCowDetails(e.target.value)} />
-      <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="Your name"
-        value={farmerName} onChange={(e) => setFarmerName(e.target.value)} />
-      <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="Phone number"
-        value={farmerPhone} onChange={(e) => setFarmerPhone(e.target.value)} />
+          {!showConfirmForm && (
+            <div className="gav-controls">
+              <input className="free-text-input" placeholder="Type or speak your answer…" value={input}
+                onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendMessage()} />
+              <button className="primary-btn" style={{ marginTop: 0 }} onClick={() => sendMessage()} disabled={busy}>Send</button>
+              <button className="primary-btn" style={{ marginTop: 0, background: 'transparent', color: 'var(--amber)' }} onClick={startListening} disabled={busy}>🎙</button>
+            </div>
+          )}
 
-      <button className="primary-btn" onClick={submitCase} disabled={submitting || !issueText.trim()}>
-        {submitting ? 'Submitting…' : 'Submit to a vet'}
-      </button>
-      {note && <div className="file-hint" style={{ marginTop: 14 }}>{note}</div>}
+          {showConfirmForm && confirmData && (
+            <div className="gav-confirm">
+              <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber)', textTransform: 'uppercase', marginBottom: 8 }}>
+                Confirm to get a vet callback
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--cream)', marginBottom: 4 }}><b>At a surface level:</b> {confirmData.surfaceDiagnosis}</div>
+              {confirmData.suggestedProductName && (
+                <div style={{ fontSize: 13, color: 'var(--cream)' }}><b>May help:</b> {confirmData.suggestedProductName}</div>
+              )}
+              <div className="row">
+                <input className="free-text-input" placeholder="Your name" value={farmerName} onChange={(e) => setFarmerName(e.target.value)} />
+                <input className="free-text-input" placeholder="Phone number (required)" value={farmerPhone} onChange={(e) => setFarmerPhone(e.target.value)} />
+              </div>
+              <div className="row">
+                <input className="free-text-input" placeholder="Village / address (for delivery)" value={farmerAddress} onChange={(e) => setFarmerAddress(e.target.value)} />
+                <input className="free-text-input" placeholder="Cow details — breed, age" value={cowDetails} onChange={(e) => setCowDetails(e.target.value)} />
+              </div>
+              <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                <button className="primary-btn" style={{ marginTop: 0 }} onClick={confirmYes} disabled={busy}>Yes, have a vet call me</button>
+                <button className="primary-btn" style={{ marginTop: 0, background: 'transparent', color: 'var(--slate)', borderColor: 'var(--line)' }} onClick={confirmNo} disabled={busy}>Not now</button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
+      {note && <div className="file-hint" style={{ textAlign: 'center', marginTop: 14 }}>{note}</div>}
     </div>
   );
 }

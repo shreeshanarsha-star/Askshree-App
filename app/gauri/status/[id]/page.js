@@ -2,13 +2,20 @@
 import { useEffect, useState } from 'react';
 
 // Public status-check page — the link farmers save after submitting a
-// case. No login. Shows status only, and the final recommendation once a
-// vet has approved it — never the AI draft or vet notes.
+// case. No login. Shows status only, the final recommendation once a vet
+// has approved it, and (if a product was recommended) a safe summary of the
+// delivery order — never the AI draft, vet notes, or the paramed's identity.
 const STATUS_TEXT = {
   pending_ai: 'Your case has been received and is being looked at.',
   pending_vet_review: 'A vet is reviewing your case now.',
   approved: 'A vet has reviewed your case.',
   rejected: 'A vet has reviewed your case and could not make a recommendation from the details given. Please submit a new case with more detail, or contact a vet directly.',
+};
+const ORDER_STATUS_TEXT = {
+  pending_dispatch: 'Being arranged for delivery',
+  out_for_delivery: 'Out for delivery',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
 };
 
 export default function GauriStatusPage({ params }) {
@@ -33,6 +40,7 @@ export default function GauriStatusPage({ params }) {
   }
 
   const c = data.case;
+  const order = c.order;
   return (
     <div style={{ padding: '60px 24px', maxWidth: 560, margin: '0 auto' }}>
       <div className="eyebrow">Gauri.ai</div>
@@ -43,6 +51,16 @@ export default function GauriStatusPage({ params }) {
         <div style={{ border: '1px solid var(--line)', borderRadius: 8, padding: 16, background: 'rgba(255,255,255,0.015)' }}>
           <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber)', marginBottom: 8, textTransform: 'uppercase' }}>Vet's recommendation</div>
           <div style={{ fontSize: 13.5, color: 'var(--cream)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{c.final_recommendation}</div>
+        </div>
+      )}
+
+      {order && (
+        <div style={{ border: '1px solid var(--amber-dim)', borderRadius: 8, padding: 16, marginTop: 14, background: 'rgba(232,163,61,0.06)' }}>
+          <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber)', marginBottom: 8, textTransform: 'uppercase' }}>Product on the way</div>
+          <div style={{ fontSize: 14, color: 'var(--cream)', marginBottom: 4 }}>{order.product_name}</div>
+          {order.price != null && <div style={{ fontSize: 13, color: 'var(--slate)' }}>Cost: ₹{order.price} — pay the delivery person in cash or UPI when it arrives</div>}
+          {order.estimated_delivery && <div style={{ fontSize: 13, color: 'var(--slate)' }}>Expected: {order.estimated_delivery}</div>}
+          <div style={{ marginTop: 10, fontSize: 12.5, color: 'var(--amber)' }}>{ORDER_STATUS_TEXT[order.status] || order.status}</div>
         </div>
       )}
 

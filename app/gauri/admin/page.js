@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 // Admin account management for Gauri.ai staff — add/deactivate vet, agent,
 // stockist, admin accounts. Farmers never appear here; they have no account.
-const ROLES = ['vet', 'agent', 'stockist', 'admin'];
+const ROLES = ['vet', 'paramed', 'agent', 'stockist', 'admin'];
 
 export default function GauriAdminPage() {
   const [account, setAccount] = useState(undefined);
