@@ -1,7 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
-import NeuralBackground from '../components/NeuralBackground';
 import AskShreeChat from '../components/AskShreeChat';
+import Sidebar from '../components/Sidebar';
+import ThemeBackground from '../components/ThemeBackground';
+import { useTheme } from '../lib/useTheme';
 
 const TOOL_LINKS = {
   'gauri.ai': '/gauri',
@@ -21,11 +23,7 @@ export default function HomePage() {
   const [recruitOpen, setRecruitOpen] = useState(false);
   const [marketOpen, setMarketOpen] = useState(false);
   const [financeOpen, setFinanceOpen] = useState(false);
-  const [contactOpen, setContactOpen] = useState(false);
-  const [writingsOpen, setWritingsOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settingsCode, setSettingsCode] = useState('');
-  const [settingsError, setSettingsError] = useState('');
+  const { themeId, ready: themeReady } = useTheme();
   const [justLiked, setJustLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(null);
   const [shareNote, setShareNote] = useState('');
@@ -99,73 +97,12 @@ export default function HomePage() {
 
   return (
     <div style={{ position: 'relative' }}>
-      <NeuralBackground />
+      <Sidebar active="home" />
+      <div className="side-content">
+      {themeReady && <ThemeBackground themeId={themeId} />}
 
-      <div className="nav">
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <div className="logo-wrap">
-            <div className="logo">Ask <span>Shree</span></div>
-            <div className="logo-tooltip">I fall, but I still stand up and show up!</div>
-          </div>
-          <span className="mic-badge" title="Voice — coming soon">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="9" y="2" width="6" height="12" rx="3" />
-              <path d="M5 11a7 7 0 0 0 14 0" />
-              <line x1="12" y1="18" x2="12" y2="22" />
-              <line x1="8" y1="22" x2="16" y2="22" />
-            </svg>
-          </span>
-          <div style={{ position: 'relative' }}>
-            <span className="settings-badge" title="Settings"
-              onClick={() => { setSettingsOpen((o) => !o); setSettingsCode(''); setSettingsError(''); }}>
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </span>
-            {settingsOpen && (
-              <div className="settings-pop">
-                <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: 'var(--slate)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Enter code</div>
-                <input type="password" autoFocus value={settingsCode}
-                  onChange={(e) => { setSettingsCode(e.target.value); setSettingsError(''); }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      if (settingsCode === 'SN2026') { window.location.href = '/admin'; }
-                      else { setSettingsError('Incorrect code.'); setSettingsCode(''); }
-                    }
-                  }} />
-                {settingsError && <div className="err">{settingsError}</div>}
-              </div>
-            )}
-          </div>
-        </div>
+      <div className="nav" style={{ justifyContent: 'flex-end' }}>
         <div className="nav-right">
-          <div className="links" style={{ position: 'relative', display: 'flex', gap: 40 }}>
-            <div style={{ position: 'relative' }}>
-              <span onClick={() => { setWritingsOpen((o) => !o); setContactOpen(false); }} style={{ cursor: 'pointer' }}>my writings</span>
-              {writingsOpen && (
-                <div style={{ position: 'absolute', top: 28, left: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '10px 0', fontSize: 12.5, color: 'var(--cream)', minWidth: 200, zIndex: 10 }}>
-                  <a href="/writings/purpose" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Purpose</a>
-                  <a href="/writings/leadership" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Leadership</a>
-                  <a href="/writings/strategy" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Strategy</a>
-                  <a href="/writings/artificial-intelligence" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Artificial Intelligence</a>
-                  <a href="/writings/spirituality" style={{ display: 'block', padding: '8px 18px', color: 'inherit', textDecoration: 'none' }}>&#9679; Spirituality</a>
-                </div>
-              )}
-            </div>
-            <div style={{ position: 'relative' }}>
-            <span onClick={() => { setContactOpen((o) => !o); setWritingsOpen(false); }} style={{ cursor: 'pointer' }}>my contact</span>
-            {contactOpen && (
-              <div style={{ position: 'absolute', top: 28, right: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px 18px', fontSize: 12.5, color: 'var(--cream)', minWidth: 220, zIndex: 10 }}>
-                <div><a href="tel:+919606591623" style={{ color: 'inherit', textDecoration: 'none' }}>+91 96065 91623</a></div>
-                <div style={{ margin: '8px 0', borderTop: '1px solid var(--line)' }}></div>
-                <div><a href="mailto:shreesha.narsha@gmail.com" style={{ color: 'inherit', textDecoration: 'none' }}>shreesha.narsha@gmail.com</a></div>
-                <div style={{ margin: '8px 0', borderTop: '1px solid var(--line)' }}></div>
-                <div><a href="https://www.linkedin.com/in/shreesha09/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>linkedin.com/in/shreesha09</a></div>
-              </div>
-            )}
-            </div>
-          </div>
           <div className="profile">
             <div className="tags">
               <div>Head-Global Talent Acquisition &#9679;</div>
@@ -245,7 +182,7 @@ export default function HomePage() {
         </button>
       </div>
 
-      <div className="section">
+      <div className="section" id="ai-systems">
         <div className="eyebrow">AI SYSTEMS</div>
         <div style={{ marginTop: 16 }}>
           <div className="ai-group">
@@ -366,6 +303,7 @@ export default function HomePage() {
       </div>
 
       <AskShreeChat />
+      </div>
     </div>
   );
 }
