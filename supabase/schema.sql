@@ -316,3 +316,16 @@ create table if not exists smart_hunt_usage (
   last_used_at timestamptz default now()
 );
 alter table smart_hunt_usage enable row level security;
+
+-- Voice.ai free-use gate (same pattern — 3 free requests per IP, lifted for
+-- logged-in accounts). Voice.ai transcribes speech (live recording via
+-- Groq/OpenAI Whisper, or the browser's own free Web Speech API), reads an
+-- optional attached file, and answers using Claude's web-search tool —
+-- an open-ended assistant rather than a fixed extraction/scoring pipeline.
+create table if not exists voice_usage (
+  ip_address text primary key,
+  use_count integer not null default 0,
+  status text not null default 'free',
+  last_used_at timestamptz default now()
+);
+alter table voice_usage enable row level security;

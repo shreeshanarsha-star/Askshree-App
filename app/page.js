@@ -9,9 +9,10 @@ const TOOL_LINKS = {
   'smart source.ai': '/tools/smart-source-ai',
   'smart hunt.ai': '/tools/smart-hunt-ai',
   'smart screen.ai': '/tools/smart-screen-ai',
+  'voice.ai': '/tools/voice-ai',
 };
 const TOOL_NAMES = [
-  'Job Postings.ai', 'Apply.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
+  'Job Postings.ai', 'Apply.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Voice.ai', 'Interview.ai',
   'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Induction.ai', 'Campus.ai', 'Analytics.ai', 'Dashboard.ai',
 ];
 export default function HomePage() {
@@ -273,6 +274,7 @@ export default function HomePage() {
                 <a className="live" href="/tools/smart-screen-ai">Smart screen.ai</a>
                 <a className="live" href="/tools/assessment-ai">Assessment.ai</a>
                 <a className="live" href="/tools/offer-ai">Offer.ai</a>
+                <a className="live" href="/tools/voice-ai">Voice.ai</a>
                 <span className="soon">Interview.ai</span>
                 <span className="soon">Refer.ai</span>
                 <span className="soon">Onboard.ai</span>
