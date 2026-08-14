@@ -6,6 +6,7 @@ import { KeyGate } from '../../../components/KeyGate';
 import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
 import AddToProjectButton from '../../../components/AddToProjectButton';
+import EditableCell from '../../../components/EditableCell';
 
 function scoreColor(score) {
   if (score == null) return 'var(--slate)';
@@ -39,6 +40,10 @@ export default function SmartHuntAI() {
 
   function candidateKey(c) {
     return c.id || c.profile_url;
+  }
+
+  function updateCandidateField(key, field, value) {
+    setCandidates((prev) => prev.map((c) => (candidateKey(c) === key ? { ...c, [field]: value } : c)));
   }
 
   function toggleSelect(c) {
@@ -79,6 +84,10 @@ export default function SmartHuntAI() {
         Company: c.company || '',
         Location: c.location || '',
         'Match %': c.match_score != null ? c.match_score : '',
+        Qualification: c.qualification || '',
+        'Current CTC': c.current_ctc || '',
+        'Expected CTC': c.expected_ctc || '',
+        'Notice Period': c.notice_period || '',
         'Profile URL': c.profile_url || '',
       }));
     const sheet = XLSX.utils.json_to_sheet(rows);
@@ -223,7 +232,7 @@ export default function SmartHuntAI() {
                   <thead>
                     <tr>
                       <th></th>
-                      <th>Candidate</th><th>Designation</th><th>Company</th><th>Location</th><th>Match</th><th>Contact</th><th>Profile</th>
+                      <th>Candidate</th><th>Designation</th><th>Company</th><th>Location</th><th>Match</th><th>Qualification</th><th>Current CTC</th><th>Expected CTC</th><th>Notice</th><th>Contact</th><th>Profile</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -247,6 +256,10 @@ export default function SmartHuntAI() {
                               )}
                             </div>
                           </td>
+                          <td><EditableCell value={c.qualification} onChange={(v) => updateCandidateField(key, 'qualification', v)} /></td>
+                          <td><EditableCell value={c.current_ctc} onChange={(v) => updateCandidateField(key, 'current_ctc', v)} /></td>
+                          <td><EditableCell value={c.expected_ctc} onChange={(v) => updateCandidateField(key, 'expected_ctc', v)} /></td>
+                          <td><EditableCell value={c.notice_period} onChange={(v) => updateCandidateField(key, 'notice_period', v)} /></td>
                           <td>
                             {cs.revealed ? (
                               <span style={{ fontSize: 11 }}>{cs.email || cs.phone || '—'}</span>
