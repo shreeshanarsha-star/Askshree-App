@@ -15,7 +15,7 @@ function fileToBase64(file) {
   });
 }
 
-// Voice.ai — speak or type a request, optionally attach a reference file,
+// Gauri.ai — speak or type a request, optionally attach a reference file,
 // and AI answers using that file plus live web search. Voice input works
 // two ways: live browser recording (captured via MediaRecorder and
 // transcribed server-side through Groq/OpenAI Whisper — whichever's
@@ -23,7 +23,7 @@ function fileToBase64(file) {
 // live transcript with zero server round-trip when the browser supports it
 // (Chrome/Edge). Either way the recruiter sees and can edit the text before
 // submitting — nothing is sent on voice alone without a look-over.
-export default function VoiceAI() {
+export default function GauriAI() {
   const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
   const { token: authToken } = useOptionalSession();
 
@@ -72,7 +72,7 @@ export default function VoiceAI() {
           reader.onerror = reject;
           reader.readAsDataURL(blob);
         });
-        const res = await siteFetch('/api/tools/voice/transcribe-only', {
+        const res = await siteFetch('/api/tools/gauri/transcribe-only', {
           method: 'POST',
           body: JSON.stringify({ audioFile: { base64, mimeType: actualMimeType } }),
         }).catch(() => null);
@@ -126,7 +126,7 @@ export default function VoiceAI() {
     if (referenceFile) {
       body.referenceFile = { name: referenceFile.name, mimeType: referenceFile.type, base64: await fileToBase64(referenceFile) };
     }
-    const res = await siteFetch('/api/tools/voice/analyze', {
+    const res = await siteFetch('/api/tools/gauri/analyze', {
       method: 'POST',
       headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
       body: JSON.stringify(body),
@@ -144,7 +144,7 @@ export default function VoiceAI() {
   if (checking) return null;
   if (!unlocked) {
     return (
-      <KeyGate error={error} keyVal={siteKeyVal} setKey={setKey} submit={submit} checking={checking} label="Voice.ai — enter key" />
+      <KeyGate error={error} keyVal={siteKeyVal} setKey={setKey} submit={submit} checking={checking} label="Gauri.ai — enter key" />
     );
   }
 
@@ -156,7 +156,7 @@ export default function VoiceAI() {
       </div>
       <div style={{ padding: '44px 56px 80px', maxWidth: 980, margin: '0 auto' }}>
         <div className="eyebrow">Recruit.ai</div>
-        <h1 className="serif" style={{ fontSize: 26, color: 'var(--cream)', margin: '8px 0 12px' }}>Voice.ai</h1>
+        <h1 className="serif" style={{ fontSize: 26, color: 'var(--cream)', margin: '8px 0 12px' }}>Gauri.ai</h1>
         <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 620, marginBottom: 28, textAlign: 'justify' }}>
           Speak or type a request, optionally attach a file for context — AI reads the file, searches
           the web if it needs to, and does whatever you asked.
@@ -222,7 +222,7 @@ export default function VoiceAI() {
           </div>
 
           <button className="primary-btn" onClick={runAssistant} disabled={!canRun}>
-            {running ? 'Working…' : 'Ask Voice.ai'}
+            {running ? 'Working…' : 'Ask Gauri.ai'}
           </button>
           {note && <div className="file-hint" style={{ marginTop: 14 }}>{note}</div>}
 

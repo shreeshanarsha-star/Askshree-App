@@ -4,15 +4,15 @@ import NeuralBackground from '../components/NeuralBackground';
 import AskShreeChat from '../components/AskShreeChat';
 
 const TOOL_LINKS = {
+  'gauri.ai': '/tools/gauri-ai',
   'job postings.ai': '/tools/job-postings-ai',
   'apply.ai': '/tools/apply-ai',
   'smart source.ai': '/tools/smart-source-ai',
   'smart hunt.ai': '/tools/smart-hunt-ai',
   'smart screen.ai': '/tools/smart-screen-ai',
-  'voice.ai': '/tools/voice-ai',
 };
 const TOOL_NAMES = [
-  'Job Postings.ai', 'Apply.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Voice.ai', 'Interview.ai',
+  'Gauri.ai', 'Job Postings.ai', 'Apply.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
   'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Induction.ai', 'Campus.ai', 'Analytics.ai', 'Dashboard.ai',
 ];
 export default function HomePage() {
@@ -267,6 +267,7 @@ export default function HomePage() {
             </div>
             {recruitOpen && (
               <div className="tool-grid">
+                <a className="live" href="/tools/gauri-ai">Gauri.ai</a>
                 <a className="live" href="/tools/job-postings-ai">Job Postings.ai</a>
                 <a className="live" href="/tools/apply-ai">Apply.ai</a>
                 <a className="live" href="/tools/smart-source-ai">Smart Source.ai</a>
@@ -274,7 +275,6 @@ export default function HomePage() {
                 <a className="live" href="/tools/smart-screen-ai">Smart screen.ai</a>
                 <a className="live" href="/tools/assessment-ai">Assessment.ai</a>
                 <a className="live" href="/tools/offer-ai">Offer.ai</a>
-                <a className="live" href="/tools/voice-ai">Voice.ai</a>
                 <span className="soon">Interview.ai</span>
                 <span className="soon">Refer.ai</span>
                 <span className="soon">Onboard.ai</span>

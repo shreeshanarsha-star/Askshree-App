@@ -4,7 +4,7 @@ AI-native recruiting tools: Job Postings.ai (post a role, get a shortlisted CV l
 (search and apply to open roles), Smart screen.ai (batch-screen CVs against a JD), Assessment.ai (assign
 Big Five / PULSE&trade; / IMPACT&trade; psychometric assessments from a CV and get a scored breakdown),
 Offer.ai, Smart Source.ai (LinkedIn X-ray search + AI scoring), Smart Hunt.ai (LinkedIn + our own
-candidate database + optional local resume files, one consolidated search), Voice.ai (voice or typed
+candidate database + optional local resume files, one consolidated search), Gauri.ai (voice or typed
 requests, grounded in an uploaded file and/or live web search), and the Ask Shree chatbot — all with real
 backends. The whole site sits behind a shared tool key, with a separate 4332-code lock on the "my
 writings" section.
@@ -28,9 +28,9 @@ writings" section.
    X-ray search (serpapi.com, 250 free searches/month); without it those
    tools' LinkedIn source silently returns no results but database/local
    sources still work.
-   `GROQ_API_KEY` and/or `OPENAI_API_KEY` — optional, for Voice.ai's
+   `GROQ_API_KEY` and/or `OPENAI_API_KEY` — optional, for Gauri.ai's
    "Record voice" and audio-file transcription (Groq tried first, OpenAI as
-   fallback). Without either, Voice.ai still works via typed text and the
+   fallback). Without either, Gauri.ai still works via typed text and the
    browser's own free live speech recognition (Chrome/Edge) — only
    server-side audio transcription is disabled.
 3. **Admin login** — create your admin user in Supabase Dashboard →
@@ -56,7 +56,7 @@ writings" section.
   Smart Source.ai (real drag-and-drop JD upload + SerpApi LinkedIn X-ray
   search + AI scoring), Smart Hunt.ai (fans the same search out across
   LinkedIn, the `candidates` table, and optional local files picked via a
-  folder dialog — picking the folder is the permission grant), Voice.ai
+  folder dialog — picking the folder is the permission grant), Gauri.ai
   (live browser recording transcribed via Groq/OpenAI Whisper, or the
   browser's free Web Speech API, or typed text; answers via Claude with an
   uploaded file and/or live web search as grounding), a site-wide shared

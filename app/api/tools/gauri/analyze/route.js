@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getClientIp, logToolRun } from '../../../../../lib/gating';
-import { checkAndRecordVoiceUsage } from '../../../../../lib/voiceGating';
-import { transcribeAudio } from '../../../../../lib/voiceTranscribe';
-import { runVoiceAssistant } from '../../../../../lib/voiceAssistant';
+import { checkAndRecordGauriUsage } from '../../../../../lib/gauriGating';
+import { transcribeAudio } from '../../../../../lib/gauriTranscribe';
+import { runGauriAssistant } from '../../../../../lib/gauriAssistant';
 import { extractText } from '../../../../../lib/extractText';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
 import { getAuthedUser } from '../../../../../lib/authedUser';
 
-// Voice.ai — one request, two possible sources of grounding (an uploaded
+// Gauri.ai — one request, two possible sources of grounding (an uploaded
 // file and/or live web search), and an open-ended "do whatever's asked"
 // assistant on top. Input can be: an uploaded audio/video clip (transcribed
 // server-side via Groq/OpenAI Whisper), a live-recorded clip from the
@@ -18,7 +18,7 @@ export async function POST(req) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
   const user = await getAuthedUser(req);
   const ip = getClientIp(req);
-  const gate = await checkAndRecordVoiceUsage(ip, user?.id);
+  const gate = await checkAndRecordGauriUsage(ip, user?.id);
   if (!gate.allowed) {
     return NextResponse.json({ locked: true, message: gate.message }, { status: 402 });
   }
@@ -54,12 +54,12 @@ export async function POST(req) {
 
   let answer;
   try {
-    answer = await runVoiceAssistant({ query, referenceText, useWebSearch: useWebSearch !== false });
+    answer = await runGauriAssistant({ query, referenceText, useWebSearch: useWebSearch !== false });
   } catch (e) {
     return NextResponse.json({ error: 'Could not process that request. Try again in a moment.' }, { status: 500 });
   }
 
-  await logToolRun(ip, 'voice_ai');
+  await logToolRun(ip, 'gauri_ai');
 
   return NextResponse.json({ ok: true, transcript: query, answer, status: gate.status });
 }

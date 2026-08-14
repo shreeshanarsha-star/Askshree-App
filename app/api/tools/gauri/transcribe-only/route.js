@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { transcribeAudio } from '../../../../../lib/voiceTranscribe';
+import { transcribeAudio } from '../../../../../lib/gauriTranscribe';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
 
 // Transcription only, no assistant call — used by the "Record voice" button
 // to fill the request textarea so the recruiter can review/edit before
-// actually submitting. Doesn't touch the Voice.ai free-use gate; that's
+// actually submitting. Doesn't touch the Gauri.ai free-use gate; that's
 // charged on the real /analyze call, not on filling in a text box.
 export async function POST(req) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
