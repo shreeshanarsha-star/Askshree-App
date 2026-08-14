@@ -78,7 +78,7 @@ export async function POST(req) {
   }
   if (scoreErr) {
     return NextResponse.json({
-      error: `DEBUG2: scoreResults threw: ${scoreErr} | rawResults=${searchResult.results.length}`,
+      error: 'Could not score the results. Try again in a moment.',
     }, { status: 503 });
   }
 

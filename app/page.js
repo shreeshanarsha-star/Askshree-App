@@ -7,6 +7,7 @@ const TOOL_LINKS = {
   'job postings.ai': '/tools/job-postings-ai',
   'apply.ai': '/tools/apply-ai',
   'smart source.ai': '/tools/smart-source-ai',
+  'smart hunt.ai': '/tools/smart-hunt-ai',
   'smart screen.ai': '/tools/smart-screen-ai',
 };
 const TOOL_NAMES = [
@@ -268,10 +269,10 @@ export default function HomePage() {
                 <a className="live" href="/tools/job-postings-ai">Job Postings.ai</a>
                 <a className="live" href="/tools/apply-ai">Apply.ai</a>
                 <a className="live" href="/tools/smart-source-ai">Smart Source.ai</a>
+                <a className="live" href="/tools/smart-hunt-ai">Smart hunt.ai</a>
                 <a className="live" href="/tools/smart-screen-ai">Smart screen.ai</a>
                 <a className="live" href="/tools/assessment-ai">Assessment.ai</a>
                 <a className="live" href="/tools/offer-ai">Offer.ai</a>
-                <span className="soon">Smart hunt.ai</span>
                 <span className="soon">Interview.ai</span>
                 <span className="soon">Refer.ai</span>
                 <span className="soon">Onboard.ai</span>

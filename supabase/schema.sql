@@ -304,3 +304,15 @@ create table if not exists smart_source_usage (
   last_used_at timestamptz default now()
 );
 alter table smart_source_usage enable row level security;
+
+-- Smart Hunt.ai free-use gate (same pattern — 3 free hunts per IP, lifted
+-- for logged-in accounts). Smart Hunt.ai reuses Smart Source.ai's LinkedIn
+-- search + scoring functions, adds our own candidates table and (optional,
+-- explicitly-granted) local files as two more sources in the same search.
+create table if not exists smart_hunt_usage (
+  ip_address text primary key,
+  search_count integer not null default 0,
+  status text not null default 'free',
+  last_used_at timestamptz default now()
+);
+alter table smart_hunt_usage enable row level security;
