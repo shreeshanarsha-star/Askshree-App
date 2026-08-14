@@ -23,10 +23,11 @@ export default function SmartHuntAI() {
   const { unlocked, checking, error, key: siteKeyVal, setKey, submit, siteFetch } = useSiteKey('/api/tools/site-key-check');
   const { token: authToken } = useOptionalSession();
 
-  const [skillsInput, setSkillsInput] = useState('');
-  const [booleanQuery, setBooleanQuery] = useState('');
-  const [location, setLocation] = useState('');
   const [company, setCompany] = useState('');
+  const [role, setRole] = useState('');
+  const [location, setLocation] = useState('');
+  const [skillsInput, setSkillsInput] = useState('');
+  const [keywords, setKeywords] = useState('');
   const [running, setRunning] = useState(false);
   const [note, setNote] = useState('');
   const [candidates, setCandidates] = useState(null);
@@ -121,8 +122,9 @@ export default function SmartHuntAI() {
     setSelected(new Set());
     setContactState({});
     const body = {
+      company, role, location,
       skills: skillsInput.split(',').map((s) => s.trim()).filter(Boolean),
-      booleanQuery, location, company,
+      keywords,
     };
     const res = await siteFetch('/api/tools/smart-hunt/search', {
       method: 'POST',
@@ -137,7 +139,7 @@ export default function SmartHuntAI() {
     setNote(data.candidates?.length ? '' : 'No matching profiles found — try broadening the keywords or dropping the location filter.');
   }
 
-  const canSearch = !running && skillsInput.trim().length > 0;
+  const canSearch = !running && (company.trim() || role.trim() || location.trim() || skillsInput.trim() || keywords.trim());
 
   if (checking) return null;
   if (!unlocked) {
@@ -156,21 +158,23 @@ export default function SmartHuntAI() {
         <div className="eyebrow">Recruit.ai</div>
         <h1 className="serif" style={{ fontSize: 26, color: 'var(--cream)', margin: '8px 0 12px' }}>Smart Hunt.ai</h1>
         <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 620, marginBottom: 28, textAlign: 'justify' }}>
-          Manual X-ray search across public candidate data — type keywords, location, or company and AI
-          builds and scores the search. Reveal contact details, select candidates to share by email, or
-          export the full list to Excel.
+          Manual X-ray search across public candidate data. Fill in as many or as few as you like — AI
+          searches by company first, then narrows using role, location, skills, and keywords, in that
+          order. Reveal contact details, select candidates to share by email, or export the full list to
+          Excel.
         </p>
 
         <div className="jp-panel active">
-          <input className="free-text-input" type="text" placeholder="Keywords, comma-separated — e.g. sourcing manager, talent acquisition"
-            value={skillsInput} onChange={(e) => setSkillsInput(e.target.value)} />
-          <input className="free-text-input" style={{ marginTop: 10 }} type="text"
-            placeholder="Optional: exact boolean search terms (e.g. &quot;Django&quot; OR &quot;Flask&quot;)"
-            value={booleanQuery} onChange={(e) => setBooleanQuery(e.target.value)} />
-          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="Location (optional) — e.g. Bengaluru"
-            value={location} onChange={(e) => setLocation(e.target.value)} />
-          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="Company (optional) — e.g. Razorpay"
+          <input className="free-text-input" type="text" placeholder="1. Company (optional) — e.g. Razorpay"
             value={company} onChange={(e) => setCompany(e.target.value)} />
+          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="2. Role (optional) — e.g. Sourcing Manager"
+            value={role} onChange={(e) => setRole(e.target.value)} />
+          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="3. Location / Country (optional) — e.g. Bengaluru"
+            value={location} onChange={(e) => setLocation(e.target.value)} />
+          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="4. Skills, comma-separated (optional) — e.g. Talent Acquisition, Sourcing"
+            value={skillsInput} onChange={(e) => setSkillsInput(e.target.value)} />
+          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="5. Keywords (optional) — any other exact terms or phrases"
+            value={keywords} onChange={(e) => setKeywords(e.target.value)} />
 
           <button className="primary-btn" onClick={runSearch} disabled={!canSearch}>
             {running ? 'Searching…' : 'Search'}

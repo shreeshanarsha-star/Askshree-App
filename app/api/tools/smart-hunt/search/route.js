@@ -5,10 +5,11 @@ import { buildSearchQuery, searchSerpApiWithFallback, scoreResults } from '../..
 import { requireSiteKey } from '../../../../../lib/siteAuth';
 import { getAuthedUser } from '../../../../../lib/authedUser';
 
-// Smart Hunt.ai — original spec: manual X-ray search across public candidate
-// data only. Keywords/location/company in, AI builds the search, scores
-// what comes back. No JD upload, no database merge, no local files — that
-// scope creep got stripped back out; Smart Source.ai is the JD-driven tool.
+// Smart Hunt.ai — manual X-ray search across public candidate data only.
+// Fixed field order per the finalized spec: Company first (the primary
+// filter — search from the company, then narrow with everything else),
+// then Role, Location, Skills, and free-text Keywords last. No JD upload,
+// no database merge, no local files — that's Smart Source.ai's job.
 export async function POST(req) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
   const user = await getAuthedUser(req);
@@ -19,16 +20,23 @@ export async function POST(req) {
   }
   await logToolRun(ip, 'smart_hunt_ai');
 
-  const { skills, booleanQuery, location, company } = await req.json();
+  const { company, role, location, skills, keywords } = await req.json();
+  const skillList = Array.isArray(skills) ? skills : [];
 
-  if (!Array.isArray(skills) || skills.length === 0) {
-    return NextResponse.json({ error: 'Add at least one keyword.' }, { status: 400 });
+  if (!company && !role && !location && skillList.length === 0 && !keywords) {
+    return NextResponse.json({ error: 'Give at least one field to search on.' }, { status: 400 });
   }
 
-  const criteria = { roleTitle: null, skills, location: location || null, company: company || null };
+  const criteria = {
+    company: company || null,
+    roleTitle: role || null,
+    location: location || null,
+    skills: skillList,
+    keywords: keywords || null,
+  };
 
   try {
-    const queryText = buildSearchQuery({ skills, location, roleTitle: null, booleanQuery, company });
+    const queryText = buildSearchQuery(criteria);
     const searchResult = await searchSerpApiWithFallback(criteria, queryText);
     if (!searchResult.ok || searchResult.results.length === 0) {
       return NextResponse.json({ ok: true, candidates: [], status: gate.status });
