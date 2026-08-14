@@ -165,15 +165,15 @@ export default function SmartHuntAI() {
         </p>
 
         <div className="jp-panel active">
-          <input className="free-text-input" type="text" placeholder="1. Company (optional) — e.g. Razorpay"
+          <input className="free-text-input" type="text" placeholder="1. Company — e.g. Razorpay"
             value={company} onChange={(e) => setCompany(e.target.value)} />
-          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="2. Role (optional) — e.g. Sourcing Manager"
+          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="2. Role — e.g. Sourcing Manager"
             value={role} onChange={(e) => setRole(e.target.value)} />
-          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="3. Location / Country (optional) — e.g. Bengaluru"
+          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="3. Location / Country — e.g. Bengaluru"
             value={location} onChange={(e) => setLocation(e.target.value)} />
-          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="4. Skills, comma-separated (optional) — e.g. Talent Acquisition, Sourcing"
+          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="4. Skills, comma-separated — e.g. Talent Acquisition, Sourcing"
             value={skillsInput} onChange={(e) => setSkillsInput(e.target.value)} />
-          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="5. Keywords (optional) — any other exact terms or phrases"
+          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="5. Keywords — any other exact terms or phrases"
             value={keywords} onChange={(e) => setKeywords(e.target.value)} />
 
           <button className="primary-btn" onClick={runSearch} disabled={!canSearch}>

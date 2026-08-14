@@ -230,7 +230,7 @@ export default function SmartSourceAI() {
             </>
           )}
 
-          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="Location filter (optional) — e.g. Bengaluru"
+          <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="Location filter — e.g. Bengaluru"
             value={location} onChange={(e) => setLocation(e.target.value)} />
 
           <button className="primary-btn" onClick={runSearch} disabled={!canSearch}>
