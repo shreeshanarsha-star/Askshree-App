@@ -5,6 +5,7 @@ import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
 import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
+import AddToProjectButton from '../../../components/AddToProjectButton';
 
 function scoreColor(score) {
   if (score == null) return 'var(--slate)';
@@ -173,7 +174,13 @@ export default function SmartHuntAI() {
                 <div className="file-hint" style={{ margin: 0 }}>
                   {candidates.length} candidate{candidates.length > 1 ? 's' : ''} found{selected.size > 0 ? ` — ${selected.size} selected` : ''}
                 </div>
-                <div style={{ display: 'flex', gap: 10 }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <a href="/tools/projects" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--slate)' }}>View projects</a>
+                  <AddToProjectButton
+                    siteFetch={siteFetch}
+                    selectedCount={selected.size}
+                    getSelectedCandidates={() => candidates.filter((c) => selected.has(candidateKey(c)))}
+                  />
                   <button
                     type="button"
                     onClick={() => setShareOpen((v) => !v)}

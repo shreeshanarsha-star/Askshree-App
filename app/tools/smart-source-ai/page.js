@@ -5,6 +5,7 @@ import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
 import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
+import AddToProjectButton from '../../../components/AddToProjectButton';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -235,7 +236,13 @@ export default function SmartSourceAI() {
                   {candidates.length} candidate{candidates.length > 1 ? 's' : ''} found{selected.size > 0 ? ` — ${selected.size} selected` : ''}
                   {cached && ' — showing results from a recent matching search'}
                 </div>
-                <div style={{ display: 'flex', gap: 10 }}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <a href="/tools/projects" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--slate)' }}>View projects</a>
+                  <AddToProjectButton
+                    siteFetch={siteFetch}
+                    selectedCount={selected.size}
+                    getSelectedCandidates={() => candidates.filter((c) => selected.has(candidateKey(c)))}
+                  />
                   <button
                     type="button"
                     onClick={() => setShareOpen((v) => !v)}
