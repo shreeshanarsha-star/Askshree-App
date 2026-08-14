@@ -15,6 +15,40 @@ function fileToBase64(file) {
   });
 }
 
+function timeAgo(dateStr) {
+  const diffMs = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 60) return mins <= 1 ? 'just now' : `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+// Auto-scrolling ticker of the newest open listings — decorative discovery,
+// not the main apply flow (that's the panel below). Duplicates the list
+// once so the CSS animation loops seamlessly at -50% translateX.
+function JobTicker({ listings }) {
+  const latest = listings.slice(0, 10);
+  if (latest.length === 0) return null;
+  const items = [...latest, ...latest];
+  return (
+    <div className="job-ticker">
+      <div className="job-ticker-label">● Latest job postings</div>
+      <div className="job-ticker-track">
+        {items.map((j, i) => (
+          <div className="job-ticker-item" key={`${j.id}-${i}`}>
+            <span className="dot" />
+            <b>{j.title}</b>
+            <span>— {j.company}</span>
+            <span className="posted">{timeAgo(j.created_at)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function TermsCheckbox({ checked, onChange }) {
   return (
     <label style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 11.5, color: 'var(--slate)', marginTop: 14, cursor: 'pointer' }}>
@@ -95,9 +129,11 @@ export default function ApplyAI() {
       <div style={{ padding: '44px 56px 80px', maxWidth: 920, margin: '0 auto' }}>
         <div className="eyebrow">Recruit.ai</div>
         <h1 className="serif" style={{ fontSize: 26, color: 'var(--cream)', margin: '8px 0 12px' }}>Apply.ai</h1>
-        <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 560, marginBottom: 28, textAlign: 'justify' }}>
+        <p style={{ fontSize: 13.5, color: 'var(--slate)', maxWidth: 560, marginBottom: 20, textAlign: 'justify' }}>
           Search and apply to a role, free — AI matches your CV against open listings and applies on your behalf, or you pick the ones you want.
         </p>
+
+        <JobTicker listings={listings} />
 
         <div className="jp-panel active">
           <div className="jp-subtabs">

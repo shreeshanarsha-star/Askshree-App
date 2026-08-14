@@ -301,6 +301,15 @@
   .jp-tabs{display:flex; gap:8px; margin-bottom:22px;}
   .jp-tab{font-family:'IBM Plex Mono',monospace; font-size:12px; padding:9px 20px; border-radius:20px; border:1px solid var(--line); background:transparent; color:var(--slate); cursor:pointer;}
   .jp-tab.active{background:var(--amber); color:#1a1204; border-color:var(--amber);}
+  .job-ticker{overflow:hidden; border:1px solid var(--line); border-radius:10px; padding:14px 0; margin-bottom:28px; background:rgba(255,255,255,0.015);}
+  .job-ticker-label{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:var(--amber-dim); padding:0 20px 10px;}
+  .job-ticker-track{display:flex; gap:14px; width:max-content; animation:ticker-scroll 32s linear infinite; padding:0 20px;}
+  .job-ticker:hover .job-ticker-track{animation-play-state:paused;}
+  .job-ticker-item{display:flex; align-items:center; gap:9px; white-space:nowrap; border:1px solid var(--line); border-radius:20px; padding:8px 16px; font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--slate); flex-shrink:0;}
+  .job-ticker-item .dot{width:5px; height:5px; border-radius:50%; background:var(--amber); flex-shrink:0;}
+  .job-ticker-item b{color:var(--cream); font-family:'Inter',sans-serif; font-weight:500; font-size:12px;}
+  .job-ticker-item .posted{color:var(--amber-dim); font-size:10px;}
+  @keyframes ticker-scroll{from{transform:translateX(0);} to{transform:translateX(-50%);}}
   .jp-panel{display:none;}
   .jp-panel.active{display:block;}
   .jp-subtabs{display:flex; gap:8px; margin-bottom:18px;}
