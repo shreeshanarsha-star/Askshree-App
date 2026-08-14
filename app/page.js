@@ -249,9 +249,18 @@ export default function HomePage() {
         <div className="eyebrow">AI SYSTEMS</div>
         <div style={{ marginTop: 16 }}>
           <div className="ai-group">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => window.location.href = '/tools/gauri-ai'}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span className="ai-badge">A</span>
+                <span className="ai-name">Gauri.ai</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="ai-group">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span className="ai-badge">B</span>
                 <span className="ai-name">C suite.ai</span>
               </div>
             </div>
@@ -260,14 +269,13 @@ export default function HomePage() {
           <div className="ai-group">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setRecruitOpen((o) => !o)}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span className="ai-badge">B</span>
+                <span className="ai-badge">C</span>
                 <span className="ai-name">Recruit.ai</span>
               </div>
               <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{recruitOpen ? '▾' : '▸'}</span>
             </div>
             {recruitOpen && (
               <div className="tool-grid">
-                <a className="live" href="/tools/gauri-ai">Gauri.ai</a>
                 <a className="live" href="/tools/job-postings-ai">Job Postings.ai</a>
                 <a className="live" href="/tools/apply-ai">Apply.ai</a>
                 <a className="live" href="/tools/smart-source-ai">Smart Source.ai</a>
@@ -289,7 +297,7 @@ export default function HomePage() {
           <div className="ai-group">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span className="ai-badge">C</span>
+                <span className="ai-badge">D</span>
                 <span className="ai-name">Talent.ai</span>
               </div>
             </div>
@@ -298,7 +306,7 @@ export default function HomePage() {
           <div className="ai-group">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setMarketOpen((o) => !o)}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span className="ai-badge">D</span>
+                <span className="ai-badge">E</span>
                 <span className="ai-name">Market.ai</span>
               </div>
               <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{marketOpen ? '▾' : '▸'}</span>
@@ -312,8 +320,8 @@ export default function HomePage() {
           </div>
 
           {[
-            ['E', 'Learn.ai'],
-            ['F', 'Rewards.ai'],
+            ['F', 'Learn.ai'],
+            ['G', 'Rewards.ai'],
           ].map(([letter, name]) => (
             <div className="ai-group" key={letter}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -328,7 +336,7 @@ export default function HomePage() {
           <div className="ai-group">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} onClick={() => setFinanceOpen((o) => !o)}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span className="ai-badge">G</span>
+                <span className="ai-badge">H</span>
                 <span className="ai-name">Finance.ai</span>
               </div>
               <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{financeOpen ? '▾' : '▸'}</span>
@@ -341,9 +349,9 @@ export default function HomePage() {
           </div>
 
           {[
-            ['H', 'Brand.ai'],
-            ['I', 'Sales.ai'],
-            ['J', 'Research.ai'],
+            ['I', 'Brand.ai'],
+            ['J', 'Sales.ai'],
+            ['K', 'Research.ai'],
           ].map(([letter, name]) => (
             <div className="ai-group" key={letter}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
