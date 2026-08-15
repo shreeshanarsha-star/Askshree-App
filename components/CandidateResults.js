@@ -252,7 +252,7 @@ export default function CandidateResults({
               disabled={cs.loading}
               title={cs.message || ''}
               style={{
-                fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)',
+                fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)',
                 border: '1px solid var(--line)', borderRadius: 14, padding: '5px 11px', background: 'transparent',
                 cursor: cs.loading ? 'default' : 'pointer', whiteSpace: 'nowrap',
               }}
@@ -323,7 +323,7 @@ export default function CandidateResults({
               ))}
             </div>
           )}
-          <a href="/tools/projects" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--slate)' }}>View projects</a>
+          <a href="/tools/projects" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--slate)' }}>View projects</a>
           <AddToProjectButton
             siteFetch={siteFetch}
             selectedCount={selected.size}
@@ -334,7 +334,7 @@ export default function CandidateResults({
             onClick={bulkRevealContact}
             disabled={selected.size === 0 || bulkRevealing}
             style={{
-              fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: selected.size ? 'var(--amber)' : 'var(--slate)',
+              fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5, color: selected.size ? 'var(--amber)' : 'var(--slate)',
               border: '1px solid ' + (selected.size ? 'var(--amber-dim)' : 'var(--line)'), borderRadius: 20, padding: '8px 14px',
               background: 'transparent', cursor: selected.size ? 'pointer' : 'not-allowed',
             }}
@@ -346,7 +346,7 @@ export default function CandidateResults({
             onClick={() => setShareOpen((v) => !v)}
             disabled={selected.size === 0}
             style={{
-              fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: selected.size ? 'var(--amber)' : 'var(--slate)',
+              fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5, color: selected.size ? 'var(--amber)' : 'var(--slate)',
               border: '1px solid ' + (selected.size ? 'var(--amber-dim)' : 'var(--line)'), borderRadius: 20, padding: '8px 14px',
               background: 'transparent', cursor: selected.size ? 'pointer' : 'not-allowed',
             }}
@@ -357,7 +357,7 @@ export default function CandidateResults({
             type="button"
             onClick={exportToExcel}
             style={{
-              fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: 'var(--amber)',
+              fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5, color: 'var(--amber)',
               border: '1px solid var(--amber-dim)', borderRadius: 20, padding: '8px 14px',
               background: 'transparent', cursor: 'pointer',
             }}

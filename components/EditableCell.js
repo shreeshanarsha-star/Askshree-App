@@ -22,7 +22,7 @@ export default function EditableCell({ value, onChange, placeholder = 'Add manua
         style={{
           width: 100, background: 'rgba(255,255,255,0.05)', border: '1px solid var(--amber-dim)',
           borderRadius: 4, padding: '3px 6px', color: 'var(--cream)', fontSize: 11,
-          fontFamily: 'IBM Plex Mono, monospace', outline: 'none',
+          fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, outline: 'none',
         }}
       />
     );

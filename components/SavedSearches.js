@@ -57,7 +57,7 @@ export default function SavedSearches({ tool, siteFetch, getParams, onLoad }) {
         type="button"
         onClick={toggle}
         style={{
-          fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: 'var(--slate)',
+          fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5, color: 'var(--slate)',
           border: '1px solid var(--line)', borderRadius: 20, padding: '8px 14px',
           background: 'transparent', cursor: 'pointer',
         }}
@@ -78,7 +78,7 @@ export default function SavedSearches({ tool, siteFetch, getParams, onLoad }) {
               style={{
                 flex: 1, background: 'rgba(255,255,255,0.04)', border: '1px solid var(--line)',
                 borderRadius: 6, padding: '6px 9px', color: 'var(--cream)', fontSize: 11.5,
-                fontFamily: 'IBM Plex Mono, monospace', outline: 'none',
+                fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, outline: 'none',
               }}
             />
             <button
@@ -112,7 +112,7 @@ export default function SavedSearches({ tool, siteFetch, getParams, onLoad }) {
                 >
                   <div style={{ minWidth: 0 }}>
                     <div style={{ color: 'var(--cream)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</div>
-                    <div style={{ color: 'var(--slate)', fontSize: 10, fontFamily: 'IBM Plex Mono, monospace' }}>{timeAgo(s.created_at)}</div>
+                    <div style={{ color: 'var(--slate)', fontSize: 10, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500 }}>{timeAgo(s.created_at)}</div>
                   </div>
                   <span onClick={(e) => remove(s.id, e)} style={{ color: 'var(--slate)', fontSize: 13, flexShrink: 0 }} title="Delete">&times;</span>
                 </div>

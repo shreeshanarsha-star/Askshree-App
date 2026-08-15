@@ -170,7 +170,7 @@ export default function GauriAI() {
               style={{
                 border: '1px solid ' + (recording ? 'var(--amber)' : 'var(--line)'),
                 color: recording ? 'var(--amber)' : 'var(--slate)',
-                background: 'transparent', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5,
+                background: 'transparent', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5,
                 padding: '9px 16px', borderRadius: 20, cursor: 'pointer',
               }}
             >
@@ -182,7 +182,7 @@ export default function GauriAI() {
               style={{
                 border: '1px solid ' + (liveListening ? 'var(--amber)' : 'var(--line)'),
                 color: liveListening ? 'var(--amber)' : 'var(--slate)',
-                background: 'transparent', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5,
+                background: 'transparent', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5,
                 padding: '9px 16px', borderRadius: 20, cursor: 'pointer',
               }}
             >
@@ -201,7 +201,7 @@ export default function GauriAI() {
               style={{
                 border: '1px solid ' + (referenceFile ? 'var(--amber-dim)' : 'var(--line)'),
                 color: referenceFile ? 'var(--amber)' : 'var(--slate)',
-                background: 'transparent', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5,
+                background: 'transparent', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5,
                 padding: '9px 16px', borderRadius: 20, cursor: 'pointer',
               }}
             >

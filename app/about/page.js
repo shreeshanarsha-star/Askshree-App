@@ -24,7 +24,7 @@ export default function AboutPage() {
             }}>
               <img src="/profile-photo.jpg" alt="Shreesha Narsha" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
-            <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: 'var(--amber-dim)', lineHeight: 2 }}>
+            <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5, color: 'var(--amber-dim)', lineHeight: 2 }}>
               <div>Head-Global Talent Acquisition &#9679;</div>
               <div>AI Builder &#9679;</div>
               <div>Bengaluru, India &#9679;</div>

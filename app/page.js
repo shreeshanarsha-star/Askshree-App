@@ -170,7 +170,7 @@ export default function HomePage() {
                 </div>
               )}
             </div>
-            {shareNote && <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
+            {shareNote && <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
           </div>
 
         </div>
@@ -211,7 +211,7 @@ export default function HomePage() {
                 <span className="ai-badge">C</span>
                 <span className="ai-name">Recruit.ai</span>
               </div>
-              <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{recruitOpen ? '▾' : '▸'}</span>
+              <span style={{ color: 'var(--slate)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11 }}>{recruitOpen ? '▾' : '▸'}</span>
             </div>
             {recruitOpen && (
               <div className="tool-grid">
@@ -248,10 +248,10 @@ export default function HomePage() {
                 <span className="ai-badge">E</span>
                 <span className="ai-name">Market.ai</span>
               </div>
-              <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{marketOpen ? '▾' : '▸'}</span>
+              <span style={{ color: 'var(--slate)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11 }}>{marketOpen ? '▾' : '▸'}</span>
             </div>
             {marketOpen && (
-              <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
+              <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, color: 'var(--slate)', lineHeight: 2.2 }}>
                 <span style={{ opacity: 0.45, marginRight: 16 }}>Leads.ai</span>
                 <span style={{ opacity: 0.45 }}>Research.ai</span>
               </div>
@@ -278,10 +278,10 @@ export default function HomePage() {
                 <span className="ai-badge">H</span>
                 <span className="ai-name">Finance.ai</span>
               </div>
-              <span style={{ color: 'var(--slate)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 11 }}>{financeOpen ? '▾' : '▸'}</span>
+              <span style={{ color: 'var(--slate)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11 }}>{financeOpen ? '▾' : '▸'}</span>
             </div>
             {financeOpen && (
-              <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'IBM Plex Mono, monospace', color: 'var(--slate)', lineHeight: 2.2 }}>
+              <div style={{ marginTop: 16, fontSize: 11, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, color: 'var(--slate)', lineHeight: 2.2 }}>
                 <span style={{ color: 'var(--cream)', cursor: 'pointer', marginRight: 16 }} onClick={() => window.location.href = '/tools/margin-ai'}>Margin.ai</span>
               </div>
             )}

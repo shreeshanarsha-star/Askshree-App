@@ -130,7 +130,7 @@ export default function GauriVetDashboard() {
                 {cases.map((c) => (
                   <tr key={c.id}>
                     <td>{c.needs_callback && c.status === 'pending_vet_review' && (
-                      <span style={{ color: 'var(--amber)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, border: '1px solid var(--amber-dim)', borderRadius: 10, padding: '2px 8px' }}>☎ Call {c.farmer_phone}</span>
+                      <span style={{ color: 'var(--amber)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, border: '1px solid var(--amber-dim)', borderRadius: 10, padding: '2px 8px' }}>☎ Call {c.farmer_phone}</span>
                     )}</td>
                     <td className="name-cell">{c.farmer_name || 'Not given'}</td>
                     <td>{c.cow_details || '—'}</td>
@@ -166,7 +166,7 @@ export default function GauriVetDashboard() {
                   <div style={{ border: '1px solid var(--line)', borderRadius: 8, padding: 12, maxHeight: 260, overflowY: 'auto' }}>
                     {selected.conversation_transcript.map((t, i) => (
                       <div key={i} style={{ marginBottom: 8, fontSize: 12.5 }}>
-                        <span style={{ color: t.role === 'farmer' ? 'var(--cream)' : 'var(--amber)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, textTransform: 'uppercase' }}>{t.role === 'farmer' ? 'Farmer' : 'Gauri'}</span>
+                        <span style={{ color: t.role === 'farmer' ? 'var(--cream)' : 'var(--amber)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, textTransform: 'uppercase' }}>{t.role === 'farmer' ? 'Farmer' : 'Gauri'}</span>
                         <div style={{ color: 'var(--cream)' }}>{t.text}</div>
                       </div>
                     ))}
@@ -178,7 +178,7 @@ export default function GauriVetDashboard() {
 
               {draftFor(selected) ? (
                 <div style={{ border: '1px solid var(--line)', borderRadius: 8, padding: 14, marginBottom: 16, background: 'rgba(255,255,255,0.015)' }}>
-                  <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber)', marginBottom: 8, textTransform: 'uppercase' }}>
+                  <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber)', marginBottom: 8, textTransform: 'uppercase' }}>
                     AI read — urgency: {draftFor(selected).urgency}
                   </div>
                   <div style={{ fontSize: 12.5, color: 'var(--cream)', marginBottom: 8 }}>

@@ -49,14 +49,14 @@ export default function GauriStatusPage({ params }) {
 
       {c.status === 'approved' && c.final_recommendation && (
         <div style={{ border: '1px solid var(--line)', borderRadius: 8, padding: 16, background: 'rgba(255,255,255,0.015)' }}>
-          <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber)', marginBottom: 8, textTransform: 'uppercase' }}>Vet's recommendation</div>
+          <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber)', marginBottom: 8, textTransform: 'uppercase' }}>Vet's recommendation</div>
           <div style={{ fontSize: 13.5, color: 'var(--cream)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{c.final_recommendation}</div>
         </div>
       )}
 
       {order && (
         <div style={{ border: '1px solid var(--amber-dim)', borderRadius: 8, padding: 16, marginTop: 14, background: 'rgba(232,163,61,0.06)' }}>
-          <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber)', marginBottom: 8, textTransform: 'uppercase' }}>Product on the way</div>
+          <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber)', marginBottom: 8, textTransform: 'uppercase' }}>Product on the way</div>
           <div style={{ fontSize: 14, color: 'var(--cream)', marginBottom: 4 }}>{order.product_name}</div>
           {order.price != null && <div style={{ fontSize: 13, color: 'var(--slate)' }}>Cost: ₹{order.price} — pay the delivery person in cash or UPI when it arrives</div>}
           {order.estimated_delivery && <div style={{ fontSize: 13, color: 'var(--slate)' }}>Expected: {order.estimated_delivery}</div>}

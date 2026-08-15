@@ -69,7 +69,7 @@ export default function ApprovePage({ params }) {
       </h1>
       <p style={{ color: 'var(--slate)', fontSize: 12, marginBottom: 24 }}>Step {data.position} of {data.totalSteps}</p>
 
-      <div className="field-label" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)', margin: '0 0 8px', textTransform: 'uppercase' }}>1 · Proposal summary</div>
+      <div className="field-label" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)', margin: '0 0 8px', textTransform: 'uppercase' }}>1 · Proposal summary</div>
       <div className="stat-strip">
         <div className="stat-item"><span className="stat-label">Total CTC</span><span className="stat-value amber">{p.currency} {money(p.totalCtcProposed)}</span></div>
         <div className="stat-item"><span className="stat-label">Gross</span><span className="stat-value">{p.currency} {money(p.grossProposed)}</span></div>
@@ -79,12 +79,12 @@ export default function ApprovePage({ params }) {
 
       {p.justification && (
         <>
-          <div className="field-label" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)', margin: '24px 0 8px', textTransform: 'uppercase' }}>2 · Justification</div>
+          <div className="field-label" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)', margin: '24px 0 8px', textTransform: 'uppercase' }}>2 · Justification</div>
           <div className="as-auto-value" style={{ lineHeight: 1.75, textAlign: 'justify' }}>{p.justification}</div>
         </>
       )}
 
-      <div className="field-label" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)', margin: '24px 0 8px', textTransform: 'uppercase' }}>3 · Detailed breakup</div>
+      <div className="field-label" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)', margin: '24px 0 8px', textTransform: 'uppercase' }}>3 · Detailed breakup</div>
       <table className="offer-table">
         <thead>
           <tr><th rowSpan={2}>Component</th><th className="num" colSpan={2}>Current</th><th className="num" colSpan={2}>Proposed</th></tr>
@@ -105,12 +105,12 @@ export default function ApprovePage({ params }) {
 
       {p.otherBenefits && (
         <>
-          <div className="field-label" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)', margin: '24px 0 8px', textTransform: 'uppercase' }}>Other benefits</div>
+          <div className="field-label" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)', margin: '24px 0 8px', textTransform: 'uppercase' }}>Other benefits</div>
           <div className="as-auto-value" style={{ lineHeight: 1.75 }}>{p.otherBenefits}</div>
         </>
       )}
 
-      <div className="field-label" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)', margin: '24px 0 8px', textTransform: 'uppercase' }}>Your decision</div>
+      <div className="field-label" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)', margin: '24px 0 8px', textTransform: 'uppercase' }}>Your decision</div>
       <input type="text" placeholder="Optional comment" value={comment} onChange={(e) => setComment(e.target.value)}
         style={{ width: '100%', marginBottom: 14, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--line)', borderRadius: 6, padding: '10px 12px', color: 'var(--cream)', fontSize: 13 }} />
       <div style={{ display: 'flex', gap: 10 }}>

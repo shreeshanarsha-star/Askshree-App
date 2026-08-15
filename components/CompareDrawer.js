@@ -53,17 +53,17 @@ export default function CompareDrawer({ candidates, candidateKey, onRemove, onCl
 
                   {score != null && (
                     <div style={{ textAlign: 'center', marginBottom: 12 }}>
-                      <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 20, color: scoreColor(score) }}>{score}%</span>
+                      <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 20, color: scoreColor(score) }}>{score}%</span>
                       {c.match_reason && <div style={{ fontSize: 10.5, color: 'var(--slate)', marginTop: 4, lineHeight: 1.5 }}>{c.match_reason}</div>}
                     </div>
                   )}
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 11.5, borderTop: '1px solid var(--line)', paddingTop: 12 }}>
-                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 9.5, textTransform: 'uppercase' }}>Location</span><div style={{ color: 'var(--cream)' }}>{c.location || '—'}</div></div>
-                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 9.5, textTransform: 'uppercase' }}>Qualification</span><div style={{ color: 'var(--cream)' }}>{c.qualification || '—'}</div></div>
-                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 9.5, textTransform: 'uppercase' }}>Current CTC</span><div style={{ color: 'var(--cream)' }}>{c.current_ctc || '—'}</div></div>
-                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 9.5, textTransform: 'uppercase' }}>Expected CTC</span><div style={{ color: 'var(--cream)' }}>{c.expected_ctc || '—'}</div></div>
-                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'IBM Plex Mono, monospace', fontSize: 9.5, textTransform: 'uppercase' }}>Notice</span><div style={{ color: 'var(--cream)' }}>{c.notice_period || '—'}</div></div>
+                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 9.5, textTransform: 'uppercase' }}>Location</span><div style={{ color: 'var(--cream)' }}>{c.location || '—'}</div></div>
+                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 9.5, textTransform: 'uppercase' }}>Qualification</span><div style={{ color: 'var(--cream)' }}>{c.qualification || '—'}</div></div>
+                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 9.5, textTransform: 'uppercase' }}>Current CTC</span><div style={{ color: 'var(--cream)' }}>{c.current_ctc || '—'}</div></div>
+                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 9.5, textTransform: 'uppercase' }}>Expected CTC</span><div style={{ color: 'var(--cream)' }}>{c.expected_ctc || '—'}</div></div>
+                    <div><span style={{ color: 'var(--amber-dim)', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 9.5, textTransform: 'uppercase' }}>Notice</span><div style={{ color: 'var(--cream)' }}>{c.notice_period || '—'}</div></div>
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
@@ -73,7 +73,7 @@ export default function CompareDrawer({ candidates, candidateKey, onRemove, onCl
                       <button
                         type="button" onClick={() => revealContactFor(c)} disabled={cs.loading}
                         style={{
-                          fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)',
+                          fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)',
                           border: '1px solid var(--line)', borderRadius: 14, padding: '5px 11px', background: 'transparent', cursor: 'pointer',
                         }}
                       >

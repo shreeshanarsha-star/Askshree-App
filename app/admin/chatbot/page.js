@@ -134,7 +134,7 @@ export default function AdminChatbot() {
                     {l.flagged_reason && <span className="status-locked status-pill" style={{ marginLeft: 8 }}>flagged — {l.flagged_reason}</span>}
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--slate)' }}>{l.answer}</div>
-                  <div style={{ fontSize: 10.5, color: 'var(--amber-dim)', marginTop: 6, fontFamily: 'IBM Plex Mono, monospace' }}>{l.page || 'homepage'} · {new Date(l.created_at).toLocaleString()}</div>
+                  <div style={{ fontSize: 10.5, color: 'var(--amber-dim)', marginTop: 6, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500 }}>{l.page || 'homepage'} · {new Date(l.created_at).toLocaleString()}</div>
                 </div>
               ))}
             </div>

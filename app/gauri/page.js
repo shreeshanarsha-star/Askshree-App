@@ -363,7 +363,7 @@ export default function GauriAvatarPage() {
 
           {showConfirmForm && confirmData && (
             <div className="gav-confirm">
-              <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber)', textTransform: 'uppercase', marginBottom: 8 }}>
+              <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber)', textTransform: 'uppercase', marginBottom: 8 }}>
                 Confirm to get a vet callback
               </div>
               <div style={{ fontSize: 13, color: 'var(--cream)', marginBottom: 4 }}><b>At a surface level:</b> {confirmData.surfaceDiagnosis}</div>

@@ -31,7 +31,7 @@ function CommentsCell({ value, onSave }) {
           rows={2}
           style={{
             background: 'rgba(255,255,255,0.05)', border: '1px solid var(--amber-dim)', borderRadius: 4,
-            padding: '5px 7px', color: 'var(--cream)', fontSize: 11, fontFamily: 'IBM Plex Mono, monospace',
+            padding: '5px 7px', color: 'var(--cream)', fontSize: 11, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500,
             outline: 'none', resize: 'vertical',
           }}
         />
@@ -179,7 +179,7 @@ export default function ProjectDetail({ params }) {
               <div style={{ display: 'flex', gap: 10 }}>
                 <button type="button" onClick={() => setShareOpen((v) => !v)} disabled={selected.size === 0}
                   style={{
-                    fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: selected.size ? 'var(--amber)' : 'var(--slate)',
+                    fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5, color: selected.size ? 'var(--amber)' : 'var(--slate)',
                     border: '1px solid ' + (selected.size ? 'var(--amber-dim)' : 'var(--line)'), borderRadius: 20, padding: '8px 14px',
                     background: 'transparent', cursor: selected.size ? 'pointer' : 'not-allowed',
                   }}>
@@ -187,7 +187,7 @@ export default function ProjectDetail({ params }) {
                 </button>
                 <button type="button" onClick={exportToExcel}
                   style={{
-                    fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: 'var(--amber)',
+                    fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5, color: 'var(--amber)',
                     border: '1px solid var(--amber-dim)', borderRadius: 20, padding: '8px 14px', background: 'transparent', cursor: 'pointer',
                   }}>
                   Export to Excel
@@ -247,7 +247,7 @@ export default function ProjectDetail({ params }) {
                                 onClick={() => patchCandidate(c.id, { status: c.status === s ? null : s })}
                                 title={STATUS_LABELS[s]}
                                 style={{
-                                  fontSize: 9.5, fontFamily: 'IBM Plex Mono, monospace', padding: '3px 6px', borderRadius: 10,
+                                  fontSize: 9.5, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, padding: '3px 6px', borderRadius: 10,
                                   border: '1px solid ' + (c.status === s ? STATUS_COLORS[s] : 'var(--line)'),
                                   color: c.status === s ? STATUS_COLORS[s] : 'var(--slate)',
                                   background: 'transparent', whiteSpace: 'nowrap',
@@ -266,7 +266,7 @@ export default function ProjectDetail({ params }) {
                                 onClick={() => patchCandidate(c.id, { outreach_status: s })}
                                 title={OUTREACH_LABELS[s]}
                                 style={{
-                                  fontSize: 9.5, fontFamily: 'IBM Plex Mono, monospace', padding: '3px 6px', borderRadius: 10,
+                                  fontSize: 9.5, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, padding: '3px 6px', borderRadius: 10,
                                   border: '1px solid ' + ((c.outreach_status || 'new') === s ? OUTREACH_COLORS[s] : 'var(--line)'),
                                   color: (c.outreach_status || 'new') === s ? OUTREACH_COLORS[s] : 'var(--slate)',
                                   background: 'transparent', whiteSpace: 'nowrap',
@@ -284,7 +284,7 @@ export default function ProjectDetail({ params }) {
                           ) : (
                             <button type="button" onClick={() => revealContactFor(c)} disabled={cs.loading} title={cs.message || ''}
                               style={{
-                                fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)',
+                                fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)',
                                 border: '1px solid var(--line)', borderRadius: 14, padding: '5px 11px', background: 'transparent',
                                 cursor: cs.loading ? 'default' : 'pointer', whiteSpace: 'nowrap',
                               }}>

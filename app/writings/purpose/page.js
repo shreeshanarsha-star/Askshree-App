@@ -23,7 +23,7 @@ export default function PurposeWritingPage() {
       </div>
 
       <div style={{ padding: '56px 24px 80px', maxWidth: 760, margin: '0 auto' }}>
-        <div className="eyebrow" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.08em', color: 'var(--amber)', marginBottom: 14 }}>WRITINGS</div>
+        <div className="eyebrow" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, letterSpacing: '0.08em', color: 'var(--amber)', marginBottom: 14 }}>WRITINGS</div>
         <h1 style={{ fontFamily: 'Fraunces, serif', fontWeight: 500, fontSize: 32, color: 'var(--cream)', margin: '0 0 32px' }}>Purpose</h1>
 
         <div
@@ -142,7 +142,7 @@ export default function PurposeWritingPage() {
               key={t.href}
               href={t.href}
               style={{
-                fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, textDecoration: 'none',
+                fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, textDecoration: 'none',
                 border: '1px solid ' + (t.active ? 'var(--amber-dim)' : 'var(--line)'),
                 color: t.active ? 'var(--amber)' : 'var(--slate)',
                 borderRadius: 20, padding: '6px 14px',

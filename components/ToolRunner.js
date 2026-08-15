@@ -36,7 +36,7 @@ export default function ToolRunner({ title, tag, endpoint, fields, renderResult 
   return (
     <div className="section" style={{ maxWidth: 760 }}>
       <span style={{
-        fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)',
+        fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)',
         textTransform: 'uppercase', letterSpacing: '0.04em',
       }}>{tag}</span>
       <h2 style={{ marginTop: 8 }}>{title}</h2>
@@ -46,7 +46,7 @@ export default function ToolRunner({ title, tag, endpoint, fields, renderResult 
           <div key={f.name}>
             <label style={{
               display: 'block', fontSize: 12, color: 'var(--slate)', marginBottom: 6,
-              fontFamily: 'IBM Plex Mono, monospace',
+              fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500,
             }}>{f.label}</label>
             {f.type === 'textarea' ? (
               <textarea
@@ -77,7 +77,7 @@ export default function ToolRunner({ title, tag, endpoint, fields, renderResult 
           onClick={run}
           disabled={loading}
           style={{
-            justifySelf: 'start', fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5,
+            justifySelf: 'start', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 12.5,
             border: '1px solid var(--amber-dim)', color: 'var(--amber)', background: 'transparent',
             padding: '10px 22px', borderRadius: 6, cursor: 'pointer',
           }}

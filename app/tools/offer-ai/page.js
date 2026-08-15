@@ -318,7 +318,7 @@ export default function OfferAI() {
                     <div className="doc-row" key={i}>
                       <span className="dicon">{(f.name.split('.').pop() || 'file').slice(0, 3)}</span>
                       <span className="dname">{f.name}</span>
-                      <span className="view-link" style={{ cursor: 'pointer', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)' }} onClick={(e) => { e.stopPropagation(); removeFile(i); }}>✕ Remove</span>
+                      <span className="view-link" style={{ cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)' }} onClick={(e) => { e.stopPropagation(); removeFile(i); }}>✕ Remove</span>
                     </div>
                   ))}
                 </div>
@@ -387,7 +387,7 @@ export default function OfferAI() {
                     ['notice_period', 'Notice period'], ['tentative_joining_date', 'Tentative joining date'],
                   ].map(([key, label]) => (
                     <div key={key}>
-                      <label style={{ display: 'block', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10, color: 'var(--slate)', marginBottom: 6 }}>{label}</label>
+                      <label style={{ display: 'block', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10, color: 'var(--slate)', marginBottom: 6 }}>{label}</label>
                       <input type="text" value={cand[key]} onChange={(e) => setCand((c) => ({ ...c, [key]: e.target.value }))}
                         onBlur={() => saveField({ [key]: cand[key] })} />
                     </div>
@@ -436,7 +436,7 @@ export default function OfferAI() {
                 </div>
               )}
 
-              <div className="field-label" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)', margin: '20px 0 8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <div className="field-label" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)', margin: '20px 0 8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Compensation breakdown {recalculating ? '— recalculating…' : ''}
               </div>
               <table className="offer-table">
@@ -517,7 +517,7 @@ export default function OfferAI() {
                 <input type="text" value={jobRole} onChange={(e) => setJobRole(e.target.value)} />
               </div>
 
-              <div className="field-label" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)', margin: '20px 0 8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <div className="field-label" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 10.5, color: 'var(--slate)', margin: '20px 0 8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 Send for approval — in order
               </div>
               {approverEmails.map((email, i) => (

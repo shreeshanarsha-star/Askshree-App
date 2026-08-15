@@ -56,12 +56,12 @@ export default function ProposalView({ params }) {
 
       {p.justification && (
         <>
-          <h3 style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)', textTransform: 'uppercase', margin: '24px 0 8px' }}>Justification</h3>
+          <h3 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)', textTransform: 'uppercase', margin: '24px 0 8px' }}>Justification</h3>
           <p style={{ fontSize: 13, lineHeight: 1.75, textAlign: 'justify' }}>{p.justification}</p>
         </>
       )}
 
-      <h3 style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)', textTransform: 'uppercase', margin: '24px 0 8px' }}>Detailed breakup</h3>
+      <h3 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)', textTransform: 'uppercase', margin: '24px 0 8px' }}>Detailed breakup</h3>
       <table className="offer-table">
         <thead>
           <tr><th rowSpan={2}>Component</th><th className="num" colSpan={2}>Current</th><th className="num" colSpan={2}>Proposed</th></tr>
@@ -82,14 +82,14 @@ export default function ProposalView({ params }) {
 
       {p.other_benefits && (
         <>
-          <h3 style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)', textTransform: 'uppercase', margin: '24px 0 8px' }}>Other benefits</h3>
+          <h3 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)', textTransform: 'uppercase', margin: '24px 0 8px' }}>Other benefits</h3>
           <p style={{ fontSize: 13, lineHeight: 1.75 }}>{p.other_benefits}</p>
         </>
       )}
 
       {data.approvals && data.approvals.length > 0 && (
         <>
-          <h3 style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--amber-dim)', textTransform: 'uppercase', margin: '24px 0 8px' }}>Approval chain</h3>
+          <h3 style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)', textTransform: 'uppercase', margin: '24px 0 8px' }}>Approval chain</h3>
           <ul style={{ fontSize: 12.5, color: 'var(--slate)', lineHeight: 2 }}>
             {data.approvals.map((a) => (
               <li key={a.sequence_order}>{a.sequence_order}. {a.approver_email} — {a.status}{a.comment ? ` ("${a.comment}")` : ''}</li>

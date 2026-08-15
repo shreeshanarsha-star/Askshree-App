@@ -61,7 +61,7 @@ export default function AddToProjectButton({ siteFetch, selectedCount, getSelect
         onClick={openPanel}
         disabled={selectedCount === 0}
         style={{
-          fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: selectedCount ? 'var(--amber)' : 'var(--slate)',
+          fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11.5, color: selectedCount ? 'var(--amber)' : 'var(--slate)',
           border: '1px solid ' + (selectedCount ? 'var(--amber-dim)' : 'var(--line)'), borderRadius: 20, padding: '8px 14px',
           background: 'transparent', cursor: selectedCount ? 'pointer' : 'not-allowed',
         }}
