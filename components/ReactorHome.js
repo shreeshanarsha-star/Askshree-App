@@ -188,7 +188,7 @@ export default function ReactorHome() {
         <span className="orb2-corner orb2-corner-bl" />
         <span className="orb2-corner orb2-corner-br" />
         <div className="home2-col">
-          <div className="home2-col-label">TACTICAL DISPLAY</div>
+          <div className="home2-col-label">YOUR WORKSPACE</div>
           {activeFeature ? (
             <FeatureWorkspace
               feature={activeFeature}
@@ -217,7 +217,7 @@ export default function ReactorHome() {
         </div>
 
         <div className="home2-col">
-          <div className="home2-col-label">FEATURE DISPLAY</div>
+          <div className="home2-col-label">TOOLS</div>
           <FeatureNavPanel selected={selected} onOpenFeature={openFeature} />
         </div>
       </div>
