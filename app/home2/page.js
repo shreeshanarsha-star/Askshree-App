@@ -123,7 +123,7 @@ export default function Home2Page() {
             onClose={closeFeature}
           />
         ) : (
-          <div>
+          <div className="home2-workspace">
             <h1 style={{ margin: 0, maxWidth: 'none' }}>
               Tell me what you need.<br /><em>AI systems will get you there.</em>
             </h1>

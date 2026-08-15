@@ -132,6 +132,7 @@ export default function OrbitalSystems({ onOpenFeature }) {
 
   return (
     <div className={`orb2-wrap ${expanded ? 'orb2-expanded' : ''}`}>
+      <div className="orb2-stage-card">
       <div className="orb2-stage">
         {DEPARTMENTS.map((d, i) => {
           const angle = -90 + (360 / n) * i;
@@ -165,6 +166,7 @@ export default function OrbitalSystems({ onOpenFeature }) {
         <div className="orb2-core" id="reactor-core">
           <Icon name="mic" size={24} />
         </div>
+      </div>
       </div>
 
       <div className="orb2-panel">
