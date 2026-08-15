@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import AskShreeChat from '../../components/AskShreeChat';
 import AppLauncher from '../../components/AppLauncher';
 import ThemeBackground from '../../components/ThemeBackground';
+import GestureControl from '../../components/GestureControl';
 import { OrbitalStage, FeatureNavPanel, DEPARTMENTS } from '../../components/OrbitalSystems';
 import FeatureWorkspace from '../../components/FeatureWorkspace';
 import { useTheme } from '../../lib/useTheme';
@@ -140,6 +141,7 @@ export default function Home2Page() {
     <div className="home2-shell" style={{ position: 'relative', ...(themeReady ? getThemeAccentStyle(themeId) : {}) }}>
       <div className="home2-full">
       {themeReady && <ThemeBackground themeId={themeId} />}
+      <GestureControl />
 
       <div className="home2-topbar">
         <h1 className="home2-topbar-h1">
