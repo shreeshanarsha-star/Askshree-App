@@ -895,7 +895,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .orb2-wrap{display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;}
 .orb2-wrap.orb2-expanded{grid-template-columns:0px 1fr;}
 .orb2-wrap.orb2-expanded .orb2-stage-card{display:none;}
-.orb2-stage-card{background:var(--navy-2); border:1px solid var(--line); border-radius:16px; padding:32px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;}
+.orb2-stage-card{background:rgba(255,255,255,0.015); border:1px dashed var(--line); border-radius:16px; padding:32px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;}
 .orb2-stage{position:relative; width:min(520px,84%); aspect-ratio:1/1; margin:0 auto;}
 .orb2-line{position:absolute; left:50%; top:50%; height:1px; background:var(--line); transform-origin:0 0;}
 .orb2-line.orb2-live{background:rgba(var(--amber-rgb),0.35);}
