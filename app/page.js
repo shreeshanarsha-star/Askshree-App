@@ -120,14 +120,13 @@ export default function HomePage() {
 
       <div className="hero">
         <div>
-          <div style={{ fontFamily: 'Fraunces, serif', fontStyle: 'italic', color: 'var(--amber)', fontSize: 16, marginBottom: 10 }}>
-            <span style={{ color: 'var(--cream)', fontStyle: 'normal' }}>Hiring is evolving.</span> So am I.
+          <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.14em', color: 'var(--amber)', fontSize: 13, marginBottom: 12 }}>
+            ASK &middot; EXPLORE &middot; DELEGATE
           </div>
           <h1>
-            A talent acquisition leader who architected the solution, then coded it with AI to fix
-            his own talent acquisition challenges — until <em>delegating tasks to AI became the solution itself.</em>
+            Tell me what you need. <em>I&rsquo;ll help you get it done.</em>
           </h1>
-          <p className="sub">Talent acquisition, based in Bengaluru — building AI-native tools for sourcing and hiring in my own time.</p>
+          <p className="sub">AI systems for real work — helping you find, research, analyse and move things forward.</p>
 
           <div className="terminal">
             <span className="chev">&gt;</span>
