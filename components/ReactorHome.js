@@ -199,7 +199,7 @@ export default function ReactorHome() {
           ) : (
             <div className="home2-empty-panel">
               <div className="orb2-panel-empty">
-                Ask Hey Shree to open a tool — try &ldquo;open calculator&rdquo; or pick one from Feature Display — and it&rsquo;ll appear here.
+                Ask Hey Shree to open a tool — try &ldquo;open calculator&rdquo; or pick one from Tools — and it&rsquo;ll appear here.
               </div>
             </div>
           )}
