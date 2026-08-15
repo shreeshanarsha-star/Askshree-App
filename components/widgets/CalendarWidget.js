@@ -17,7 +17,8 @@ export default function CalendarWidget() {
   const cells = [];
   for (let i = firstDow - 1; i >= 0; i--) cells.push({ day: daysInPrevMonth - i, muted: true });
   for (let d = 1; d <= daysInMonth; d++) cells.push({ day: d, muted: false });
-  while (cells.length % 7 !== 0) cells.push({ day: cells.length, muted: true });
+  let nextMonthDay = 1;
+  while (cells.length % 7 !== 0) cells.push({ day: nextMonthDay++, muted: true });
 
   function isToday(day, muted) {
     return !muted && day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
