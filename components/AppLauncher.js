@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import { useOptionalSession } from '../lib/useOptionalSession';
 
 const ICONS = {
@@ -41,74 +40,60 @@ const APPS = [
   { key: 'settings', name: 'gear', label: 'Settings', href: '/settings' },
 ];
 
-export default function AppLauncher() {
-  const [open, setOpen] = useState(false);
+// Controlled by the parent (its trigger button now lives in the terminal
+// command bar), so this component only owns the backdrop + popup card.
+export default function AppLauncher({ open, onClose }) {
   const { ready, email, signOut } = useOptionalSession();
+
+  if (!open) return null;
 
   return (
     <>
-      {open && <div className="applauncher-backdrop" onClick={() => setOpen(false)} />}
+      <div className="applauncher-backdrop" onClick={onClose} />
 
-      <button
-        type="button"
-        className="applauncher-btn"
-        aria-label="Open menu"
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span className="applauncher-dots">
-          {Array.from({ length: 8 }).map((_, i) => <i key={i} />)}
-        </span>
-      </button>
-
-      {open && (
-        <div className="applauncher-card">
-          <div className="applauncher-eyebrow">MENU</div>
-          <div className="applauncher-grid">
-            {APPS.map((app) =>
-              app.disabled ? (
-                <div key={app.key} className="applauncher-item applauncher-item-disabled" title="Coming soon">
-                  <Icon name={app.name} />
-                  <span>{app.label}</span>
-                </div>
-              ) : app.onClick ? (
-                <div
-                  key={app.key}
-                  className="applauncher-item"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => { app.onClick(); setOpen(false); }}
-                >
-                  <Icon name={app.name} />
-                  <span>{app.label}</span>
-                </div>
-              ) : (
-                <a key={app.key} className="applauncher-item" href={app.href} onClick={() => setOpen(false)}>
-                  <Icon name={app.name} />
-                  <span>{app.label}</span>
-                </a>
-              )
-            )}
-          </div>
-
-          <div className="applauncher-footer">
-            {ready && (
-              email ? (
-                <div className="applauncher-footer-item" role="button" tabIndex={0} onClick={() => { signOut(); setOpen(false); }} title={email}>
-                  <Icon name="login" size={16} /><span>Log out</span>
-                </div>
-              ) : (
-                <a className="applauncher-footer-item" href="/login" onClick={() => setOpen(false)}>
-                  <Icon name="login" size={16} /><span>Login</span>
-                </a>
-              )
-            )}
-            <a className="applauncher-footer-item" href="https://www.linkedin.com/in/shreesha09/" target="_blank" rel="noopener noreferrer">
-              <span className="applauncher-li">in</span><span>LinkedIn</span>
-            </a>
-          </div>
+      <div className="applauncher-card applauncher-card-bottom">
+        <div className="applauncher-eyebrow">MENU</div>
+        <div className="applauncher-grid">
+          {APPS.map((app) =>
+            app.disabled ? (
+              <div key={app.key} className="applauncher-item applauncher-item-disabled" title="Coming soon">
+                <Icon name={app.name} />
+                <span>{app.label}</span>
+              </div>
+            ) : app.onClick ? (
+              <div
+                key={app.key}
+                className="applauncher-item"
+                role="button"
+                tabIndex={0}
+                onClick={() => { app.onClick(); onClose(); }}
+              >
+                <Icon name={app.name} />
+                <span>{app.label}</span>
+              </div>
+            ) : (
+              <a key={app.key} className="applauncher-item" href={app.href} onClick={onClose}>
+                <Icon name={app.name} />
+                <span>{app.label}</span>
+              </a>
+            )
+          )}
         </div>
-      )}
+
+        {ready && (
+          <div className="applauncher-footer">
+            {email ? (
+              <div className="applauncher-footer-item" role="button" tabIndex={0} onClick={() => { signOut(); onClose(); }} title={email}>
+                <Icon name="login" size={16} /><span>Log out</span>
+              </div>
+            ) : (
+              <a className="applauncher-footer-item" href="/login" onClick={onClose}>
+                <Icon name="login" size={16} /><span>Login</span>
+              </a>
+            )}
+          </div>
+        )}
+      </div>
     </>
   );
 }

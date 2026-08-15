@@ -29,6 +29,7 @@ export default function Home2Page() {
   const [activeFeature, setActiveFeature] = useState(null);
   const [workspaceExpanded, setWorkspaceExpanded] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const [waffleOpen, setWaffleOpen] = useState(false);
 
   const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
   const leftFilled = !!activeFeature;
@@ -219,30 +220,49 @@ export default function Home2Page() {
         </div>
       </div>
 
-      <div className="terminal" style={{ marginTop: 32 }}>
-        <span className="chev">&gt;</span>
-        <button type="button" className="terminal-icon-btn" onClick={wakeReactor} aria-label="Wake HeyShree">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 11a7 7 0 0 0 14 0" /><line x1="12" y1="18" x2="12" y2="22" />
-          </svg>
-        </button>
-        <button type="button" className="terminal-icon-btn" onClick={() => setQuery('')} aria-label="Clear">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" />
-          </svg>
-        </button>
-        <input
-          type="text"
-          placeholder={`Try a tool name... ${TOOL_NAMES[hintIndex]}`}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && runQuery()}
-        />
-        <button className="run" onClick={runQuery}>run query</button>
+      <div className="home2-command-grid" style={{ gridTemplateColumns: triptychCols }}>
+        <div className="terminal">
+          <span className="chev">&gt;&gt;</span>
+
+          <button type="button" className="terminal-icon-btn" onClick={() => setWaffleOpen((o) => !o)} aria-label="Open menu" aria-expanded={waffleOpen}>
+            <span className="terminal-dots">
+              {Array.from({ length: 8 }).map((_, i) => <i key={i} />)}
+            </span>
+          </button>
+          <a className="terminal-icon-btn" href="https://www.linkedin.com/in/shreesha09/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" stroke="none">
+              <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.6c0-1.34-.02-3.06-1.87-3.06-1.87 0-2.16 1.46-2.16 2.96V21H9z" />
+            </svg>
+          </a>
+          <a className="terminal-icon-btn" href="#" aria-label="Instagram (coming soon)" title="Instagram — coming soon" onClick={(e) => e.preventDefault()} style={{ opacity: 0.4, cursor: 'not-allowed' }}>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+            </svg>
+          </a>
+
+          <button type="button" className="terminal-icon-btn" onClick={wakeReactor} aria-label="Wake HeyShree">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 11a7 7 0 0 0 14 0" /><line x1="12" y1="18" x2="12" y2="22" />
+            </svg>
+          </button>
+          <button type="button" className="terminal-icon-btn" onClick={() => setQuery('')} aria-label="Clear">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="6" y1="6" x2="18" y2="18" /><line x1="18" y1="6" x2="6" y2="18" />
+            </svg>
+          </button>
+          <input
+            type="text"
+            placeholder={`Try a tool name... ${TOOL_NAMES[hintIndex]}`}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && runQuery()}
+          />
+          <button className="run" onClick={runQuery}>run query</button>
+        </div>
       </div>
 
       <AskShreeChat />
-      <AppLauncher />
+      <AppLauncher open={waffleOpen} onClose={() => setWaffleOpen(false)} />
       </div>
     </div>
   );

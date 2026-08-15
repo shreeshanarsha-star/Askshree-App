@@ -1181,6 +1181,20 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 
 .terminal-icon-btn:hover{border-color:var(--amber-dim); color:var(--amber);}
 
+.home2-command-grid{display:grid; gap:20px; padding:0 32px; margin-top:20px; transition:grid-template-columns .45s cubic-bezier(.22,.9,.32,1);}
+.home2-command-grid .terminal{grid-column:2 / 4;}
+
+.terminal-dots{display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,1fr); gap:3px; width:14px; height:8px;}
+.terminal-dots i{display:block; width:2.5px; height:2.5px; border-radius:50%; background:var(--slate);}
+.terminal-icon-btn:hover .terminal-dots i{background:var(--amber);}
+
+.applauncher-card-bottom{top:auto; bottom:96px; left:32px; box-shadow:0 -16px 44px rgba(0,0,0,0.5);}
+
+@media (max-width:1000px){
+  .home2-command-grid{grid-template-columns:1fr !important;}
+  .home2-command-grid .terminal{grid-column:1;}
+}
+
 @media (max-width:1000px){
   .home2-triptych{grid-template-columns:1fr;}
 }
