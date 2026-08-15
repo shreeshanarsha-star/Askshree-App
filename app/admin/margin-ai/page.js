@@ -59,9 +59,11 @@ export default function MarginAI() {
       <div className="admin-side">
         <div className="logo">Ask <span>Shree</span> admin</div>
         <div className="admin-nav">
-          <a href="/admin">Overview</a>
+                    <a href="/admin">Overview</a>
+          <a href="/admin/dashboard">Analytics</a>
           <a href="/admin/job-postings">Job postings</a>
           <a href="/admin/chatbot">Ask Shree chatbot</a>
+          <a href="/admin/theme">Site theme</a>
           <a href="/admin/margin-ai" className="active">Margin.ai</a>
         </div>
       </div>

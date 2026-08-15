@@ -33,9 +33,12 @@ export default function AdminJobPostings() {
       <div className="admin-side">
         <div className="logo">Ask <span>Shree</span> admin</div>
         <div className="admin-nav">
-          <a href="/admin">Overview</a>
+                    <a href="/admin">Overview</a>
+          <a href="/admin/dashboard">Analytics</a>
           <a href="/admin/job-postings" className="active">Job postings</a>
           <a href="/admin/chatbot">Ask Shree chatbot</a>
+          <a href="/admin/theme">Site theme</a>
+          <a href="/admin/margin-ai">Margin.ai</a>
         </div>
       </div>
       <div className="admin-main">

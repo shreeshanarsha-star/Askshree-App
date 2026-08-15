@@ -103,7 +103,20 @@ export default function AdminDashboardPage() {
   const maxHeat = Math.max(1, ...stats.heatmap.flat());
 
   return (
-    <div className="dashboard">
+    <div className="admin-shell">
+      <div className="admin-side">
+        <div className="logo">Ask <span>Shree</span> admin</div>
+        <div className="admin-nav">
+          <a href="/admin">Overview</a>
+          <a href="/admin/dashboard" className="active">Analytics</a>
+          <a href="/admin/job-postings">Job postings</a>
+          <a href="/admin/chatbot">Ask Shree chatbot</a>
+          <a href="/admin/theme">Site theme</a>
+          <a href="/admin/margin-ai">Margin.ai</a>
+        </div>
+      </div>
+      <div className="admin-main">
+      <div className="dashboard">
       {!stats.hasData && (
         <div className="dash-banner">
           No usage data yet. Once visitors start using tools, this fills in automatically.
@@ -151,7 +164,9 @@ export default function AdminDashboardPage() {
         .heatmap-day { font-size: 11px; color: #898781; }
         .heatmap-cell { height: 14px; border-radius: 3px; }
       `}</style>
-    </div>
+      </div>
+      </div>
+      </div>
   );
 }
 
