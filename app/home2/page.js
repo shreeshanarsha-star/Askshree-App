@@ -128,18 +128,6 @@ export default function Home2Page() {
               Tell me what you need.<br /><em>AI systems will get you there.</em>
             </h1>
 
-            <div className="terminal" style={{ marginTop: 24 }}>
-              <span className="chev">&gt;</span>
-              <input
-                type="text"
-                placeholder={`Try a tool name... ${TOOL_NAMES[hintIndex]}`}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && runQuery()}
-              />
-              <button className="run" onClick={runQuery}>run query</button>
-            </div>
-
             <div className="engage-row" style={{ marginTop: 24 }}>
               <button className={`engage-btn ${justLiked ? 'liked' : ''}`} onClick={handleLike}>
                 <svg viewBox="0 0 24 24" width="14" height="14" fill={justLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -180,6 +168,18 @@ export default function Home2Page() {
       <div className="section" id="ai-systems" style={{ paddingTop: 8 }}>
         <div style={{ marginTop: 8 }}>
           <OrbitalSystems onOpenFeature={openFeature} />
+        </div>
+
+        <div className="terminal" style={{ marginTop: 32 }}>
+          <span className="chev">&gt;</span>
+          <input
+            type="text"
+            placeholder={`Try a tool name... ${TOOL_NAMES[hintIndex]}`}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && runQuery()}
+          />
+          <button className="run" onClick={runQuery}>run query</button>
         </div>
       </div>
 
