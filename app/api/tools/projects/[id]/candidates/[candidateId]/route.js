@@ -5,6 +5,7 @@ import { getAuthedUser } from '../../../../../../../lib/authedUser';
 import { getProjectOwned, removeCandidateFromProject, updateProjectCandidate } from '../../../../../../../lib/projects';
 
 const VALID_STATUSES = ['shortlisted', 'rejected', 'screen_later'];
+const VALID_OUTREACH_STATUSES = ['new', 'contacted', 'responded', 'rejected'];
 
 export async function PATCH(req, { params }) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
@@ -17,6 +18,9 @@ export async function PATCH(req, { params }) {
   const body = await req.json();
   if ('status' in body && body.status !== null && !VALID_STATUSES.includes(body.status)) {
     return NextResponse.json({ ok: false, error: 'Invalid status.' }, { status: 400 });
+  }
+  if ('outreach_status' in body && body.outreach_status !== null && !VALID_OUTREACH_STATUSES.includes(body.outreach_status)) {
+    return NextResponse.json({ ok: false, error: 'Invalid outreach status.' }, { status: 400 });
   }
   await updateProjectCandidate({ projectId: params.id, candidateId: params.candidateId, fields: body });
   return NextResponse.json({ ok: true });

@@ -6,6 +6,7 @@ import { KeyGate } from '../../../components/KeyGate';
 import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
 import CandidateResults from '../../../components/CandidateResults';
+import SavedSearches from '../../../components/SavedSearches';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -96,6 +97,8 @@ export default function SmartSourceAI() {
         'Current CTC': c.current_ctc || '',
         'Expected CTC': c.expected_ctc || '',
         'Notice Period': c.notice_period || '',
+        'Outreach Status': c.outreach_status || 'new',
+        'Why This Match': c.match_reason || '',
         'Profile URL': c.profile_url || '',
       }));
     const sheet = XLSX.utils.json_to_sheet(rows);
@@ -177,9 +180,24 @@ export default function SmartSourceAI() {
         </p>
 
         <div className="jp-panel active">
-          <div className="jp-subtabs">
-            <button className={`jp-subtab ${mode === 'auto' ? 'active' : ''}`} onClick={() => setMode('auto')}>Paste a JD</button>
-            <button className={`jp-subtab ${mode === 'manual' ? 'active' : ''}`} onClick={() => setMode('manual')}>Type skills manually</button>
+          <div className="jp-subtabs" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', gap: 0 }}>
+              <button className={`jp-subtab ${mode === 'auto' ? 'active' : ''}`} onClick={() => setMode('auto')}>Paste a JD</button>
+              <button className={`jp-subtab ${mode === 'manual' ? 'active' : ''}`} onClick={() => setMode('manual')}>Type skills manually</button>
+            </div>
+            <SavedSearches
+              tool="smart_source"
+              siteFetch={siteFetch}
+              getParams={() => ({ mode, jobDescription, skillsInput, booleanQuery, location })}
+              onLoad={(p) => {
+                setMode(p.mode || 'auto');
+                setJobDescription(p.jobDescription || '');
+                setJdFile(null);
+                setSkillsInput(p.skillsInput || '');
+                setBooleanQuery(p.booleanQuery || '');
+                setLocation(p.location || '');
+              }}
+            />
           </div>
 
           {mode === 'auto' && (

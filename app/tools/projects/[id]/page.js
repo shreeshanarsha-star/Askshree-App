@@ -13,6 +13,9 @@ function scoreColor(score) {
 
 const STATUS_LABELS = { shortlisted: 'Shortlisted', rejected: 'Rejected', screen_later: 'Screen later' };
 const STATUS_COLORS = { shortlisted: 'var(--amber)', rejected: '#c0665f', screen_later: 'var(--slate)' };
+const OUTREACH = ['new', 'contacted', 'responded', 'rejected'];
+const OUTREACH_LABELS = { new: 'New', contacted: 'Contacted', responded: 'Responded', rejected: 'Rejected' };
+const OUTREACH_COLORS = { new: 'var(--slate)', contacted: 'var(--amber-dim)', responded: 'var(--amber)', rejected: '#c0665f' };
 
 function CommentsCell({ value, onSave }) {
   const [editing, setEditing] = useState(false);
@@ -120,7 +123,7 @@ export default function ProjectDetail({ params }) {
         Candidate: c.name || '', Designation: c.designation || '', Company: c.company || '',
         Location: c.location || '', 'Match %': c.match_score != null ? c.match_score : '',
         Qualification: c.qualification || '', 'Current CTC': c.current_ctc || '', 'Expected CTC': c.expected_ctc || '',
-        'Notice Period': c.notice_period || '', Status: STATUS_LABELS[c.status] || '', Comments: c.comments || '',
+        'Notice Period': c.notice_period || '', Status: STATUS_LABELS[c.status] || '', Outreach: OUTREACH_LABELS[c.outreach_status || 'new'], Comments: c.comments || '',
         'Profile URL': c.profile_url || '',
       }));
     const sheet = XLSX.utils.json_to_sheet(rows);
@@ -209,7 +212,7 @@ export default function ProjectDetail({ params }) {
                   <tr>
                     <th></th><th>Candidate</th><th>Designation</th><th>Company</th><th>Location</th><th>Match</th>
                     <th>Qualification</th><th>Current CTC</th><th>Expected CTC</th><th>Notice</th>
-                    <th>Status</th><th>Comments</th><th>Contact</th><th>Profile</th><th></th>
+                    <th>Status</th><th>Outreach</th><th>Comments</th><th>Contact</th><th>Profile</th><th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -251,6 +254,25 @@ export default function ProjectDetail({ params }) {
                                 }}
                               >
                                 {s === 'shortlisted' ? 'Short' : s === 'rejected' ? 'Rej' : 'Later'}
+                              </button>
+                            ))}
+                          </div>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: 4 }}>
+                            {OUTREACH.map((s) => (
+                              <button
+                                key={s}
+                                onClick={() => patchCandidate(c.id, { outreach_status: s })}
+                                title={OUTREACH_LABELS[s]}
+                                style={{
+                                  fontSize: 9.5, fontFamily: 'IBM Plex Mono, monospace', padding: '3px 6px', borderRadius: 10,
+                                  border: '1px solid ' + ((c.outreach_status || 'new') === s ? OUTREACH_COLORS[s] : 'var(--line)'),
+                                  color: (c.outreach_status || 'new') === s ? OUTREACH_COLORS[s] : 'var(--slate)',
+                                  background: 'transparent', whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {OUTREACH_LABELS[s]}
                               </button>
                             ))}
                           </div>

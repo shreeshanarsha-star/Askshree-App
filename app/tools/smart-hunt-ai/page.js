@@ -6,6 +6,7 @@ import { KeyGate } from '../../../components/KeyGate';
 import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
 import CandidateResults from '../../../components/CandidateResults';
+import SavedSearches from '../../../components/SavedSearches';
 
 
 // Smart Hunt.ai — original spec: manual X-ray search across public
@@ -84,6 +85,8 @@ export default function SmartHuntAI() {
         'Current CTC': c.current_ctc || '',
         'Expected CTC': c.expected_ctc || '',
         'Notice Period': c.notice_period || '',
+        'Outreach Status': c.outreach_status || 'new',
+        'Why This Match': c.match_reason || '',
         'Profile URL': c.profile_url || '',
       }));
     const sheet = XLSX.utils.json_to_sheet(rows);
@@ -174,6 +177,20 @@ export default function SmartHuntAI() {
         </p>
 
         <div className="jp-panel active">
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+            <SavedSearches
+              tool="smart_hunt"
+              siteFetch={siteFetch}
+              getParams={() => ({ company, role, location, skillsInput, keywords })}
+              onLoad={(p) => {
+                setCompany(p.company || '');
+                setRole(p.role || '');
+                setLocation(p.location || '');
+                setSkillsInput(p.skillsInput || '');
+                setKeywords(p.keywords || '');
+              }}
+            />
+          </div>
           <input className="free-text-input" type="text" placeholder="1. Company — e.g. Razorpay"
             value={company} onChange={(e) => setCompany(e.target.value)} />
           <input className="free-text-input" style={{ marginTop: 10 }} type="text" placeholder="2. Role — e.g. Sourcing Manager"

@@ -2,6 +2,7 @@
 import { useMemo, useState } from 'react';
 import AddToProjectButton from './AddToProjectButton';
 import EditableCell from './EditableCell';
+import CompareDrawer from './CompareDrawer';
 
 function scoreColor(score) {
   if (score == null) return 'var(--slate)';
@@ -14,12 +15,18 @@ function initials(name) {
   return ((parts[0]?.[0] || '') + (parts[1]?.[0] || '')).toUpperCase() || '?';
 }
 
+const OUTREACH = ['new', 'contacted', 'responded', 'rejected'];
+const OUTREACH_LABELS = { new: 'New', contacted: 'Contacted', responded: 'Responded', rejected: 'Rejected' };
+const OUTREACH_COLORS = { new: 'var(--slate)', contacted: 'var(--amber-dim)', responded: 'var(--amber)', rejected: '#c0665f' };
+const MAX_COMPARE = 4;
+
 // Shared results view for Smart Source.ai and Smart Hunt.ai — a responsive
 // card grid instead of an 11-column table, so nothing needs a horizontal
 // scrollbar to read. Adds client-side sort (by match %, default) and a
-// live search box so a recruiter can narrow a big result set fast, plus
-// a "select all visible" toggle that respects whatever the search/sort
-// currently has on screen.
+// live search box, a per-candidate "why this match" reason (click the
+// ring), an outreach-status pill that rides along when a candidate is
+// added to a project, a pin-to-compare flow (2-4 candidates side by
+// side), and bulk contact reveal for everything currently selected.
 export default function CandidateResults({
   candidates, candidateKey, selected, toggleSelect, setSelected,
   contactState, revealContactFor, updateCandidateField,
@@ -29,6 +36,10 @@ export default function CandidateResults({
 }) {
   const [query, setQuery] = useState('');
   const [sortBy, setSortBy] = useState('match');
+  const [expandedReason, setExpandedReason] = useState(new Set());
+  const [compareKeys, setCompareKeys] = useState(new Set());
+  const [compareOpen, setCompareOpen] = useState(false);
+  const [bulkRevealing, setBulkRevealing] = useState(false);
 
   const visible = useMemo(() => {
     let list = candidates;
@@ -61,6 +72,35 @@ export default function CandidateResults({
     });
   }
 
+  function toggleReason(key) {
+    setExpandedReason((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }
+
+  function togglePin(key) {
+    setCompareKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) { next.delete(key); return next; }
+      if (next.size >= MAX_COMPARE) return next;
+      next.add(key);
+      return next;
+    });
+  }
+
+  async function bulkRevealContact() {
+    setBulkRevealing(true);
+    const targets = candidates.filter((c) => selected.has(candidateKey(c)) && !(contactState[candidateKey(c)] || {}).revealed);
+    for (const c of targets) {
+      await revealContactFor(c);
+    }
+    setBulkRevealing(false);
+  }
+
+  const compareCandidates = candidates.filter((c) => compareKeys.has(candidateKey(c)));
+
   return (
     <>
       <div className="cand-toolbar">
@@ -84,6 +124,18 @@ export default function CandidateResults({
             selectedCount={selected.size}
             getSelectedCandidates={() => candidates.filter((c) => selected.has(candidateKey(c)))}
           />
+          <button
+            type="button"
+            onClick={bulkRevealContact}
+            disabled={selected.size === 0 || bulkRevealing}
+            style={{
+              fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: selected.size ? 'var(--amber)' : 'var(--slate)',
+              border: '1px solid ' + (selected.size ? 'var(--amber-dim)' : 'var(--line)'), borderRadius: 20, padding: '8px 14px',
+              background: 'transparent', cursor: selected.size ? 'pointer' : 'not-allowed',
+            }}
+          >
+            {bulkRevealing ? 'Revealing…' : `Reveal contact${selected.size ? ` (${selected.size})` : ''}`}
+          </button>
           <button
             type="button"
             onClick={() => setShareOpen((v) => !v)}
@@ -129,7 +181,9 @@ export default function CandidateResults({
             const key = candidateKey(c);
             const cs = contactState[key] || {};
             const isSelected = selected.has(key);
+            const isPinned = compareKeys.has(key);
             const score = c.match_score;
+            const outreach = c.outreach_status || 'new';
             return (
               <div key={key} className={`cand-card${isSelected ? ' selected' : ''}`}>
                 <div className="cand-card-top">
@@ -142,15 +196,41 @@ export default function CandidateResults({
                     </div>
                   </div>
                   {score != null && (
-                    <div className="cand-ring" style={{ background: `conic-gradient(${scoreColor(score)} ${score}%, rgba(255,255,255,0.08) 0)` }}>
+                    <div
+                      className="cand-ring"
+                      onClick={() => c.match_reason && toggleReason(key)}
+                      title={c.match_reason ? 'Click for why this match' : ''}
+                      style={{ background: `conic-gradient(${scoreColor(score)} ${score}%, rgba(255,255,255,0.08) 0)`, cursor: c.match_reason ? 'pointer' : 'default' }}
+                    >
                       <div className="cand-ring-inner" style={{ color: scoreColor(score) }}>{score}%</div>
                     </div>
                   )}
                 </div>
 
+                {c.match_reason && expandedReason.has(key) && (
+                  <div className="cand-reason">{c.match_reason}</div>
+                )}
+
                 <div className="cand-chips">
                   {c.location && <span className="cand-chip">{c.location}</span>}
                   {c.notice_period && <span className="cand-chip">Notice: {c.notice_period}</span>}
+                </div>
+
+                <div className="cand-outreach">
+                  {OUTREACH.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => updateCandidateField(key, 'outreach_status', outreach === s ? 'new' : s)}
+                      title={OUTREACH_LABELS[s]}
+                      style={{
+                        border: '1px solid ' + (outreach === s ? OUTREACH_COLORS[s] : 'var(--line)'),
+                        color: outreach === s ? OUTREACH_COLORS[s] : 'var(--slate)',
+                      }}
+                    >
+                      {OUTREACH_LABELS[s]}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="cand-field-row">
@@ -188,14 +268,36 @@ export default function CandidateResults({
                       {cs.loading ? '…' : cs.message ? 'Not available' : 'Reveal contact'}
                     </button>
                   )}
-                  {c.profile_url && (
-                    <a href={c.profile_url} target="_blank" rel="noreferrer" style={{ fontSize: 11.5, color: 'var(--amber)' }}>View profile</a>
-                  )}
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <button type="button" className={`cand-pin${isPinned ? ' pinned' : ''}`} onClick={() => togglePin(key)}>
+                      {isPinned ? '✓ Compare' : '+ Compare'}
+                    </button>
+                    {c.profile_url && (
+                      <a href={c.profile_url} target="_blank" rel="noreferrer" style={{ fontSize: 11.5, color: 'var(--amber)' }}>View profile</a>
+                    )}
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {compareKeys.size >= 2 && !compareOpen && (
+        <div className="cand-compare-bar" onClick={() => setCompareOpen(true)}>
+          Compare {compareKeys.size} candidates
+        </div>
+      )}
+
+      {compareOpen && (
+        <CompareDrawer
+          candidates={compareCandidates}
+          candidateKey={candidateKey}
+          onRemove={(key) => setCompareKeys((prev) => { const next = new Set(prev); next.delete(key); return next; })}
+          onClose={() => setCompareOpen(false)}
+          contactState={contactState}
+          revealContactFor={revealContactFor}
+        />
       )}
     </>
   );

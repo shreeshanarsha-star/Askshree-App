@@ -106,6 +106,7 @@ export async function POST(req) {
       location: c.location,
       profile_url: c.profile_url,
       match_score: c.match_score,
+      match_reason: c.match_reason || null,
       source: 'linkedin',
     }));
 
