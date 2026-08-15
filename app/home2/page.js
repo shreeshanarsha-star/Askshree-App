@@ -34,6 +34,15 @@ export default function Home2Page() {
   const [selectedId, setSelectedId] = useState(null);
 
   const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
+  const leftFilled = !!activeFeature;
+  const rightFilled = !!selected;
+  const triptychCols = leftFilled && rightFilled
+    ? '1fr 1.15fr 1fr'
+    : leftFilled
+      ? '1.1fr 1.15fr 0.55fr'
+      : rightFilled
+        ? '0.55fr 1.15fr 1.1fr'
+        : '0.62fr 1.5fr 0.62fr';
   const SHARE_URL = 'https://askshree.com/home2';
   const SHARE_TEXT = 'AI-native recruiting tools by Shreesha Narsha';
 
@@ -147,7 +156,7 @@ export default function Home2Page() {
         </div>
       </div>
 
-      <div className="home2-triptych" id="ai-systems">
+      <div className="home2-triptych" id="ai-systems" style={{ gridTemplateColumns: triptychCols }}>
         <div className="home2-col">
           <div className="home2-col-label">TACTICAL DISPLAY</div>
           {activeFeature ? (

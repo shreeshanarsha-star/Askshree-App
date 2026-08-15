@@ -141,7 +141,7 @@ export function OrbitalStage({ selectedId, onSelect }) {
           return (
             <div key={d.id}>
               <div
-                className={`orb2-line ${d.status === 'live' ? 'orb2-live' : ''}`}
+                className={`orb2-line ${d.status === 'live' ? 'orb2-live' : ''} ${selectedId === d.id ? 'orb2-line-active' : ''}`}
                 style={{ width: `${R}%`, transform: `rotate(${angle}deg)` }}
               />
               <div
