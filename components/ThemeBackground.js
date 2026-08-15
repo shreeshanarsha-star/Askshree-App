@@ -61,6 +61,15 @@ export default function ThemeBackground({ themeId }) {
     window.addEventListener('resize', sized);
     const rt = setTimeout(sized, 300);
 
+    function handleVisibility() {
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+      } else {
+        raf = requestAnimationFrame(tick);
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+
     function tick() {
       const s = stateRef.current;
       s.t += 1;
@@ -183,6 +192,7 @@ export default function ThemeBackground({ themeId }) {
 
     return () => {
       window.removeEventListener('resize', sized);
+      document.removeEventListener('visibilitychange', handleVisibility);
       clearTimeout(rt);
       cancelAnimationFrame(raf);
     };

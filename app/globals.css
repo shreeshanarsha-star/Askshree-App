@@ -1043,7 +1043,17 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   content:''; position:absolute; left:0; top:4px; bottom:4px; width:1px;
   background:linear-gradient(180deg, transparent, rgba(var(--amber-rgb),0.22) 15%, rgba(var(--amber-rgb),0.22) 85%, transparent);
 }
-.home2-col-label{font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:10.5px; letter-spacing:0.14em; color:var(--amber); text-transform:uppercase; margin-bottom:10px;}
+.home2-col-label{font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:10.5px; letter-spacing:0.14em; color:var(--amber); text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:10px;}
+
+.orb2-status-line{
+  display:inline-flex; align-items:center; gap:6px; font-weight:500; letter-spacing:0.02em;
+  font-size:10px; color:var(--slate); text-transform:none; white-space:nowrap;
+}
+@keyframes orb2StatusBlink{0%,100%{opacity:1;}50%{opacity:0.35;}}
+.orb2-status-dot{
+  width:6px; height:6px; border-radius:50%; background:var(--amber);
+  box-shadow:0 0 6px rgba(var(--amber-rgb),0.7); animation:orb2StatusBlink 1.8s ease-in-out infinite;
+}
 .home2-col .home2-workspace, .home2-col .orb2-stage-card, .home2-col .orb2-panel, .home2-col .home2-empty-panel{flex:1; margin:0;}
 .home2-col .orb2-panel-empty{display:flex; align-items:center; justify-content:center; height:100%; text-align:center;}
 

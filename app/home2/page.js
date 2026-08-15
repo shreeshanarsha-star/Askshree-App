@@ -8,18 +8,15 @@ import FeatureWorkspace from '../../components/FeatureWorkspace';
 import { useTheme } from '../../lib/useTheme';
 import { getThemeAccentStyle } from '../../lib/themes';
 
-const TOOL_LINKS = {
-  'gauri.ai': '/gauri',
-  'job postings.ai': '/tools/job-postings-ai',
-  'apply.ai': '/tools/apply-ai',
-  'smart source.ai': '/tools/smart-source-ai',
-  'smart hunt.ai': '/tools/smart-hunt-ai',
-  'smart screen.ai': '/tools/smart-screen-ai',
-};
-const TOOL_NAMES = [
-  'Gauri.ai', 'Job Postings.ai', 'Apply.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
-  'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Induction.ai', 'Campus.ai', 'Analytics.ai', 'Dashboard.ai',
-];
+// Flat, searchable index built from the real department/tool data — every
+// department and every tool (live or soon) is reachable from the terminal.
+const SEARCH_INDEX = DEPARTMENTS.flatMap((d) => [
+  { name: d.name, deptId: d.id, kind: 'dept', href: d.href, status: d.status },
+  ...d.tools.map((t) => ({ name: t.name, deptId: d.id, kind: 'tool', href: t.href, status: t.status, widget: t.widget })),
+]);
+const LIVE_COUNT = DEPARTMENTS.filter((d) => d.status === 'live').length;
+const TOOL_NAMES = SEARCH_INDEX.filter((e) => e.status === 'live').map((e) => e.name);
+const LAST_DEPT_KEY = 'askshree_home2_last_dept';
 
 export default function Home2Page() {
   const [query, setQuery] = useState('');
@@ -54,6 +51,20 @@ export default function Home2Page() {
     const id = setInterval(() => setHintIndex((i) => (i + 1) % TOOL_NAMES.length), 2200);
     return () => clearInterval(id);
   }, []);
+
+  // Remember the last department the person had open, so a return visit
+  // picks up where they left off instead of resetting to a blank console.
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(LAST_DEPT_KEY);
+      if (saved && DEPARTMENTS.some((d) => d.id === saved)) setSelectedId(saved);
+    } catch (e) { /* localStorage unavailable — fine, just start blank */ }
+  }, []);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    try { window.localStorage.setItem(LAST_DEPT_KEY, selectedId); } catch (e) { /* ignore */ }
+  }, [selectedId]);
 
   async function handleLike() {
     setJustLiked(true);
@@ -109,9 +120,19 @@ export default function Home2Page() {
   function runQuery() {
     const q = query.trim().toLowerCase();
     if (!q) return;
-    const match = Object.keys(TOOL_LINKS).find((name) => name.includes(q) || q.includes(name));
-    if (match) window.location.href = TOOL_LINKS[match];
-    else document.querySelector('.chat-launcher')?.click();
+    const match =
+      SEARCH_INDEX.find((e) => e.name.toLowerCase() === q) ||
+      SEARCH_INDEX.find((e) => e.name.toLowerCase().includes(q) || q.includes(e.name.toLowerCase()));
+
+    if (!match) {
+      document.querySelector('.chat-launcher')?.click();
+      return;
+    }
+    if (match.deptId) setSelectedId(match.deptId);
+    if (match.widget) { openFeature({ id: match.widget, title: match.name }); return; }
+    if (match.href) { window.location.href = match.href; return; }
+    if (match.kind === 'tool') { openFeature({ id: 'soon', title: match.name }); return; }
+    // department with no href and no tools yet — just leave it selected on the reactor
   }
 
   return (
@@ -182,7 +203,13 @@ export default function Home2Page() {
         </div>
 
         <div className="home2-col">
-          <div className="home2-col-label">AI SYSTEMS</div>
+          <div className="home2-col-label">
+            AI SYSTEMS
+            <span className="orb2-status-line">
+              <i className="orb2-status-dot" />
+              {LIVE_COUNT} live &middot; {DEPARTMENTS.length} systems
+            </span>
+          </div>
           <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} />
         </div>
 
