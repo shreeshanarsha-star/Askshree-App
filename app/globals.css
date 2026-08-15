@@ -298,7 +298,7 @@
   .cand-sort{background:transparent; border:1px solid var(--line); border-radius:20px; padding:7px 12px; font-size:11.5px; color:var(--slate); font-family:'IBM Plex Mono',monospace; outline:none; cursor:pointer;}
   .cand-selectall{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--slate); font-family:'IBM Plex Mono',monospace; cursor:pointer; user-select:none;}
   .cand-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px;}
-  .cand-card{border:1px solid var(--line); border-radius:12px; padding:18px; background:rgba(255,255,255,0.015); transition:border-color .15s, background .15s;}
+  .cand-card{border:1px solid var(--line); border-radius:12px; padding:18px; background:rgba(255,255,255,0.015); transition:border-color .15s, background .15s; min-width:0; overflow:hidden;}
   .cand-card:hover{border-color:var(--amber-dim);}
   .cand-card.selected{border-color:var(--amber); background:rgba(232,163,61,0.05);}
   .cand-card-top{display:flex; align-items:flex-start; gap:11px;}
@@ -311,13 +311,13 @@
   .cand-ring-inner{position:absolute; inset:3px; border-radius:50%; background:#0d1420; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:10.5px;}
   .cand-chips{display:flex; flex-wrap:wrap; gap:6px; margin:13px 0;}
   .cand-chip{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--slate); border:1px solid var(--line); border-radius:12px; padding:3px 9px; white-space:nowrap;}
-  .cand-field-row{display:flex; gap:14px; margin-bottom:10px;}
+  .cand-field-row{display:flex; flex-wrap:wrap; gap:10px 14px; margin-bottom:10px;}
   .cand-field{flex:1; min-width:0; font-size:11.5px;}
   .cand-field-label{color:var(--amber-dim); font-family:'IBM Plex Mono',monospace; font-size:9.5px; text-transform:uppercase; letter-spacing:0.03em; margin-bottom:3px;}
-  .cand-actions{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line);}
+  .cand-actions{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px 10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line);}
   .cand-empty{padding:40px 20px; text-align:center; color:var(--slate); font-size:13px; border:1px dashed var(--line); border-radius:12px;}
   .cand-reason{font-size:11px; color:var(--slate); line-height:1.5; margin:-4px 0 12px; padding:8px 10px; background:rgba(255,255,255,0.02); border-radius:6px; cursor:default;}
-  .cand-outreach{display:flex; gap:4px; margin-bottom:13px;}
+  .cand-outreach{display:flex; flex-wrap:wrap; gap:4px 4px; margin-bottom:13px;}
   .cand-outreach button{font-size:9.5px; font-family:'IBM Plex Mono',monospace; padding:3px 7px; border-radius:10px; background:transparent; cursor:pointer; white-space:nowrap;}
   .cand-pin{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--slate); border:1px solid var(--line); border-radius:14px; padding:5px 10px; background:transparent; cursor:pointer; white-space:nowrap;}
   .cand-pin.pinned{color:var(--amber); border-color:var(--amber-dim); background:rgba(232,163,61,0.06);}
