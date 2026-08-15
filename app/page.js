@@ -103,16 +103,6 @@ export default function HomePage() {
       <div className="side-content">
       {themeReady && <ThemeBackground themeId={themeId} />}
 
-      <div className="nav" style={{ justifyContent: 'flex-end' }}>
-        <div className="nav-right">
-          <div className="profile">
-            <div className="ring">
-              <img src="/profile-photo.jpg" alt="Shreesha Narsha" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="hero">
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-start', gap: 14, flexWrap: 'wrap' }}>
