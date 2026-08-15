@@ -106,11 +106,6 @@ export default function HomePage() {
       <div className="nav" style={{ justifyContent: 'flex-end' }}>
         <div className="nav-right">
           <div className="profile">
-            <div className="tags">
-              <div>Head-Global Talent Acquisition &#9679;</div>
-              <div>AI Builder &#9679;</div>
-              <div>Bengaluru &#9679;</div>
-            </div>
             <div className="ring">
               <img src="/profile-photo.jpg" alt="Shreesha Narsha" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
             </div>
