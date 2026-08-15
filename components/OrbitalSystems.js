@@ -113,26 +113,19 @@ const DEPARTMENTS = [
   },
 ];
 
-export default function OrbitalSystems({ onOpenFeature }) {
-  const [selectedId, setSelectedId] = useState(null);
-  const [expanded, setExpanded] = useState(false);
-  const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
+export function OrbitalStage({ selectedId, onSelect }) {
   const n = DEPARTMENTS.length;
   const R = 37;
 
-  function select(id) {
-    setSelectedId(id);
-  }
   function onNodeKeyDown(e, id) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      select(id);
+      onSelect(id);
     }
   }
 
   return (
-    <div className={`orb2-wrap ${expanded ? 'orb2-expanded' : ''}`}>
-      <div className="orb2-stage-card">
+    <div className="orb2-stage-card">
       <div className="orb2-stage">
         {DEPARTMENTS.map((d, i) => {
           const angle = -90 + (360 / n) * i;
@@ -151,7 +144,7 @@ export default function OrbitalSystems({ onOpenFeature }) {
                 aria-label={d.name}
                 className={`orb2-node orb2-${d.status} ${selectedId === d.id ? 'orb2-selected' : ''}`}
                 style={{ left: `${left}%`, top: `${top}%` }}
-                onClick={() => select(d.id)}
+                onClick={() => onSelect(d.id)}
                 onKeyDown={(e) => onNodeKeyDown(e, d.id)}
               >
                 <Icon name={d.icon} />
@@ -167,69 +160,71 @@ export default function OrbitalSystems({ onOpenFeature }) {
           <Icon name="mic" size={24} />
         </div>
       </div>
-      </div>
-
-      <div className="orb2-panel">
-        {!selected && (
-          <div className="orb2-panel-empty">
-            Select a department to open its console.
-            <br />
-            HeyShree is listening at the center — wake it any time.
-          </div>
-        )}
-        {selected && (
-          <>
-            <div className="orb2-panel-head">
-              <div>
-                <div className="orb2-panel-title">{selected.name}</div>
-                <div className={`orb2-panel-status ${selected.status === 'soon' ? 'orb2-status-soon' : ''}`}>
-                  {selected.status === 'live' ? 'LIVE' : 'COMING SOON'}
-                </div>
-              </div>
-              <button type="button" className="orb2-fs-btn" onClick={() => setExpanded((e) => !e)}>
-                {expanded ? 'Exit fullscreen' : 'Fullscreen'}
-              </button>
-            </div>
-
-            {selected.tools.length === 0 && selected.href && (
-              <a className="orb2-open-link" href={selected.href}>Open {selected.name} &rarr;</a>
-            )}
-            {selected.tools.length === 0 && !selected.href && (
-              <div className="orb2-panel-empty">Tools for {selected.name} are in the works.</div>
-            )}
-            {selected.tools.map((t) => (
-              <div key={t.name} className={`orb2-tool-row ${t.status === 'soon' ? 'orb2-tool-soon' : ''}`}>
-                {t.widget ? (
-                  <span
-                    className="orb2-tool-link"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onOpenFeature && onOpenFeature({ id: t.widget, title: t.name })}
-                    onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: t.widget, title: t.name }); } }}
-                  >
-                    {t.name}
-                  </span>
-                ) : t.status === 'live' ? (
-                  <a href={t.href}>{t.name}</a>
-                ) : (
-                  <span
-                    className="orb2-tool-link"
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => onOpenFeature && onOpenFeature({ id: 'soon', title: t.name })}
-                    onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: 'soon', title: t.name }); } }}
-                  >
-                    {t.name}
-                  </span>
-                )}
-                <span className={`orb2-pill ${t.status === 'soon' ? 'orb2-pill-soon' : ''}`}>
-                  {t.status === 'live' ? 'LIVE' : 'SOON'}
-                </span>
-              </div>
-            ))}
-          </>
-        )}
-      </div>
     </div>
   );
 }
+
+export function FeatureNavPanel({ selected, onOpenFeature }) {
+  return (
+    <div className="orb2-panel">
+      {!selected && (
+        <div className="orb2-panel-empty">
+          Select a department to open its console.
+          <br />
+          HeyShree is listening at the center — wake it any time.
+        </div>
+      )}
+      {selected && (
+        <>
+          <div className="orb2-panel-head">
+            <div>
+              <div className="orb2-panel-title">{selected.name}</div>
+              <div className={`orb2-panel-status ${selected.status === 'soon' ? 'orb2-status-soon' : ''}`}>
+                {selected.status === 'live' ? 'LIVE' : 'COMING SOON'}
+              </div>
+            </div>
+          </div>
+
+          {selected.tools.length === 0 && selected.href && (
+            <a className="orb2-open-link" href={selected.href}>Open {selected.name} &rarr;</a>
+          )}
+          {selected.tools.length === 0 && !selected.href && (
+            <div className="orb2-panel-empty">Tools for {selected.name} are in the works.</div>
+          )}
+          {selected.tools.map((t) => (
+            <div key={t.name} className={`orb2-tool-row ${t.status === 'soon' ? 'orb2-tool-soon' : ''}`}>
+              {t.widget ? (
+                <span
+                  className="orb2-tool-link"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onOpenFeature && onOpenFeature({ id: t.widget, title: t.name })}
+                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: t.widget, title: t.name }); } }}
+                >
+                  {t.name}
+                </span>
+              ) : t.status === 'live' ? (
+                <a href={t.href}>{t.name}</a>
+              ) : (
+                <span
+                  className="orb2-tool-link"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => onOpenFeature && onOpenFeature({ id: 'soon', title: t.name })}
+                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: 'soon', title: t.name }); } }}
+                >
+                  {t.name}
+                </span>
+              )}
+              <span className={`orb2-pill ${t.status === 'soon' ? 'orb2-pill-soon' : ''}`}>
+                {t.status === 'live' ? 'LIVE' : 'SOON'}
+              </span>
+            </div>
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+export { DEPARTMENTS };

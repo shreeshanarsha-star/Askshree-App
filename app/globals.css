@@ -1013,3 +1013,25 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .widget-notes-item{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-family:'Plus Jakarta Sans',sans-serif; font-size:13px; color:var(--cream);}
 .widget-notes-remove{background:none; border:none; color:var(--slate); font-size:16px; line-height:1; cursor:pointer; flex-shrink:0;}
 .widget-notes-remove:hover{color:var(--amber);}
+
+/* ---- Home v2: compact top bar + 3-column triptych ---- */
+.home2-topbar{padding:24px 32px 24px 190px;}
+.home2-topbar-h1{margin:0; font-family:'Fraunces',serif; font-weight:500; font-size:22px; line-height:1.4; color:var(--cream); max-width:640px;}
+.home2-topbar-h1 em{color:var(--amber); font-style:italic;}
+
+.home2-triptych{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; align-items:stretch; padding:0 32px; margin-top:8px;}
+.home2-col{display:flex; flex-direction:column; min-width:0;}
+.home2-col-label{font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:10.5px; letter-spacing:0.14em; color:var(--amber); text-transform:uppercase; margin-bottom:10px;}
+.home2-col .home2-workspace, .home2-col .orb2-stage-card, .home2-col .orb2-panel{flex:1; margin:0;}
+.home2-col .orb2-panel-empty{display:flex; align-items:center; justify-content:center; height:100%; text-align:center;}
+
+.terminal-icon-btn{background:transparent; border:1px solid var(--line); border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:var(--slate); cursor:pointer; flex-shrink:0; margin-right:6px;}
+.terminal-icon-btn:hover{border-color:var(--amber-dim); color:var(--amber);}
+
+@media (max-width:1000px){
+  .home2-triptych{grid-template-columns:1fr;}
+}
+@media (max-width:640px){
+  .home2-topbar{padding:130px 20px 20px;}
+  .home2-triptych{padding:0 20px;}
+}
