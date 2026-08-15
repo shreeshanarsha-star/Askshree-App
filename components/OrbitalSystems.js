@@ -118,7 +118,7 @@ export default function OrbitalSystems({ onOpenFeature }) {
   const [expanded, setExpanded] = useState(false);
   const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
   const n = DEPARTMENTS.length;
-  const R = 40;
+  const R = 37;
 
   function select(id) {
     setSelectedId(id);
