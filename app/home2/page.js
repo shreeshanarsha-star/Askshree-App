@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import AskShreeChat from '../../components/AskShreeChat';
-import HeyShreeVoice from '../../components/HeyShreeVoice';
 import AppLauncher from '../../components/AppLauncher';
 import ThemeBackground from '../../components/ThemeBackground';
 import OrbitalSystems from '../../components/OrbitalSystems';
@@ -167,7 +166,6 @@ export default function Home2Page() {
       </div>
 
       <AskShreeChat />
-      <HeyShreeVoice />
       <AppLauncher />
       </div>
     </div>

@@ -109,7 +109,6 @@ export default function OrbitalSystems() {
               >
                 <Icon name={d.icon} />
                 <span className="orb2-nm">{d.name}</span>
-                <span className="orb2-badge">{d.letter}</span>
               </div>
             </div>
           );
@@ -117,10 +116,9 @@ export default function OrbitalSystems() {
 
         <div className="orb2-ring orb2-ring-outer" />
         <div className="orb2-ring orb2-ring-mid" />
-        <div className="orb2-core">
-          <Icon name="mic" size={26} />
+        <div className="orb2-core" id="reactor-core">
+          <Icon name="mic" size={24} />
         </div>
-        <div className="orb2-core-label">HeyShree</div>
       </div>
 
       <div className="orb2-panel">

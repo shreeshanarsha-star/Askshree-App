@@ -22,15 +22,18 @@ function Icon({ name, size = 20 }) {
   );
 }
 
-function openHeyShree() {
-  const btn = document.querySelector('.heyshree-launcher');
-  if (btn) btn.click();
+function focusReactor() {
+  const el = document.getElementById('reactor-core');
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.classList.add('orb2-awake');
+  setTimeout(() => el.classList.remove('orb2-awake'), 1200);
 }
 
 const APPS = [
   { key: 'home', name: 'home', label: 'Home', href: '/home2' },
   { key: 'systems', name: 'systems', label: 'AI Systems', href: '/home2#ai-systems' },
-  { key: 'heyshree', name: 'mic', label: 'HeyShree', onClick: openHeyShree },
+  { key: 'heyshree', name: 'mic', label: 'HeyShree', onClick: focusReactor },
   { key: 'writings', name: 'pencil', label: 'Writings', href: '/writings/purpose' },
   { key: 'about', name: 'user', label: 'About Me', href: '/about' },
   { key: 'contact', name: 'mail', label: 'Contact', href: '/contact' },
