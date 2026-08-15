@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import { useOptionalSession } from '../lib/useOptionalSession';
 
 const ICONS = {
@@ -29,10 +28,7 @@ function openHeyShree() {
 }
 
 export default function Sidebar({ active }) {
-  const [contactOpen, setContactOpen] = useState(false);
   const { ready, email, signOut } = useOptionalSession();
-
-  function closeFlyouts() { setContactOpen(false); }
 
   return (
     <nav className="side-rail">
@@ -59,18 +55,9 @@ export default function Sidebar({ active }) {
           <Icon name="user" /><span>About Me</span>
         </a>
 
-        <div className="side-item-wrap">
-          <div className={`side-item ${contactOpen ? 'active' : ''}`} onClick={() => setContactOpen((o) => !o)}>
-            <Icon name="mail" /><span>Contact</span>
-          </div>
-          {contactOpen && (
-            <div className="side-flyout" onMouseLeave={closeFlyouts}>
-              <a href="tel:+919606591623">+91 96065 91623</a>
-              <a href="mailto:shreesha.narsha@gmail.com">shreesha.narsha@gmail.com</a>
-              <a href="https://www.linkedin.com/in/shreesha09/" target="_blank" rel="noopener noreferrer">linkedin.com/in/shreesha09</a>
-            </div>
-          )}
-        </div>
+        <a href="/contact" className={`side-item ${active === 'contact' ? 'active' : ''}`}>
+          <Icon name="mail" /><span>Contact</span>
+        </a>
 
         <a href="/credits" className={`side-item ${active === 'credits' ? 'active' : ''}`}>
           <Icon name="credit" /><span>Credits</span>
