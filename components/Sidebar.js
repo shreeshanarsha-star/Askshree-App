@@ -29,12 +29,11 @@ function openHeyShree() {
 }
 
 export default function Sidebar({ active }) {
-  const [writingsOpen, setWritingsOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const { ready, email, signOut } = useOptionalSession();
 
-  function closeFlyouts() { setWritingsOpen(false); setAboutOpen(false); setContactOpen(false); }
+  function closeFlyouts() { setAboutOpen(false); setContactOpen(false); }
 
   return (
     <nav className="side-rail">
@@ -53,23 +52,12 @@ export default function Sidebar({ active }) {
           <Icon name="mic" /><span>HeyShree</span>
         </div>
 
-        <div className="side-item-wrap">
-          <div className={`side-item ${writingsOpen ? 'active' : ''}`} onClick={() => { setWritingsOpen((o) => !o); setAboutOpen(false); setContactOpen(false); }}>
-            <Icon name="pencil" /><span>Writings</span>
-          </div>
-          {writingsOpen && (
-            <div className="side-flyout" onMouseLeave={closeFlyouts}>
-              <a href="/writings/purpose">&#9679; Purpose</a>
-              <a href="/writings/leadership">&#9679; Leadership</a>
-              <a href="/writings/strategy">&#9679; Strategy</a>
-              <a href="/writings/artificial-intelligence">&#9679; Artificial Intelligence</a>
-              <a href="/writings/spirituality">&#9679; Spirituality</a>
-            </div>
-          )}
-        </div>
+        <a href="/writings/purpose" className="side-item">
+          <Icon name="pencil" /><span>Writings</span>
+        </a>
 
         <div className="side-item-wrap">
-          <div className={`side-item ${aboutOpen ? 'active' : ''}`} onClick={() => { setAboutOpen((o) => !o); setWritingsOpen(false); setContactOpen(false); }}>
+          <div className={`side-item ${aboutOpen ? 'active' : ''}`} onClick={() => { setAboutOpen((o) => !o); setContactOpen(false); }}>
             <Icon name="user" /><span>About Me</span>
           </div>
           {aboutOpen && (
@@ -82,7 +70,7 @@ export default function Sidebar({ active }) {
         </div>
 
         <div className="side-item-wrap">
-          <div className={`side-item ${contactOpen ? 'active' : ''}`} onClick={() => { setContactOpen((o) => !o); setWritingsOpen(false); setAboutOpen(false); }}>
+          <div className={`side-item ${contactOpen ? 'active' : ''}`} onClick={() => { setContactOpen((o) => !o); setAboutOpen(false); }}>
             <Icon name="mail" /><span>Contact</span>
           </div>
           {contactOpen && (
