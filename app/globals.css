@@ -290,6 +290,33 @@
     color:var(--amber); background:transparent; padding:8px 16px; border-radius:6px; cursor:pointer;
   }
 
+  /* ---------- Candidate results (Smart Source.ai / Smart Hunt.ai) ---------- */
+  .cand-toolbar{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:24px 0 14px; flex-wrap:wrap;}
+  .cand-toolbar-left{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .cand-search{background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:20px; padding:7px 14px; font-size:12px; color:var(--cream); font-family:'IBM Plex Mono',monospace; outline:none; min-width:190px;}
+  .cand-search::placeholder{color:var(--slate);}
+  .cand-sort{background:transparent; border:1px solid var(--line); border-radius:20px; padding:7px 12px; font-size:11.5px; color:var(--slate); font-family:'IBM Plex Mono',monospace; outline:none; cursor:pointer;}
+  .cand-selectall{display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--slate); font-family:'IBM Plex Mono',monospace; cursor:pointer; user-select:none;}
+  .cand-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:14px;}
+  .cand-card{border:1px solid var(--line); border-radius:12px; padding:18px; background:rgba(255,255,255,0.015); transition:border-color .15s, background .15s;}
+  .cand-card:hover{border-color:var(--amber-dim);}
+  .cand-card.selected{border-color:var(--amber); background:rgba(232,163,61,0.05);}
+  .cand-card-top{display:flex; align-items:flex-start; gap:11px;}
+  .cand-check{margin-top:4px; flex-shrink:0; cursor:pointer;}
+  .cand-avatar{width:38px; height:38px; border-radius:50%; background:rgba(232,163,61,0.1); color:var(--amber); display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-size:14px; font-weight:600; flex-shrink:0;}
+  .cand-id{flex:1; min-width:0;}
+  .cand-name{font-size:14.5px; color:var(--cream); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .cand-role{font-size:12px; color:var(--slate); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .cand-ring{position:relative; width:44px; height:44px; border-radius:50%; flex-shrink:0;}
+  .cand-ring-inner{position:absolute; inset:3px; border-radius:50%; background:#0d1420; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:10.5px;}
+  .cand-chips{display:flex; flex-wrap:wrap; gap:6px; margin:13px 0;}
+  .cand-chip{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--slate); border:1px solid var(--line); border-radius:12px; padding:3px 9px; white-space:nowrap;}
+  .cand-field-row{display:flex; gap:14px; margin-bottom:10px;}
+  .cand-field{flex:1; min-width:0; font-size:11.5px;}
+  .cand-field-label{color:var(--amber-dim); font-family:'IBM Plex Mono',monospace; font-size:9.5px; text-transform:uppercase; letter-spacing:0.03em; margin-bottom:3px;}
+  .cand-actions{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:14px; padding-top:12px; border-top:1px solid var(--line);}
+  .cand-empty{padding:40px 20px; text-align:center; color:var(--slate); font-size:13px; border:1px dashed var(--line); border-radius:12px;}
+
   /* ---------- ADMIN LOGIN ---------- */
   .login-screen{
     min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; z-index:2;

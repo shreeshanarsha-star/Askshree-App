@@ -5,13 +5,8 @@ import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
 import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
-import AddToProjectButton from '../../../components/AddToProjectButton';
-import EditableCell from '../../../components/EditableCell';
+import CandidateResults from '../../../components/CandidateResults';
 
-function scoreColor(score) {
-  if (score == null) return 'var(--slate)';
-  return score >= 70 ? 'var(--amber)' : score >= 40 ? 'var(--amber-dim)' : 'var(--slate)';
-}
 
 // Smart Hunt.ai — original spec: manual X-ray search across public
 // candidate data. Keywords/location/company in, AI builds the search and
@@ -196,115 +191,25 @@ export default function SmartHuntAI() {
           {note && <div className="file-hint" style={{ marginTop: 14 }}>{note}</div>}
 
           {candidates && candidates.length > 0 && (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '24px 0 12px', flexWrap: 'wrap', gap: 10 }}>
-                <div className="file-hint" style={{ margin: 0 }}>
-                  {candidates.length} candidate{candidates.length > 1 ? 's' : ''} found{selected.size > 0 ? ` — ${selected.size} selected` : ''}
-                </div>
-                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                  <a href="/tools/projects" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--slate)' }}>View projects</a>
-                  <AddToProjectButton
-                    siteFetch={siteFetch}
-                    selectedCount={selected.size}
-                    getSelectedCandidates={() => candidates.filter((c) => selected.has(candidateKey(c)))}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShareOpen((v) => !v)}
-                    disabled={selected.size === 0}
-                    style={{
-                      fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: selected.size ? 'var(--amber)' : 'var(--slate)',
-                      border: '1px solid ' + (selected.size ? 'var(--amber-dim)' : 'var(--line)'), borderRadius: 20, padding: '8px 14px',
-                      background: 'transparent', cursor: selected.size ? 'pointer' : 'not-allowed',
-                    }}
-                  >
-                    Share via email
-                  </button>
-                  <button
-                    type="button"
-                    onClick={exportToExcel}
-                    style={{
-                      fontFamily: 'IBM Plex Mono, monospace', fontSize: 11.5, color: 'var(--amber)',
-                      border: '1px solid var(--amber-dim)', borderRadius: 20, padding: '8px 14px',
-                      background: 'transparent', cursor: 'pointer',
-                    }}
-                  >
-                    Export to Excel
-                  </button>
-                </div>
-              </div>
-
-              {shareOpen && (
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
-                  <input className="free-text-input" style={{ maxWidth: 320 }} type="email" placeholder="Recipient email"
-                    value={shareTo} onChange={(e) => setShareTo(e.target.value)} />
-                  <button className="primary-btn" style={{ marginTop: 0 }} onClick={sendShareEmail} disabled={sharing || !shareTo}>
-                    {sharing ? 'Sending…' : 'Send'}
-                  </button>
-                  {shareNote && <span className="file-hint" style={{ marginTop: 0 }}>{shareNote}</span>}
-                </div>
-              )}
-
-              <div className="table-wrap">
-                <table className="assess-table">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>Candidate</th><th>Designation</th><th>Company</th><th>Location</th><th>Match</th><th>Qualification</th><th>Current CTC</th><th>Expected CTC</th><th>Notice</th><th>Contact</th><th>Profile</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {candidates.map((c) => {
-                      const key = candidateKey(c);
-                      const cs = contactState[key] || {};
-                      return (
-                        <tr key={key}>
-                          <td><input type="checkbox" checked={selected.has(key)} onChange={() => toggleSelect(c)} /></td>
-                          <td className="name-cell">{c.name || '—'}</td>
-                          <td>{c.designation || '—'}</td>
-                          <td>{c.company || '—'}</td>
-                          <td>{c.location || '—'}</td>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                              <span style={{ color: scoreColor(c.match_score) }}>{c.match_score != null ? `${c.match_score}%` : '—'}</span>
-                              {c.match_score != null && (
-                                <div style={{ width: 40, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                                  <div style={{ width: `${c.match_score}%`, height: '100%', background: 'var(--amber)' }} />
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td><EditableCell value={c.qualification} onChange={(v) => updateCandidateField(key, 'qualification', v)} /></td>
-                          <td><EditableCell value={c.current_ctc} onChange={(v) => updateCandidateField(key, 'current_ctc', v)} /></td>
-                          <td><EditableCell value={c.expected_ctc} onChange={(v) => updateCandidateField(key, 'expected_ctc', v)} /></td>
-                          <td><EditableCell value={c.notice_period} onChange={(v) => updateCandidateField(key, 'notice_period', v)} /></td>
-                          <td>
-                            {cs.revealed ? (
-                              <span style={{ fontSize: 11 }}>{cs.email || cs.phone || '—'}</span>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => revealContactFor(c)}
-                                disabled={cs.loading}
-                                title={cs.message || ''}
-                                style={{
-                                  fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: 'var(--slate)',
-                                  border: '1px solid var(--line)', borderRadius: 14, padding: '5px 11px', background: 'transparent',
-                                  cursor: cs.loading ? 'default' : 'pointer', whiteSpace: 'nowrap',
-                                }}
-                              >
-                                {cs.loading ? '…' : cs.message ? 'Not available' : 'Reveal contact'}
-                              </button>
-                            )}
-                          </td>
-                          <td><a href={c.profile_url} target="_blank" rel="noreferrer">View</a></td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </>
+            <CandidateResults
+              candidates={candidates}
+              candidateKey={candidateKey}
+              selected={selected}
+              toggleSelect={toggleSelect}
+              setSelected={setSelected}
+              contactState={contactState}
+              revealContactFor={revealContactFor}
+              updateCandidateField={updateCandidateField}
+              siteFetch={siteFetch}
+              shareOpen={shareOpen}
+              setShareOpen={setShareOpen}
+              shareTo={shareTo}
+              setShareTo={setShareTo}
+              shareNote={shareNote}
+              sharing={sharing}
+              sendShareEmail={sendShareEmail}
+              exportToExcel={exportToExcel}
+            />
           )}
         </div>
       </div>
