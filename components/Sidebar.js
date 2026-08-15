@@ -39,7 +39,7 @@ export default function Sidebar({ active }) {
   return (
     <nav className="side-rail">
       <a href="/" className="side-logo" title="Ask Shree">
-        <div className="side-mark">S</div>
+        <div className="side-mark">Ask<span>Shree</span></div>
       </a>
 
       <div className="side-items">
