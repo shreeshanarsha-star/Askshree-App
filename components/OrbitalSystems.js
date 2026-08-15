@@ -116,7 +116,7 @@ const DEPARTMENTS = [
 
 export function OrbitalStage({ selectedId, onSelect }) {
   const n = DEPARTMENTS.length;
-  const R = 37;
+  const R = 39;
   const [hintOn, setHintOn] = useState(true);
 
   useEffect(() => {
