@@ -806,6 +806,8 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(232,163,61,0.
   letter-spacing:0.01em; text-align:center; border-left:2px solid transparent; transition:color .15s;}
 .side-item:hover{color:var(--cream);}
 .side-item.active{color:var(--amber); border-left-color:var(--amber); background:rgba(232,163,61,0.06);}
+.side-item-disabled{opacity:0.4; cursor:not-allowed;}
+.side-item-disabled:hover{color:var(--slate);}
 .side-item-wrap{position:relative; width:100%;}
 .side-flyout{position:absolute; top:0; left:84px; background:var(--navy-2); border:1px solid var(--line); border-radius:8px;
   padding:10px 0; font-size:12.5px; color:var(--cream); min-width:210px; z-index:50; box-shadow:0 12px 30px #000a;}

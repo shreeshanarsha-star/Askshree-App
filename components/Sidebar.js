@@ -59,9 +59,9 @@ export default function Sidebar({ active }) {
           <Icon name="mail" /><span>Contact</span>
         </a>
 
-        <a href="/credits" className={`side-item ${active === 'credits' ? 'active' : ''}`}>
+        <div className="side-item side-item-disabled" title="Coming soon" aria-disabled="true">
           <Icon name="credit" /><span>Credits</span>
-        </a>
+        </div>
 
         {ready && (
           email ? (
