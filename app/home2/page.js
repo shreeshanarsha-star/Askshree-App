@@ -159,6 +159,10 @@ export default function Home2Page() {
 
 
       <div className="home2-triptych" id="ai-systems" style={{ gridTemplateColumns: triptychCols }}>
+        <span className="orb2-corner orb2-corner-tl" />
+        <span className="orb2-corner orb2-corner-tr" />
+        <span className="orb2-corner orb2-corner-bl" />
+        <span className="orb2-corner orb2-corner-br" />
         <div className="home2-col">
           <div className="home2-col-label">TACTICAL DISPLAY</div>
           {activeFeature ? (
