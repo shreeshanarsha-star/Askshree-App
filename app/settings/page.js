@@ -15,13 +15,29 @@ export default function SettingsPage() {
   const { token, ready } = useAdminSession();
   const [current, setCurrent] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [layout, setLayout] = useState(null);
+  const [layoutSaving, setLayoutSaving] = useState(false);
 
   async function load() {
     const res = await fetch('/api/admin/site-theme', { headers: { Authorization: `Bearer ${token}` } });
     const data = await res.json();
     setCurrent(data.theme);
+    const layoutRes = await fetch('/api/admin/homepage-layout', { headers: { Authorization: `Bearer ${token}` } });
+    const layoutData = await layoutRes.json();
+    setLayout(layoutData.layout);
   }
   useEffect(() => { if (ready) load(); }, [ready]);
+
+  async function setHomepageLayout(id) {
+    setLayoutSaving(true);
+    await fetch('/api/admin/homepage-layout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ layout: id }),
+    });
+    setLayout(id);
+    setLayoutSaving(false);
+  }
 
   async function setTheme(id) {
     setSaving(true);
@@ -34,7 +50,7 @@ export default function SettingsPage() {
     setSaving(false);
   }
 
-  if (!ready || current === null) return <div className="admin-main">Loading…</div>;
+  if (!ready || current === null || layout === null) return <div className="admin-main">Loading…</div>;
 
   return (
     <div className="admin-shell">
@@ -64,6 +80,40 @@ export default function SettingsPage() {
                 <div style={{ fontSize: 11.5, color: 'var(--slate)' }}>{s.desc}</div>
               </a>
             ))}
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-head">
+            <h3>Homepage layout</h3>
+            {layoutSaving && <span className="action">Saving…</span>}
+          </div>
+          <div style={{ padding: 18 }}>
+            <p className="file-hint" style={{ marginBottom: 14 }}>
+              Which design askshree.com/ shows visitors. The reactor console is the current live design;
+              the classic sidebar homepage is kept here for reference and can be switched back at any time.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
+              {[
+                { id: 'reactor', label: 'Reactor Console', desc: 'AI-systems orbital console — current default' },
+                { id: 'classic', label: 'Classic Sidebar', desc: 'Original sidebar homepage — legacy, kept for reference' },
+              ].map((opt) => (
+                <div
+                  key={opt.id}
+                  onClick={() => setHomepageLayout(opt.id)}
+                  style={{
+                    cursor: 'pointer', border: `1px solid ${layout === opt.id ? 'var(--amber)' : 'var(--line)'}`,
+                    borderRadius: 10, padding: '14px 16px', background: layout === opt.id ? 'rgba(var(--amber-rgb),0.08)' : 'rgba(255,255,255,0.015)',
+                  }}
+                >
+                  <div style={{ fontSize: 13.5, color: 'var(--cream)', fontWeight: 500, marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {opt.label}
+                    {layout === opt.id && <span style={{ color: 'var(--amber)' }}>✓</span>}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: 'var(--slate)' }}>{opt.desc}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
