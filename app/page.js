@@ -5,6 +5,7 @@ import HeyShreeVoice from '../components/HeyShreeVoice';
 import Sidebar from '../components/Sidebar';
 import ThemeBackground from '../components/ThemeBackground';
 import { useTheme } from '../lib/useTheme';
+import { getThemeAccentStyle } from '../lib/themes';
 
 const TOOL_LINKS = {
   'gauri.ai': '/gauri',
@@ -97,7 +98,7 @@ export default function HomePage() {
   }
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', ...(themeReady ? getThemeAccentStyle(themeId) : {}) }}>
       <Sidebar active="home" />
       <div className="side-content">
       {themeReady && <ThemeBackground themeId={themeId} />}

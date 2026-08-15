@@ -2,6 +2,7 @@
 import Sidebar from '../../components/Sidebar';
 import ThemeBackground from '../../components/ThemeBackground';
 import { useTheme } from '../../lib/useTheme';
+import { getThemeAccentStyle } from '../../lib/themes';
 import HeyShreeVoice from '../../components/HeyShreeVoice';
 
 const CREDITS = [
@@ -14,7 +15,7 @@ const CREDITS = [
 export default function CreditsPage() {
   const { themeId, ready } = useTheme();
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', ...(ready ? getThemeAccentStyle(themeId) : {}) }}>
       <Sidebar active="credits" />
       <div className="side-content">
         {ready && <ThemeBackground themeId={themeId} />}

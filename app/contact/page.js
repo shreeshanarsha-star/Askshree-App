@@ -2,6 +2,7 @@
 import Sidebar from '../../components/Sidebar';
 import ThemeBackground from '../../components/ThemeBackground';
 import { useTheme } from '../../lib/useTheme';
+import { getThemeAccentStyle } from '../../lib/themes';
 import HeyShreeVoice from '../../components/HeyShreeVoice';
 
 const CHANNELS = [
@@ -13,7 +14,7 @@ const CHANNELS = [
 export default function ContactPage() {
   const { themeId, ready } = useTheme();
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', ...(ready ? getThemeAccentStyle(themeId) : {}) }}>
       <Sidebar active="contact" />
       <div className="side-content">
         {ready && <ThemeBackground themeId={themeId} />}
