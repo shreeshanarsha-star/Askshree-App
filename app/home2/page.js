@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import AskShreeChat from '../../components/AskShreeChat';
 import HeyShreeVoice from '../../components/HeyShreeVoice';
-import Sidebar from '../../components/Sidebar';
+import AppLauncher from '../../components/AppLauncher';
 import ThemeBackground from '../../components/ThemeBackground';
 import OrbitalSystems from '../../components/OrbitalSystems';
 import { useTheme } from '../../lib/useTheme';
@@ -96,9 +96,8 @@ export default function Home2Page() {
   }
 
   return (
-    <div style={{ position: 'relative', ...(themeReady ? getThemeAccentStyle(themeId) : {}) }}>
-      <Sidebar active="home" />
-      <div className="side-content">
+    <div className="home2-shell" style={{ position: 'relative', ...(themeReady ? getThemeAccentStyle(themeId) : {}) }}>
+      <div className="home2-full">
       {themeReady && <ThemeBackground themeId={themeId} />}
 
       <div className="section" id="ai-systems" style={{ paddingTop: 48 }}>
@@ -169,6 +168,7 @@ export default function Home2Page() {
 
       <AskShreeChat />
       <HeyShreeVoice />
+      <AppLauncher />
       </div>
     </div>
   );
