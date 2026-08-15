@@ -19,15 +19,6 @@ const TOOL_NAMES = [
   'Gauri.ai', 'Job Postings.ai', 'Apply.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
   'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Induction.ai', 'Campus.ai', 'Analytics.ai', 'Dashboard.ai',
 ];
-const HERO_WORDS = ['Find.', 'Research.', 'Analyse.', 'Execute.'];
-const HERO_GAP = 400;
-const HERO_STEP = 650;
-const HERO_HOLD = 2000;
-const HERO_CYCLE = HERO_GAP + (HERO_WORDS.length - 1) * HERO_STEP + HERO_HOLD;
-function heroVisibleCount(elapsed) {
-  if (elapsed < HERO_GAP) return 0;
-  return Math.min(HERO_WORDS.length, 1 + Math.floor((elapsed - HERO_GAP) / HERO_STEP));
-}
 export default function Home2Page() {
   const [query, setQuery] = useState('');
   const [hintIndex, setHintIndex] = useState(0);
@@ -37,7 +28,6 @@ export default function Home2Page() {
   const [shareNote, setShareNote] = useState('');
   const [shareOpen, setShareOpen] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
-  const [heroElapsed, setHeroElapsed] = useState(0);
 
   const SHARE_URL = 'https://askshree.com/home2';
   const SHARE_TEXT = 'AI-native recruiting tools by Shreesha Narsha';
@@ -96,11 +86,6 @@ export default function Home2Page() {
     return () => clearInterval(id);
   }, []);
 
-  useEffect(() => {
-    const id = setInterval(() => setHeroElapsed((e) => (e + 100) % HERO_CYCLE), 100);
-    return () => clearInterval(id);
-  }, []);
-
   function runQuery() {
     const q = query.trim().toLowerCase();
     if (!q) return;
@@ -116,22 +101,11 @@ export default function Home2Page() {
 
       <div className="hero">
         <div>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-start', gap: 14, flexWrap: 'wrap' }}>
-            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.14em', color: 'var(--amber)', fontSize: 13, whiteSpace: 'nowrap' }}>
-              ASK &middot; EXPLORE &middot; DELEGATE
-            </span>
-            <span style={{ width: 1, height: 14, background: 'var(--line)', flexShrink: 0 }} />
-            <h1 style={{ margin: 0, maxWidth: 'none' }}>
-              Tell me what you need. <em>I&rsquo;ll get you there.</em>
-            </h1>
-          </div>
-          <p className="sub hero-flow-line">
-            {HERO_WORDS.map((w, i) => (
-              <span key={w} className={`hero-flow-word ${heroVisibleCount(heroElapsed) > i ? 'hero-flow-visible' : ''}`}>{w}</span>
-            ))}
-          </p>
+          <h1 style={{ margin: 0, maxWidth: 'none' }}>
+            Tell me what you need.<br /><em>AI systems will get you there.</em>
+          </h1>
 
-          <div className="engage-row">
+          <div className="engage-row" style={{ marginTop: 24 }}>
             <button className={`engage-btn ${justLiked ? 'liked' : ''}`} onClick={handleLike}>
               <svg viewBox="0 0 24 24" width="14" height="14" fill={justLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2 4.8 5.6 4c2-.4 3.9.5 5 2 1.1-1.5 3-2.4 5-2 3.6.8 5 4.4 3.6 7.7-2.5 4.7-10 9.3-10 9.3z" />
