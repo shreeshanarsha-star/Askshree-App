@@ -322,6 +322,17 @@
   .cand-pin{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--slate); border:1px solid var(--line); border-radius:14px; padding:5px 10px; background:transparent; cursor:pointer; white-space:nowrap;}
   .cand-pin.pinned{color:var(--amber); border-color:var(--amber-dim); background:rgba(232,163,61,0.06);}
   .cand-compare-bar{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:50; background:var(--amber); color:#1a1204; border-radius:24px; padding:11px 22px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:500; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.4); display:flex; align-items:center; gap:10px;}
+  .cand-view-toggle{display:flex; border:1px solid var(--line); border-radius:20px; overflow:hidden;}
+  .cand-view-toggle button{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--slate); background:transparent; border:none; padding:7px 11px; cursor:pointer; border-right:1px solid var(--line);}
+  .cand-view-toggle button:last-child{border-right:none;}
+  .cand-view-toggle button.active{color:var(--amber); background:rgba(232,163,61,0.08);}
+  .cand-pagination{display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:20px; padding-top:16px; border-top:1px solid var(--line); flex-wrap:wrap;}
+  .cand-pagination-count{font-size:12px; color:var(--slate); font-family:'IBM Plex Mono',monospace;}
+  .cand-pagination-pages{display:flex; align-items:center; gap:4px;}
+  .cand-pagination-pages button{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--slate); background:transparent; border:1px solid var(--line); border-radius:6px; padding:5px 10px; cursor:pointer; min-width:30px;}
+  .cand-pagination-pages button.active{color:var(--amber); border-color:var(--amber-dim); background:rgba(232,163,61,0.08);}
+  .cand-pagination-pages button:disabled{opacity:0.35; cursor:default;}
+  .cand-pagination-size{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--slate); background:transparent; border:1px solid var(--line); border-radius:6px; padding:6px 10px; cursor:pointer;}
 
   /* ---------- ADMIN LOGIN ---------- */
   .login-screen{

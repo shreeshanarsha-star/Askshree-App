@@ -40,6 +40,9 @@ export default function CandidateResults({
   const [compareKeys, setCompareKeys] = useState(new Set());
   const [compareOpen, setCompareOpen] = useState(false);
   const [bulkRevealing, setBulkRevealing] = useState(false);
+  const [cols, setCols] = useState(2);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   const visible = useMemo(() => {
     let list = candidates;
@@ -57,6 +60,32 @@ export default function CandidateResults({
     }
     return list;
   }, [candidates, query, sortBy]);
+
+  const pageCount = Math.max(1, Math.ceil(visible.length / pageSize));
+  const currentPage = Math.min(page, pageCount);
+  const pageCandidates = useMemo(
+    () => visible.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [visible, currentPage, pageSize]
+  );
+
+  function changePage(p) {
+    setPage(Math.max(1, Math.min(pageCount, p)));
+  }
+
+  function changePageSize(size) {
+    setPageSize(size);
+    setPage(1);
+  }
+
+  const pageWindow = useMemo(() => {
+    const windowSize = 5;
+    let start = Math.max(1, currentPage - Math.floor(windowSize / 2));
+    let end = Math.min(pageCount, start + windowSize - 1);
+    start = Math.max(1, end - windowSize + 1);
+    const pages = [];
+    for (let p = start; p <= end; p++) pages.push(p);
+    return pages;
+  }, [currentPage, pageCount]);
 
   const allVisibleSelected = visible.length > 0 && visible.every((c) => selected.has(candidateKey(c)));
 
@@ -113,11 +142,16 @@ export default function CandidateResults({
         </div>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <input className="cand-search" type="text" placeholder="Search name, company, location…"
-            value={query} onChange={(e) => setQuery(e.target.value)} />
-          <select className="cand-sort" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+            value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} />
+          <select className="cand-sort" value={sortBy} onChange={(e) => { setSortBy(e.target.value); setPage(1); }}>
             <option value="match">Sort: Match %</option>
             <option value="name">Sort: Name</option>
           </select>
+          <div className="cand-view-toggle">
+            {[2, 3, 4, 5].map((n) => (
+              <button key={n} type="button" className={cols === n ? 'active' : ''} onClick={() => setCols(n)} title={`${n} per row`}>{n}</button>
+            ))}
+          </div>
           <a href="/tools/projects" style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: 'var(--slate)' }}>View projects</a>
           <AddToProjectButton
             siteFetch={siteFetch}
@@ -176,8 +210,8 @@ export default function CandidateResults({
       {visible.length === 0 ? (
         <div className="cand-empty">No candidates match "{query}".</div>
       ) : (
-        <div className="cand-grid">
-          {visible.map((c) => {
+        <div className="cand-grid" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
+          {pageCandidates.map((c) => {
             const key = candidateKey(c);
             const cs = contactState[key] || {};
             const isSelected = selected.has(key);
@@ -280,6 +314,26 @@ export default function CandidateResults({
               </div>
             );
           })}
+        </div>
+      )}
+
+      {visible.length > 0 && (
+        <div className="cand-pagination">
+          <span className="cand-pagination-count">{visible.length} profile{visible.length > 1 ? 's' : ''}</span>
+          <div className="cand-pagination-pages">
+            <button type="button" onClick={() => changePage(currentPage - 1)} disabled={currentPage === 1}>&#8249;</button>
+            {pageWindow[0] > 1 && <button type="button" onClick={() => changePage(1)}>1</button>}
+            {pageWindow[0] > 2 && <span style={{ color: 'var(--slate)', fontSize: 12 }}>…</span>}
+            {pageWindow.map((p) => (
+              <button key={p} type="button" className={p === currentPage ? 'active' : ''} onClick={() => changePage(p)}>{p}</button>
+            ))}
+            {pageWindow[pageWindow.length - 1] < pageCount - 1 && <span style={{ color: 'var(--slate)', fontSize: 12 }}>…</span>}
+            {pageWindow[pageWindow.length - 1] < pageCount && <button type="button" onClick={() => changePage(pageCount)}>{pageCount}</button>}
+            <button type="button" onClick={() => changePage(currentPage + 1)} disabled={currentPage === pageCount}>&#8250;</button>
+          </div>
+          <select className="cand-pagination-size" value={pageSize} onChange={(e) => changePageSize(Number(e.target.value))}>
+            {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n} / page</option>)}
+          </select>
         </div>
       )}
 
