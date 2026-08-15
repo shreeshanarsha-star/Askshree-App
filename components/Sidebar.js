@@ -12,6 +12,7 @@ const ICONS = {
   credit: <><path d="M12 2 3 7l9 5 9-5-9-5z" /><path d="M3 12l9 5 9-5M3 17l9 5 9-5" /></>,
   gear: <><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></>,
   login: <><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><path d="M10 17l5-5-5-5M15 12H3" /></>,
+  mic: <><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 11a7 7 0 0 0 14 0" /><line x1="12" y1="18" x2="12" y2="22" /><line x1="8" y1="22" x2="16" y2="22" /></>,
 };
 
 function Icon({ name }) {
@@ -22,10 +23,9 @@ function Icon({ name }) {
   );
 }
 
-function openChat() {
-  const btn = document.querySelector('.chat-launcher');
+function openHeyShree() {
+  const btn = document.querySelector('.heyshree-launcher');
   if (btn) btn.click();
-  else window.location.href = '/';
 }
 
 export default function Sidebar({ active }) {
@@ -49,8 +49,8 @@ export default function Sidebar({ active }) {
         <a href="/#ai-systems" className={`side-item ${active === 'systems' ? 'active' : ''}`}>
           <Icon name="systems" /><span>AI Systems</span>
         </a>
-        <div className="side-item" onClick={openChat} role="button" tabIndex={0}>
-          <Icon name="chat" /><span>HeyShree</span>
+        <div className="side-item" onClick={openHeyShree} role="button" tabIndex={0}>
+          <Icon name="mic" /><span>HeyShree</span>
         </div>
 
         <div className="side-item-wrap">

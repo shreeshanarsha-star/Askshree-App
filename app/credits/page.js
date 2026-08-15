@@ -2,6 +2,7 @@
 import Sidebar from '../../components/Sidebar';
 import ThemeBackground from '../../components/ThemeBackground';
 import { useTheme } from '../../lib/useTheme';
+import HeyShreeVoice from '../../components/HeyShreeVoice';
 
 const CREDITS = [
   { role: 'Built by', name: 'Shreesha Narsha — Head, Global Talent Acquisition & AI Builder, Bengaluru' },
@@ -31,6 +32,7 @@ export default function CreditsPage() {
           </div>
         </div>
       </div>
+      <HeyShreeVoice />
     </div>
   );
 }

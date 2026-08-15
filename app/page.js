@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import AskShreeChat from '../components/AskShreeChat';
+import HeyShreeVoice from '../components/HeyShreeVoice';
 import Sidebar from '../components/Sidebar';
 import ThemeBackground from '../components/ThemeBackground';
 import { useTheme } from '../lib/useTheme';
@@ -303,6 +304,7 @@ export default function HomePage() {
       </div>
 
       <AskShreeChat />
+      <HeyShreeVoice />
       </div>
     </div>
   );

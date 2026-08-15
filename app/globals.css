@@ -251,6 +251,39 @@
   .chat-input-row input{flex:1; background:transparent; border:none; padding:12px 14px; color:var(--cream); font-size:12.5px; outline:none;}
   .chat-input-row button{background:transparent; border:none; color:var(--amber); padding:0 14px; cursor:pointer; font-family:'IBM Plex Mono',monospace; font-size:12px;}
 
+  /* ---------- HEY SHREE (voice bot) ---------- */
+  .heyshree-launcher{
+    position:fixed; bottom:24px; right:170px; z-index:40;
+    background:transparent; color:var(--amber); border:1px solid var(--amber-dim); border-radius:24px;
+    padding:11px 18px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:500;
+    cursor:pointer; display:flex; align-items:center; gap:8px;
+  }
+  .heyshree-launcher:hover{background:rgba(232,163,61,0.08);}
+  .hs-panel{
+    position:fixed; bottom:76px; right:28px; z-index:41; width:300px;
+    background:var(--navy-2); border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    display:none; flex-direction:column;
+  }
+  .hs-panel.open{display:flex;}
+  .hs-head{padding:14px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;}
+  .hs-head span{font-family:'Fraunces',serif; font-size:14px; color:var(--cream);}
+  .hs-head .x{color:var(--slate); cursor:pointer; font-size:14px;}
+  .hs-body{padding:22px 18px 26px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:12px;}
+  .hs-orb{
+    width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    color:var(--amber-dim); border:1px solid var(--amber-dim); transition:all 0.2s ease;
+  }
+  .hs-orb.listening{color:var(--amber); border-color:var(--amber); box-shadow:0 0 0 6px rgba(232,163,61,0.08);}
+  .hs-orb.speaking{color:var(--amber); border-color:var(--amber); box-shadow:0 0 0 6px rgba(232,163,61,0.14);}
+  .hs-orb.thinking{color:var(--slate); border-color:var(--line);}
+  .hs-status{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--slate); text-transform:uppercase; letter-spacing:0.04em;}
+  .hs-line{font-size:13px; color:var(--cream); line-height:1.5; max-height:120px; overflow-y:auto;}
+  .hs-line.hs-user{color:var(--slate); font-style:italic;}
+  .hs-tap-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; border:1px solid var(--amber-dim);
+    color:var(--amber); background:transparent; padding:8px 16px; border-radius:6px; cursor:pointer;
+  }
+
   /* ---------- ADMIN LOGIN ---------- */
   .login-screen{
     min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; z-index:2;

@@ -3,6 +3,7 @@ import Sidebar from '../../components/Sidebar';
 import ThemeBackground from '../../components/ThemeBackground';
 import { THEMES } from '../../lib/themes';
 import { useTheme } from '../../lib/useTheme';
+import HeyShreeVoice from '../../components/HeyShreeVoice';
 
 export default function SettingsPage() {
   const { themeId, ready, hasOverride, chooseTheme, resetToSiteDefault } = useTheme();
@@ -34,6 +35,7 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+      <HeyShreeVoice />
     </div>
   );
 }
