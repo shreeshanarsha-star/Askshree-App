@@ -20,6 +20,14 @@ const TOOL_NAMES = [
   'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Induction.ai', 'Campus.ai', 'Analytics.ai', 'Dashboard.ai',
 ];
 const HERO_WORDS = ['Find.', 'Research.', 'Analyse.', 'Execute.'];
+const HERO_GAP = 400;
+const HERO_STEP = 650;
+const HERO_HOLD = 2000;
+const HERO_CYCLE = HERO_GAP + (HERO_WORDS.length - 1) * HERO_STEP + HERO_HOLD;
+function heroVisibleCount(elapsed) {
+  if (elapsed < HERO_GAP) return 0;
+  return Math.min(HERO_WORDS.length, 1 + Math.floor((elapsed - HERO_GAP) / HERO_STEP));
+}
 export default function Home2Page() {
   const [query, setQuery] = useState('');
   const [hintIndex, setHintIndex] = useState(0);
@@ -29,7 +37,7 @@ export default function Home2Page() {
   const [shareNote, setShareNote] = useState('');
   const [shareOpen, setShareOpen] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
-  const [wordIndex, setWordIndex] = useState(0);
+  const [heroElapsed, setHeroElapsed] = useState(0);
 
   const SHARE_URL = 'https://askshree.com/home2';
   const SHARE_TEXT = 'AI-native recruiting tools by Shreesha Narsha';
@@ -89,7 +97,7 @@ export default function Home2Page() {
   }, []);
 
   useEffect(() => {
-    const id = setInterval(() => setWordIndex((i) => (i + 1) % HERO_WORDS.length), 1800);
+    const id = setInterval(() => setHeroElapsed((e) => (e + 100) % HERO_CYCLE), 100);
     return () => clearInterval(id);
   }, []);
 
@@ -117,8 +125,10 @@ export default function Home2Page() {
               Tell me what you need. <em>I&rsquo;ll get you there.</em>
             </h1>
           </div>
-          <p className="sub hero-cycle-line">
-            <span key={wordIndex} className="hero-cycle-word">{HERO_WORDS[wordIndex]}</span>
+          <p className="sub hero-flow-line">
+            {HERO_WORDS.map((w, i) => (
+              <span key={w} className={`hero-flow-word ${heroVisibleCount(heroElapsed) > i ? 'hero-flow-visible' : ''}`}>{w}</span>
+            ))}
           </p>
 
           <div className="engage-row">

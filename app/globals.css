@@ -968,12 +968,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .applauncher-footer-item:hover{border-color:var(--amber-dim); color:var(--cream);}
 .applauncher-li{width:16px; height:16px; border-radius:4px; background:var(--slate); color:var(--navy); font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center;}
 
-/* ---- Home v2: rotating hero word ---- */
-.hero-cycle-line{margin:20px 0 30px; min-height:1.65em;}
-.hero-cycle-word{display:inline-block; color:var(--amber); font-style:italic; font-family:'Fraunces',serif; font-weight:500; font-size:16px; animation:heroCycleFade 1.8s ease-in-out;}
-@keyframes heroCycleFade{
-  0%{opacity:0; transform:translateY(5px);}
-  14%{opacity:1; transform:translateY(0);}
-  82%{opacity:1;}
-  100%{opacity:0; transform:translateY(-5px);}
-}
+/* ---- Home v2: hero words build up, hold, then reset ---- */
+.hero-flow-line{display:flex; flex-wrap:wrap; align-items:baseline; gap:10px; margin:20px 0 30px; min-height:1.65em;}
+.hero-flow-word{display:inline-block; opacity:0; transform:translateY(6px); transition:opacity .5s ease, transform .5s ease; color:var(--amber); font-style:italic; font-family:'Fraunces',serif; font-weight:500; font-size:16px;}
+.hero-flow-word.hero-flow-visible{opacity:1; transform:translateY(0);}
