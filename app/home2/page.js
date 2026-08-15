@@ -123,38 +123,40 @@ export default function Home2Page() {
         <h1 className="home2-topbar-h1">
           Tell me what you need. <em>AI systems will get you there.</em>
         </h1>
-        <div className="engage-row" style={{ marginTop: 12 }}>
-          <button className={`engage-btn ${justLiked ? 'liked' : ''}`} onClick={handleLike}>
-            <svg viewBox="0 0 24 24" width="14" height="14" fill={justLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2 4.8 5.6 4c2-.4 3.9.5 5 2 1.1-1.5 3-2.4 5-2 3.6.8 5 4.4 3.6 7.7-2.5 4.7-10 9.3-10 9.3z" />
-            </svg>
-            Like{likeCount !== null ? ` · ${likeCount}` : ''}
-          </button>
-
-          <div style={{ position: 'relative' }}>
-            <button className="engage-btn" onClick={() => setShareOpen((o) => !o)}>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="18" cy="5" r="3" />
-                <circle cx="6" cy="12" r="3" />
-                <circle cx="18" cy="19" r="3" />
-                <line x1="8.6" y1="10.6" x2="15.4" y2="6.4" />
-                <line x1="8.6" y1="13.4" x2="15.4" y2="17.6" />
-              </svg>
-              Share
-            </button>
-            {shareOpen && (
-              <div style={{ position: 'absolute', top: 40, left: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '8px 0', fontSize: 12.5, color: 'var(--cream)', minWidth: 170, zIndex: 10 }}>
-                <div className="share-menu-item" onClick={() => shareVia('whatsapp')}>WhatsApp</div>
-                <div className="share-menu-item" onClick={() => shareVia('linkedin')}>LinkedIn</div>
-                <div className="share-menu-item" onClick={() => shareVia('twitter')}>X / Twitter</div>
-                <div className="share-menu-item" onClick={() => shareVia('email')}>Email</div>
-                <div className="share-menu-item" onClick={copyShareLink}>Copy link</div>
-              </div>
-            )}
-          </div>
-          {shareNote && <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
-        </div>
       </div>
+
+      <div className="home2-engage-fixed">
+        <button className={`engage-btn ${justLiked ? 'liked' : ''}`} onClick={handleLike}>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill={justLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2 4.8 5.6 4c2-.4 3.9.5 5 2 1.1-1.5 3-2.4 5-2 3.6.8 5 4.4 3.6 7.7-2.5 4.7-10 9.3-10 9.3z" />
+          </svg>
+          Like{likeCount !== null ? ` · ${likeCount}` : ''}
+        </button>
+
+        <div style={{ position: 'relative' }}>
+          <button className="engage-btn" onClick={() => setShareOpen((o) => !o)}>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.6" y1="10.6" x2="15.4" y2="6.4" />
+              <line x1="8.6" y1="13.4" x2="15.4" y2="17.6" />
+            </svg>
+            Share
+          </button>
+          {shareOpen && (
+            <div style={{ position: 'absolute', top: 40, right: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '8px 0', fontSize: 12.5, color: 'var(--cream)', minWidth: 170, zIndex: 10 }}>
+              <div className="share-menu-item" onClick={() => shareVia('whatsapp')}>WhatsApp</div>
+              <div className="share-menu-item" onClick={() => shareVia('linkedin')}>LinkedIn</div>
+              <div className="share-menu-item" onClick={() => shareVia('twitter')}>X / Twitter</div>
+              <div className="share-menu-item" onClick={() => shareVia('email')}>Email</div>
+              <div className="share-menu-item" onClick={copyShareLink}>Copy link</div>
+            </div>
+          )}
+        </div>
+        {shareNote && <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
+      </div>
+
 
       <div className="home2-triptych" id="ai-systems" style={{ gridTemplateColumns: triptychCols }}>
         <div className="home2-col">

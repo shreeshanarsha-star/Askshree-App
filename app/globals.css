@@ -1015,7 +1015,12 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .widget-notes-remove:hover{color:var(--amber);}
 
 /* ---- Home v2: compact top bar + 3-column triptych ---- */
-.home2-topbar{padding:24px 32px 24px 190px; position:relative; z-index:1;}
+.home2-topbar{padding:36px 32px 24px 190px; position:relative; z-index:1;}
+
+.home2-engage-fixed{
+  position:fixed; top:24px; right:28px; z-index:42;
+  display:flex; align-items:center; gap:10px;
+}
 .home2-topbar-h1{margin:0; font-family:'Fraunces',serif; font-weight:500; font-size:22px; line-height:1.4; color:var(--cream); max-width:640px;}
 .home2-topbar-h1 em{color:var(--amber); font-style:italic;}
 
@@ -1091,5 +1096,6 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 }
 @media (max-width:640px){
   .home2-topbar{padding:130px 20px 20px;}
+  .home2-engage-fixed{position:static; margin:12px 20px 0; justify-content:flex-start;}
   .home2-triptych{padding:0 20px;}
 }
