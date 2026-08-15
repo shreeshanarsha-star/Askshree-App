@@ -19,6 +19,7 @@ const TOOL_NAMES = [
   'Gauri.ai', 'Job Postings.ai', 'Apply.ai', 'Smart Source.ai', 'Smart hunt.ai', 'Smart screen.ai', 'Interview.ai',
   'Assessment.ai', 'Offer.ai', 'Refer.ai', 'Onboard.ai', 'Induction.ai', 'Campus.ai', 'Analytics.ai', 'Dashboard.ai',
 ];
+const HERO_WORDS = ['Find.', 'Research.', 'Analyse.', 'Execute.'];
 export default function Home2Page() {
   const [query, setQuery] = useState('');
   const [hintIndex, setHintIndex] = useState(0);
@@ -28,6 +29,7 @@ export default function Home2Page() {
   const [shareNote, setShareNote] = useState('');
   const [shareOpen, setShareOpen] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
+  const [wordIndex, setWordIndex] = useState(0);
 
   const SHARE_URL = 'https://askshree.com/home2';
   const SHARE_TEXT = 'AI-native recruiting tools by Shreesha Narsha';
@@ -86,6 +88,11 @@ export default function Home2Page() {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    const id = setInterval(() => setWordIndex((i) => (i + 1) % HERO_WORDS.length), 1800);
+    return () => clearInterval(id);
+  }, []);
+
   function runQuery() {
     const q = query.trim().toLowerCase();
     if (!q) return;
@@ -99,24 +106,20 @@ export default function Home2Page() {
       <div className="home2-full">
       {themeReady && <ThemeBackground themeId={themeId} />}
 
-      <div className="section" id="ai-systems" style={{ paddingTop: 48 }}>
-        <div style={{ marginTop: 8 }}>
-          <OrbitalSystems />
-        </div>
-      </div>
-
-      <div className="hero" style={{ marginTop: 8 }}>
+      <div className="hero">
         <div>
-          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-start', gap: 14, flexWrap: 'wrap' }}>
             <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.14em', color: 'var(--amber)', fontSize: 13, whiteSpace: 'nowrap' }}>
               ASK &middot; EXPLORE &middot; DELEGATE
             </span>
             <span style={{ width: 1, height: 14, background: 'var(--line)', flexShrink: 0 }} />
             <h1 style={{ margin: 0, maxWidth: 'none' }}>
-              Tell me what you need. <em>I&rsquo;ll help you get it done.</em>
+              Tell me what you need. <em>I&rsquo;ll get you there.</em>
             </h1>
           </div>
-          <p className="sub" style={{ textAlign: 'center', margin: '20px auto 30px', maxWidth: 520 }}>AI systems for real work — helping you find, research, analyse and move things forward.</p>
+          <p className="sub hero-cycle-line">
+            <span key={wordIndex} className="hero-cycle-word">{HERO_WORDS[wordIndex]}</span>
+          </p>
 
           <div className="terminal">
             <span className="chev">&gt;</span>
@@ -130,7 +133,7 @@ export default function Home2Page() {
             <button className="run" onClick={runQuery}>run query</button>
           </div>
 
-          <div className="engage-row" style={{ justifyContent: 'center' }}>
+          <div className="engage-row">
             <button className={`engage-btn ${justLiked ? 'liked' : ''}`} onClick={handleLike}>
               <svg viewBox="0 0 24 24" width="14" height="14" fill={justLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2 4.8 5.6 4c2-.4 3.9.5 5 2 1.1-1.5 3-2.4 5-2 3.6.8 5 4.4 3.6 7.7-2.5 4.7-10 9.3-10 9.3z" />
@@ -162,6 +165,12 @@ export default function Home2Page() {
             {shareNote && <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
           </div>
 
+        </div>
+      </div>
+
+      <div className="section" id="ai-systems" style={{ paddingTop: 8 }}>
+        <div style={{ marginTop: 8 }}>
+          <OrbitalSystems />
         </div>
       </div>
 
