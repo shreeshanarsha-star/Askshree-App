@@ -32,7 +32,7 @@ function focusReactor() {
 const APPS = [
   { key: 'home', name: 'home', label: 'Home', href: '/home2' },
   { key: 'systems', name: 'systems', label: 'AI Systems', href: '/home2#ai-systems' },
-  { key: 'heyshree', name: 'mic', label: 'HeyShree', onClick: focusReactor },
+  { key: 'heyshree', name: 'mic', label: 'Hey Shree', onClick: focusReactor },
   { key: 'writings', name: 'pencil', label: 'Writings', href: '/writings/purpose' },
   { key: 'about', name: 'user', label: 'About Me', href: '/about' },
   { key: 'contact', name: 'mail', label: 'Contact', href: '/contact' },

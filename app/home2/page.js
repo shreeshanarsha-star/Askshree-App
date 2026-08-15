@@ -197,7 +197,7 @@ export default function Home2Page() {
           ) : (
             <div className="home2-empty-panel">
               <div className="orb2-panel-empty">
-                Ask HeyShree to open a tool — try &ldquo;open calculator&rdquo; or pick one from Feature Display — and it&rsquo;ll appear here.
+                Ask Hey Shree to open a tool — try &ldquo;open calculator&rdquo; or pick one from Feature Display — and it&rsquo;ll appear here.
               </div>
             </div>
           )}

@@ -21,7 +21,7 @@ export default function FeatureWorkspace({ feature, expanded, onToggleExpand, on
         {feature.id === 'soon' && (
           <div className="home2-workspace-soon">
             <div className="home2-workspace-soon-title">{feature.title}</div>
-            <p>This one&rsquo;s on the roadmap — not built yet. Ask HeyShree again once it&rsquo;s live.</p>
+            <p>This one&rsquo;s on the roadmap — not built yet. Ask Hey Shree again once it&rsquo;s live.</p>
           </div>
         )}
       </div>

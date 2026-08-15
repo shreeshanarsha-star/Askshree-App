@@ -242,7 +242,7 @@ export function FeatureNavPanel({ selected, onOpenFeature }) {
         <div className="orb2-panel-empty">
           Pick a system on the reactor and I&rsquo;ll surface its tools right here.
           <br />
-          HeyShree is listening at the center — wake it any time.
+          Hey Shree is listening at the center — wake it any time.
         </div>
       )}
       {selected && (

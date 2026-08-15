@@ -44,7 +44,7 @@ export default function Sidebar({ active }) {
           <Icon name="systems" /><span>AI Systems</span>
         </a>
         <div className="side-item" onClick={openHeyShree} role="button" tabIndex={0}>
-          <Icon name="mic" /><span>HeyShree</span>
+          <Icon name="mic" /><span>Hey Shree</span>
         </div>
 
         <a href="/writings/purpose" className="side-item">
