@@ -901,12 +901,12 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   position:absolute; left:50%; top:50%; height:1px; transform-origin:0 0;
   background-image:repeating-linear-gradient(to right, rgba(255,255,255,0.38) 0 3px, transparent 3px 9px);
   background-size:200% 100%;
-  animation:orb2LineFlow 6s linear infinite;
+  animation:orb2LineFlow 7.5s linear infinite;
 }
 .orb2-line.orb2-live{
   height:1.5px;
   background-image:repeating-linear-gradient(to right, rgba(var(--amber-rgb),0.7) 0 4px, transparent 4px 10px);
-  animation:orb2LineFlow 2.6s linear infinite;
+  animation:orb2LineFlow 3.25s linear infinite;
 }
 @keyframes orb2LineFlow{ from{background-position:0% 0;} to{background-position:-200% 0;} }
 .orb2-ring{position:absolute; left:50%; top:50%; border:1px dashed var(--line); border-radius:50%; transform:translate(-50%,-50%);}
@@ -1134,7 +1134,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .orb2-line.orb2-line-active{
   background-image:repeating-linear-gradient(to right, var(--amber) 0 4px, transparent 4px 10px) !important;
   background-color:transparent !important;
-  animation:orb2LineFlow 1.1s linear infinite;
+  animation:orb2LineFlow 1.375s linear infinite;
   box-shadow:0 0 8px rgba(var(--amber-rgb),0.6);
 }
 
