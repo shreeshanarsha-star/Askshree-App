@@ -334,6 +334,49 @@
   .cand-pagination-pages button:disabled{opacity:0.35; cursor:default;}
   .cand-pagination-size{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--slate); background:transparent; border:1px solid var(--line); border-radius:6px; padding:6px 10px; cursor:pointer;}
 
+  /* ---------- Candidate results: dossier layout ---------- */
+  .cand-card-dossier{padding:22px;}
+  .cand-card-dossier .cand-name{font-size:16px; white-space:normal;}
+  .cand-card-dossier .cand-reason{margin:12px 0; font-size:12.5px;}
+
+  /* ---------- Candidate results: ranked list layout ---------- */
+  .cand-list{display:flex; flex-direction:column; gap:0;}
+  .cand-list-insight{font-size:11.5px; color:var(--slate); font-family:'IBM Plex Mono',monospace; border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin-bottom:12px;}
+  .cand-list-insight b{color:var(--amber); font-weight:500;}
+  .cand-list-row{display:flex; align-items:center; gap:12px; padding:13px 4px; border-top:1px solid var(--line);}
+  .cand-list-row:first-of-type{border-top:none;}
+  .cand-list-row.selected{background:rgba(232,163,61,0.04);}
+  .cand-list-rank{width:20px; flex-shrink:0; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--amber-dim); text-align:right;}
+  .cand-list-body{flex:1; min-width:0;}
+  .cand-list-line{white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .cand-list-sub{color:var(--slate); font-size:12px;}
+  .cand-list-reason{color:var(--slate); font-size:11.5px; margin-top:3px; line-height:1.4;}
+  .cand-list-bar{height:3px; background:rgba(255,255,255,0.08); border-radius:2px; margin-top:7px; max-width:220px;}
+  .cand-list-bar-fill{height:3px; border-radius:2px;}
+  .cand-list-score{width:38px; flex-shrink:0; text-align:right; font-family:'IBM Plex Mono',monospace; font-size:12px;}
+  .cand-list-actions{display:flex; gap:8px; flex-shrink:0;}
+  .cand-list-actions button, .cand-list-actions a{background:transparent; border:1px solid var(--line); border-radius:14px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; color:var(--slate); font-size:12px; cursor:pointer; text-decoration:none;}
+
+  /* ---------- Candidate results: table layout ---------- */
+  .cand-table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px;}
+  .cand-table{border-collapse:collapse; width:100%; min-width:920px; font-size:12px;}
+  .cand-table th{text-align:left; padding:10px 12px; color:var(--slate); font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; white-space:nowrap; border-bottom:1px solid var(--line);}
+  .cand-table td{padding:9px 12px; color:var(--cream); border-top:1px solid var(--line); white-space:nowrap;}
+  .cand-table tr.selected{background:rgba(232,163,61,0.05);}
+  .cand-table-name{font-weight:500;}
+  .cand-table td a{color:var(--amber); text-decoration:none; font-size:12px;}
+  .cand-table-outreach{background:transparent; border:1px solid var(--line); border-radius:6px; padding:4px 6px; font-family:'IBM Plex Mono',monospace; font-size:11px; cursor:pointer;}
+
+  /* ---------- Candidate results: pipeline board layout ---------- */
+  .cand-pipeline{display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:12px;}
+  .cand-pipeline-col{min-width:0;}
+  .cand-pipeline-head{font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.03em; margin-bottom:10px;}
+  .cand-pipeline-chip{border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:rgba(255,255,255,0.015);}
+  .cand-pipeline-chip.selected{background:rgba(232,163,61,0.06);}
+  .cand-pipeline-chip-top{display:flex; align-items:center; justify-content:space-between; gap:6px; cursor:pointer;}
+  .cand-pipeline-empty{color:var(--slate); font-size:11px; padding:8px 0;}
+  @media(max-width:900px){ .cand-pipeline{grid-template-columns:repeat(2, minmax(0, 1fr));} }
+
   /* ---------- ADMIN LOGIN ---------- */
   .login-screen{
     min-height:100vh; display:flex; align-items:center; justify-content:center; position:relative; z-index:2;
