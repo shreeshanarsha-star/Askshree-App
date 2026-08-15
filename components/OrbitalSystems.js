@@ -165,12 +165,12 @@ export function OrbitalStage({ selectedId, onSelect }) {
         <div className="orb2-core" id="reactor-core">
           <Icon name="mic" size={24} />
         </div>
-        {!selectedId && (
-          <div className={`orb2-hint ${hintOn ? 'orb2-hint-on' : 'orb2-hint-off'}`}>
-            Tap a system to begin
-          </div>
-        )}
       </div>
+      {!selectedId && (
+        <div className={`orb2-hint ${hintOn ? 'orb2-hint-on' : 'orb2-hint-off'}`}>
+          Tap a system to begin
+        </div>
+      )}
     </div>
   );
 }

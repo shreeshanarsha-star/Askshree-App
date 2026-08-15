@@ -895,7 +895,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .orb2-wrap{display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;}
 .orb2-wrap.orb2-expanded{grid-template-columns:0px 1fr;}
 .orb2-wrap.orb2-expanded .orb2-stage-card{display:none;}
-.orb2-stage-card{background:var(--navy-2); border:1px solid var(--line); border-radius:16px; padding:32px; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+.orb2-stage-card{background:var(--navy-2); border:1px solid var(--line); border-radius:16px; padding:32px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative;}
 .orb2-stage{position:relative; width:min(520px,84%); aspect-ratio:1/1; margin:0 auto;}
 .orb2-line{position:absolute; left:50%; top:50%; height:1px; background:var(--line); transform-origin:0 0;}
 .orb2-line.orb2-live{background:rgba(var(--amber-rgb),0.35);}
@@ -1037,7 +1037,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 
 @keyframes orb2HintPulse{0%,100%{opacity:0.55;}50%{opacity:1;}}
 .orb2-hint{
-  position:absolute; left:50%; bottom:6%; transform:translateX(-50%); white-space:nowrap;
+  position:absolute; left:50%; bottom:14px; transform:translateX(-50%); white-space:nowrap;
   font-family:'Plus Jakarta Sans',sans-serif; font-weight:500; font-size:11.5px; letter-spacing:0.02em;
   color:var(--slate); pointer-events:none; z-index:4;
   animation:orb2HintPulse 2.4s ease-in-out infinite;
