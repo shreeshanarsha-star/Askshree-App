@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const ICONS = {
   heartbeat: 'M3 12h4l2-7 4 14 2-7h6',
@@ -15,6 +15,7 @@ const ICONS = {
   flask: 'M9 3h6M10 3v6l-5.5 9.5A1 1 0 0 0 5.4 20h13.2a1 1 0 0 0 .9-1.5L14 9V3M8 15h8',
   mic: 'M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zM6 11a6 6 0 0 0 12 0M12 17v4M9 21h6',
   widgets: 'M3 3h7v18H3zM14 3h7v8h-7zM14 13h3v8h-3zM18 13h3v8h-3z',
+  chevron: 'M6 9l6 6 6-6',
 };
 
 function Icon({ name, size = 18 }) {
@@ -69,17 +70,17 @@ const DEPARTMENTS = [
   {
     id: 'widgets', letter: 'L', name: 'Widgets.ai', icon: 'widgets', status: 'live',
     tools: [
+      { name: 'Calculator', status: 'live', widget: 'calculator' },
+      { name: 'Quick Notes', status: 'live', widget: 'notes' },
       { name: 'Calendar', status: 'soon' },
       { name: 'Clock', status: 'soon' },
       { name: 'Weather', status: 'soon' },
       { name: 'Currency Converter', status: 'soon' },
-      { name: 'Calculator', status: 'live', widget: 'calculator' },
       { name: 'Unit Converter', status: 'soon' },
       { name: 'Timer / Stopwatch', status: 'soon' },
       { name: 'World Time', status: 'soon' },
       { name: 'Compass', status: 'soon' },
       { name: 'Maps / Location', status: 'soon' },
-      { name: 'Quick Notes', status: 'live', widget: 'notes' },
       { name: 'To-Do List', status: 'soon' },
       { name: 'Reminders', status: 'soon' },
       { name: 'Clipboard / Saved Items', status: 'soon' },
@@ -116,6 +117,11 @@ const DEPARTMENTS = [
 export function OrbitalStage({ selectedId, onSelect }) {
   const n = DEPARTMENTS.length;
   const R = 37;
+  const [hintOn, setHintOn] = useState(true);
+
+  useEffect(() => {
+    if (selectedId) setHintOn(false);
+  }, [selectedId]);
 
   function onNodeKeyDown(e, id) {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -159,23 +165,72 @@ export function OrbitalStage({ selectedId, onSelect }) {
         <div className="orb2-core" id="reactor-core">
           <Icon name="mic" size={24} />
         </div>
+        {!selectedId && (
+          <div className={`orb2-hint ${hintOn ? 'orb2-hint-on' : 'orb2-hint-off'}`}>
+            Tap a system to begin
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 export function FeatureNavPanel({ selected, onOpenFeature }) {
+  const [showAllSoon, setShowAllSoon] = useState(false);
+
+  useEffect(() => {
+    setShowAllSoon(false);
+  }, [selected && selected.id]);
+
+  const liveTools = selected ? selected.tools.filter((t) => t.status === 'live') : [];
+  const soonTools = selected ? selected.tools.filter((t) => t.status !== 'live') : [];
+  const SOON_PREVIEW = 4;
+  const visibleSoon = showAllSoon ? soonTools : soonTools.slice(0, SOON_PREVIEW);
+
+  function renderTool(t) {
+    return (
+      <div key={t.name} className={`orb2-tool-row ${t.status === 'soon' ? 'orb2-tool-soon' : ''}`}>
+        {t.widget ? (
+          <span
+            className="orb2-tool-link"
+            role="button"
+            tabIndex={0}
+            onClick={() => onOpenFeature && onOpenFeature({ id: t.widget, title: t.name })}
+            onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: t.widget, title: t.name }); } }}
+          >
+            {t.name}
+          </span>
+        ) : t.status === 'live' ? (
+          <a href={t.href}>{t.name}</a>
+        ) : (
+          <span
+            className="orb2-tool-link"
+            role="button"
+            tabIndex={0}
+            onClick={() => onOpenFeature && onOpenFeature({ id: 'soon', title: t.name })}
+            onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: 'soon', title: t.name }); } }}
+          >
+            {t.name}
+          </span>
+        )}
+        <span className={`orb2-pill ${t.status === 'soon' ? 'orb2-pill-soon' : ''}`}>
+          {t.status === 'live' ? 'LIVE' : 'SOON'}
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <div className="orb2-panel">
+    <div className={selected ? "orb2-panel" : "home2-empty-panel"}>
       {!selected && (
         <div className="orb2-panel-empty">
-          Select a department to open its console.
+          Pick a system on the reactor and I&rsquo;ll surface its tools right here.
           <br />
           HeyShree is listening at the center — wake it any time.
         </div>
       )}
       {selected && (
-        <>
+        <div className="orb2-panel-in" key={selected.id}>
           <div className="orb2-panel-head">
             <div>
               <div className="orb2-panel-title">{selected.name}</div>
@@ -189,39 +244,19 @@ export function FeatureNavPanel({ selected, onOpenFeature }) {
             <a className="orb2-open-link" href={selected.href}>Open {selected.name} &rarr;</a>
           )}
           {selected.tools.length === 0 && !selected.href && (
-            <div className="orb2-panel-empty">Tools for {selected.name} are in the works.</div>
+            <div className="orb2-panel-empty">{selected.name} is being built — check back soon.</div>
           )}
-          {selected.tools.map((t) => (
-            <div key={t.name} className={`orb2-tool-row ${t.status === 'soon' ? 'orb2-tool-soon' : ''}`}>
-              {t.widget ? (
-                <span
-                  className="orb2-tool-link"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => onOpenFeature && onOpenFeature({ id: t.widget, title: t.name })}
-                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: t.widget, title: t.name }); } }}
-                >
-                  {t.name}
-                </span>
-              ) : t.status === 'live' ? (
-                <a href={t.href}>{t.name}</a>
-              ) : (
-                <span
-                  className="orb2-tool-link"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => onOpenFeature && onOpenFeature({ id: 'soon', title: t.name })}
-                  onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: 'soon', title: t.name }); } }}
-                >
-                  {t.name}
-                </span>
-              )}
-              <span className={`orb2-pill ${t.status === 'soon' ? 'orb2-pill-soon' : ''}`}>
-                {t.status === 'live' ? 'LIVE' : 'SOON'}
-              </span>
-            </div>
-          ))}
-        </>
+
+          {liveTools.map(renderTool)}
+          {visibleSoon.map(renderTool)}
+
+          {!showAllSoon && soonTools.length > SOON_PREVIEW && (
+            <button type="button" className="orb2-soon-more" onClick={() => setShowAllSoon(true)}>
+              <Icon name="chevron" size={13} />
+              {soonTools.length - SOON_PREVIEW} more on the roadmap
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

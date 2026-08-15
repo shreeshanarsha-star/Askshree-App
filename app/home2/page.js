@@ -158,9 +158,9 @@ export default function Home2Page() {
               onClose={closeFeature}
             />
           ) : (
-            <div className="home2-workspace">
+            <div className="home2-empty-panel">
               <div className="orb2-panel-empty">
-                Select a feature from Feature Display to open it here.
+                Ask HeyShree to open a tool — try &ldquo;open calculator&rdquo; or pick one from Feature Display — and it&rsquo;ll appear here.
               </div>
             </div>
           )}

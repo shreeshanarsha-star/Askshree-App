@@ -1022,11 +1022,54 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .home2-triptych{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; align-items:stretch; padding:0 32px; margin-top:8px; position:relative; z-index:1;}
 .home2-col{display:flex; flex-direction:column; min-width:0;}
 .home2-col-label{font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:10.5px; letter-spacing:0.14em; color:var(--amber); text-transform:uppercase; margin-bottom:10px;}
-.home2-col .home2-workspace, .home2-col .orb2-stage-card, .home2-col .orb2-panel{flex:1; margin:0;}
+.home2-col .home2-workspace, .home2-col .orb2-stage-card, .home2-col .orb2-panel, .home2-col .home2-empty-panel{flex:1; margin:0;}
 .home2-col .orb2-panel-empty{display:flex; align-items:center; justify-content:center; height:100%; text-align:center;}
 
 .terminal-icon-btn{background:transparent; border:1px solid var(--line); border-radius:6px; width:28px; height:28px; display:flex; align-items:center; justify-content:center; color:var(--slate); cursor:pointer; flex-shrink:0; margin-right:6px;}
 .home2-full .terminal{position:relative; z-index:1;}
+
+/* ---- Home v2: design pass — empty states, hint, roadmap toggle, motion, a11y ---- */
+.home2-empty-panel{
+  flex:1; margin:0; border:1px dashed var(--line); border-radius:16px; background:rgba(255,255,255,0.015);
+  display:flex; align-items:center; justify-content:center; padding:22px;
+}
+.home2-empty-panel .orb2-panel-empty{margin:0;}
+
+@keyframes orb2HintPulse{0%,100%{opacity:0.55;}50%{opacity:1;}}
+.orb2-hint{
+  position:absolute; left:50%; bottom:6%; transform:translateX(-50%); white-space:nowrap;
+  font-family:'Plus Jakarta Sans',sans-serif; font-weight:500; font-size:11.5px; letter-spacing:0.02em;
+  color:var(--slate); pointer-events:none; z-index:4;
+  animation:orb2HintPulse 2.4s ease-in-out infinite;
+  transition:opacity .6s ease;
+}
+.orb2-hint-off{opacity:0; animation:none;}
+
+.orb2-panel-in{display:flex; flex-direction:column; gap:12px; animation:orb2PanelIn .32s ease both;}
+@keyframes orb2PanelIn{from{opacity:0; transform:translateY(6px);}to{opacity:1; transform:translateY(0);}}
+
+.orb2-soon-more{
+  display:inline-flex; align-items:center; gap:6px; align-self:flex-start; background:transparent;
+  border:1px solid var(--line); color:var(--slate); font-family:'Plus Jakarta Sans',sans-serif; font-weight:500;
+  font-size:11.5px; border-radius:8px; padding:7px 12px; cursor:pointer; margin-top:2px;
+}
+.orb2-soon-more svg{transform:rotate(-90deg);}
+.orb2-soon-more:hover{border-color:var(--amber-dim); color:var(--amber);}
+
+/* contrast + keyboard focus */
+.orb2-node.orb2-soon{opacity:0.62;}
+.orb2-node.orb2-soon .orb2-nm{color:#b7bfcf;}
+.orb2-node:focus-visible, .orb2-tool-link:focus-visible, .orb2-soon-more:focus-visible{
+  outline:2px solid var(--amber); outline-offset:2px;
+}
+
+/* terminal: match reactor's glassy glow language */
+.home2-full .terminal{
+  background:rgba(17,23,38,0.55); border:1px solid rgba(var(--amber-rgb),0.25); border-radius:14px;
+  backdrop-filter:blur(6px); box-shadow:0 0 30px rgba(var(--amber-rgb),0.06); transition:box-shadow .3s, border-color .3s;
+}
+.home2-full .terminal:focus-within{border-color:rgba(var(--amber-rgb),0.5); box-shadow:0 0 40px rgba(var(--amber-rgb),0.14);}
+
 .terminal-icon-btn:hover{border-color:var(--amber-dim); color:var(--amber);}
 
 @media (max-width:1000px){
