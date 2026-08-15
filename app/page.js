@@ -115,12 +115,15 @@ export default function HomePage() {
 
       <div className="hero">
         <div>
-          <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.14em', color: 'var(--amber)', fontSize: 13, marginBottom: 12 }}>
-            ASK &middot; EXPLORE &middot; DELEGATE
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'flex-start', gap: 14, flexWrap: 'wrap' }}>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.14em', color: 'var(--amber)', fontSize: 13, whiteSpace: 'nowrap' }}>
+              ASK &middot; EXPLORE &middot; DELEGATE
+            </span>
+            <span style={{ width: 1, height: 14, background: 'var(--line)', flexShrink: 0 }} />
+            <h1 style={{ margin: 0, maxWidth: 'none' }}>
+              Tell me what you need. <em>I&rsquo;ll help you get it done.</em>
+            </h1>
           </div>
-          <h1>
-            Tell me what you need. <em>I&rsquo;ll help you get it done.</em>
-          </h1>
           <p className="sub">AI systems for real work — helping you find, research, analyse and move things forward.</p>
 
           <div className="terminal">
