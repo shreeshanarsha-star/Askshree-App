@@ -111,7 +111,7 @@ export default function AdminDashboardPage() {
           <a href="/admin/dashboard" className="active">Analytics</a>
           <a href="/admin/job-postings">Job postings</a>
           <a href="/admin/chatbot">Ask Shree chatbot</a>
-          <a href="/admin/theme">Site theme</a>
+          <a href="/settings">Settings</a>
           <a href="/admin/margin-ai">Margin.ai</a>
         </div>
       </div>
