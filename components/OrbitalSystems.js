@@ -138,6 +138,11 @@ export function OrbitalStage({ selectedId, onSelect }) {
           const rad = (angle * Math.PI) / 180;
           const left = 50 + R * Math.cos(rad);
           const top = 50 + R * Math.sin(rad);
+          // Labels live OUTSIDE the circle, never inside it (that's what was
+          // causing text to spill past the node edge). Push the label to
+          // whichever side points away from the core, so it never crosses
+          // the connecting line or crowds the ring.
+          const labelAbove = Math.sin(rad) < -0.15;
           return (
             <div key={d.id}>
               <div
@@ -148,12 +153,14 @@ export function OrbitalStage({ selectedId, onSelect }) {
                 role="button"
                 tabIndex={0}
                 aria-label={d.name}
-                className={`orb2-node orb2-${d.status} ${selectedId === d.id ? 'orb2-selected' : ''}`}
+                className={`orb2-node-wrap orb2-${d.status} ${selectedId === d.id ? 'orb2-selected' : ''} ${labelAbove ? 'orb2-label-above' : 'orb2-label-below'}`}
                 style={{ left: `${left}%`, top: `${top}%` }}
                 onClick={() => onSelect(d.id)}
                 onKeyDown={(e) => onNodeKeyDown(e, d.id)}
               >
-                <Icon name={d.icon} />
+                <div className="orb2-node">
+                  <Icon name={d.icon} />
+                </div>
                 <span className="orb2-nm">{d.name}</span>
               </div>
             </div>
@@ -175,17 +182,26 @@ export function OrbitalStage({ selectedId, onSelect }) {
   );
 }
 
+const PAGE_SIZE = 6;
+
 export function FeatureNavPanel({ selected, onOpenFeature }) {
   const [showAllSoon, setShowAllSoon] = useState(false);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     setShowAllSoon(false);
+    setPage(0);
   }, [selected && selected.id]);
+
+  useEffect(() => { setPage(0); }, [showAllSoon]);
 
   const liveTools = selected ? selected.tools.filter((t) => t.status === 'live') : [];
   const soonTools = selected ? selected.tools.filter((t) => t.status !== 'live') : [];
   const SOON_PREVIEW = 4;
   const visibleSoon = showAllSoon ? soonTools : soonTools.slice(0, SOON_PREVIEW);
+  const rows = [...liveTools, ...visibleSoon];
+  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  const pageRows = rows.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
   function renderTool(t) {
     return (
@@ -247,14 +263,33 @@ export function FeatureNavPanel({ selected, onOpenFeature }) {
             <div className="orb2-panel-empty">{selected.name} is being built — check back soon.</div>
           )}
 
-          {liveTools.map(renderTool)}
-          {visibleSoon.map(renderTool)}
+          <div className="orb2-tool-rows">
+            {pageRows.map(renderTool)}
+          </div>
 
           {!showAllSoon && soonTools.length > SOON_PREVIEW && (
             <button type="button" className="orb2-soon-more" onClick={() => setShowAllSoon(true)}>
               <Icon name="chevron" size={13} />
               {soonTools.length - SOON_PREVIEW} more on the roadmap
             </button>
+          )}
+
+          {totalPages > 1 && (
+            <div className="orb2-page-nav">
+              <button
+                type="button" className="orb2-page-btn"
+                disabled={page === 0}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                aria-label="Previous"
+              >^</button>
+              <span className="orb2-page-indicator">{page + 1} / {totalPages}</span>
+              <button
+                type="button" className="orb2-page-btn orb2-page-btn-down"
+                disabled={page >= totalPages - 1}
+                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                aria-label="Next"
+              >^</button>
+            </div>
           )}
         </div>
       )}
