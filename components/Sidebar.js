@@ -29,11 +29,10 @@ function openHeyShree() {
 }
 
 export default function Sidebar({ active }) {
-  const [aboutOpen, setAboutOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const { ready, email, signOut } = useOptionalSession();
 
-  function closeFlyouts() { setAboutOpen(false); setContactOpen(false); }
+  function closeFlyouts() { setContactOpen(false); }
 
   return (
     <nav className="side-rail">
@@ -56,21 +55,12 @@ export default function Sidebar({ active }) {
           <Icon name="pencil" /><span>Writings</span>
         </a>
 
-        <div className="side-item-wrap">
-          <div className={`side-item ${aboutOpen ? 'active' : ''}`} onClick={() => { setAboutOpen((o) => !o); setContactOpen(false); }}>
-            <Icon name="user" /><span>About Me</span>
-          </div>
-          {aboutOpen && (
-            <div className="side-flyout" onMouseLeave={closeFlyouts}>
-              <div className="side-flyout-static">Head-Global Talent Acquisition</div>
-              <div className="side-flyout-static">AI Builder</div>
-              <div className="side-flyout-static">Bengaluru, India</div>
-            </div>
-          )}
-        </div>
+        <a href="/about" className={`side-item ${active === 'about' ? 'active' : ''}`}>
+          <Icon name="user" /><span>About Me</span>
+        </a>
 
         <div className="side-item-wrap">
-          <div className={`side-item ${contactOpen ? 'active' : ''}`} onClick={() => { setContactOpen((o) => !o); setAboutOpen(false); }}>
+          <div className={`side-item ${contactOpen ? 'active' : ''}`} onClick={() => setContactOpen((o) => !o)}>
             <Icon name="mail" /><span>Contact</span>
           </div>
           {contactOpen && (
