@@ -1,6 +1,18 @@
 'use client';
 import CalculatorWidget from './widgets/CalculatorWidget';
 import NotesWidget from './widgets/NotesWidget';
+import CalendarWidget from './widgets/CalendarWidget';
+import ClockWidget from './widgets/ClockWidget';
+import TimerWidget from './widgets/TimerWidget';
+import TodoWidget from './widgets/TodoWidget';
+import RemindersWidget from './widgets/RemindersWidget';
+import ClipboardWidget from './widgets/ClipboardWidget';
+import ExpenseWidget from './widgets/ExpenseWidget';
+import ChartsWidget from './widgets/ChartsWidget';
+import UnitConverterWidget from './widgets/UnitConverterWidget';
+import WorldTimeWidget from './widgets/WorldTimeWidget';
+import MoonPhaseWidget from './widgets/MoonPhaseWidget';
+import SunriseSunsetWidget from './widgets/SunriseSunsetWidget';
 
 export default function FeatureWorkspace({ feature, expanded, onToggleExpand, onClose }) {
   if (!feature) return null;
@@ -18,6 +30,18 @@ export default function FeatureWorkspace({ feature, expanded, onToggleExpand, on
       <div className="home2-workspace-body">
         {feature.id === 'calculator' && <CalculatorWidget />}
         {feature.id === 'notes' && <NotesWidget />}
+        {feature.id === 'calendar' && <CalendarWidget />}
+        {feature.id === 'clock' && <ClockWidget />}
+        {feature.id === 'timer' && <TimerWidget />}
+        {feature.id === 'todo' && <TodoWidget />}
+        {feature.id === 'reminders' && <RemindersWidget />}
+        {feature.id === 'clipboard' && <ClipboardWidget />}
+        {feature.id === 'expense' && <ExpenseWidget />}
+        {feature.id === 'charts' && <ChartsWidget />}
+        {feature.id === 'unit-converter' && <UnitConverterWidget />}
+        {feature.id === 'world-time' && <WorldTimeWidget />}
+        {feature.id === 'moon-phase' && <MoonPhaseWidget />}
+        {feature.id === 'sunrise-sunset' && <SunriseSunsetWidget />}
         {feature.id === 'soon' && (
           <div className="home2-workspace-soon">
             <div className="home2-workspace-soon-title">{feature.title}</div>
