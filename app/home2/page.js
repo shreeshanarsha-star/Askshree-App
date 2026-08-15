@@ -4,6 +4,7 @@ import AskShreeChat from '../../components/AskShreeChat';
 import AppLauncher from '../../components/AppLauncher';
 import ThemeBackground from '../../components/ThemeBackground';
 import OrbitalSystems from '../../components/OrbitalSystems';
+import FeatureWorkspace from '../../components/FeatureWorkspace';
 import { useTheme } from '../../lib/useTheme';
 import { getThemeAccentStyle } from '../../lib/themes';
 
@@ -28,6 +29,8 @@ export default function Home2Page() {
   const [shareNote, setShareNote] = useState('');
   const [shareOpen, setShareOpen] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
+  const [activeFeature, setActiveFeature] = useState(null);
+  const [workspaceExpanded, setWorkspaceExpanded] = useState(false);
 
   const SHARE_URL = 'https://askshree.com/home2';
   const SHARE_TEXT = 'AI-native recruiting tools by Shreesha Narsha';
@@ -86,6 +89,17 @@ export default function Home2Page() {
     return () => clearInterval(id);
   }, []);
 
+  function openFeature(feature) {
+    setActiveFeature(feature);
+    setWorkspaceExpanded(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function closeFeature() {
+    setActiveFeature(null);
+    setWorkspaceExpanded(false);
+  }
+
   function runQuery() {
     const q = query.trim().toLowerCase();
     if (!q) return;
@@ -99,62 +113,73 @@ export default function Home2Page() {
       <div className="home2-full">
       {themeReady && <ThemeBackground themeId={themeId} />}
 
+      <div className="home2-section-label">ACTIONS</div>
       <div className="hero">
-        <div>
-          <h1 style={{ margin: 0, maxWidth: 'none' }}>
-            Tell me what you need.<br /><em>AI systems will get you there.</em>
-          </h1>
+        {activeFeature ? (
+          <FeatureWorkspace
+            feature={activeFeature}
+            expanded={workspaceExpanded}
+            onToggleExpand={() => setWorkspaceExpanded((e) => !e)}
+            onClose={closeFeature}
+          />
+        ) : (
+          <div>
+            <h1 style={{ margin: 0, maxWidth: 'none' }}>
+              Tell me what you need.<br /><em>AI systems will get you there.</em>
+            </h1>
 
-          <div className="engage-row" style={{ marginTop: 24 }}>
-            <button className={`engage-btn ${justLiked ? 'liked' : ''}`} onClick={handleLike}>
-              <svg viewBox="0 0 24 24" width="14" height="14" fill={justLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2 4.8 5.6 4c2-.4 3.9.5 5 2 1.1-1.5 3-2.4 5-2 3.6.8 5 4.4 3.6 7.7-2.5 4.7-10 9.3-10 9.3z" />
-              </svg>
-              Like{likeCount !== null ? ` · ${likeCount}` : ''}
-            </button>
-
-            <div style={{ position: 'relative' }}>
-              <button className="engage-btn" onClick={() => setShareOpen((o) => !o)}>
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="18" cy="5" r="3" />
-                  <circle cx="6" cy="12" r="3" />
-                  <circle cx="18" cy="19" r="3" />
-                  <line x1="8.6" y1="10.6" x2="15.4" y2="6.4" />
-                  <line x1="8.6" y1="13.4" x2="15.4" y2="17.6" />
-                </svg>
-                Share
-              </button>
-              {shareOpen && (
-                <div style={{ position: 'absolute', top: 40, left: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '8px 0', fontSize: 12.5, color: 'var(--cream)', minWidth: 170, zIndex: 10 }}>
-                  <div className="share-menu-item" onClick={() => shareVia('whatsapp')}>WhatsApp</div>
-                  <div className="share-menu-item" onClick={() => shareVia('linkedin')}>LinkedIn</div>
-                  <div className="share-menu-item" onClick={() => shareVia('twitter')}>X / Twitter</div>
-                  <div className="share-menu-item" onClick={() => shareVia('email')}>Email</div>
-                  <div className="share-menu-item" onClick={copyShareLink}>Copy link</div>
-                </div>
-              )}
+            <div className="terminal" style={{ marginTop: 24 }}>
+              <span className="chev">&gt;</span>
+              <input
+                type="text"
+                placeholder={`Try a tool name... ${TOOL_NAMES[hintIndex]}`}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && runQuery()}
+              />
+              <button className="run" onClick={runQuery}>run query</button>
             </div>
-            {shareNote && <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
-          </div>
 
-        </div>
+            <div className="engage-row" style={{ marginTop: 24 }}>
+              <button className={`engage-btn ${justLiked ? 'liked' : ''}`} onClick={handleLike}>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill={justLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2 4.8 5.6 4c2-.4 3.9.5 5 2 1.1-1.5 3-2.4 5-2 3.6.8 5 4.4 3.6 7.7-2.5 4.7-10 9.3-10 9.3z" />
+                </svg>
+                Like{likeCount !== null ? ` · ${likeCount}` : ''}
+              </button>
+
+              <div style={{ position: 'relative' }}>
+                <button className="engage-btn" onClick={() => setShareOpen((o) => !o)}>
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.6" y1="10.6" x2="15.4" y2="6.4" />
+                    <line x1="8.6" y1="13.4" x2="15.4" y2="17.6" />
+                  </svg>
+                  Share
+                </button>
+                {shareOpen && (
+                  <div style={{ position: 'absolute', top: 40, left: 0, background: 'var(--navy-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '8px 0', fontSize: 12.5, color: 'var(--cream)', minWidth: 170, zIndex: 10 }}>
+                    <div className="share-menu-item" onClick={() => shareVia('whatsapp')}>WhatsApp</div>
+                    <div className="share-menu-item" onClick={() => shareVia('linkedin')}>LinkedIn</div>
+                    <div className="share-menu-item" onClick={() => shareVia('twitter')}>X / Twitter</div>
+                    <div className="share-menu-item" onClick={() => shareVia('email')}>Email</div>
+                    <div className="share-menu-item" onClick={copyShareLink}>Copy link</div>
+                  </div>
+                )}
+              </div>
+              {shareNote && <span style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber-dim)' }}>{shareNote}</span>}
+            </div>
+          </div>
+        )}
       </div>
+
+      <div className="home2-divider">AI SYSTEMS</div>
 
       <div className="section" id="ai-systems" style={{ paddingTop: 8 }}>
         <div style={{ marginTop: 8 }}>
-          <OrbitalSystems />
-        </div>
-
-        <div className="terminal" style={{ marginTop: 32 }}>
-          <span className="chev">&gt;</span>
-          <input
-            type="text"
-            placeholder={`Try a tool name... ${TOOL_NAMES[hintIndex]}`}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && runQuery()}
-          />
-          <button className="run" onClick={runQuery}>run query</button>
+          <OrbitalSystems onOpenFeature={openFeature} />
         </div>
       </div>
 

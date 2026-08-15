@@ -67,19 +67,19 @@ const DEPARTMENTS = [
   { id: 'sales', letter: 'J', name: 'Sales.ai', icon: 'chart', status: 'soon', tools: [] },
   { id: 'research', letter: 'K', name: 'Research.ai', icon: 'flask', status: 'soon', tools: [] },
   {
-    id: 'widgets', letter: 'L', name: 'Widgets.ai', icon: 'widgets', status: 'soon',
+    id: 'widgets', letter: 'L', name: 'Widgets.ai', icon: 'widgets', status: 'live',
     tools: [
       { name: 'Calendar', status: 'soon' },
       { name: 'Clock', status: 'soon' },
       { name: 'Weather', status: 'soon' },
       { name: 'Currency Converter', status: 'soon' },
-      { name: 'Calculator', status: 'soon' },
+      { name: 'Calculator', status: 'live', widget: 'calculator' },
       { name: 'Unit Converter', status: 'soon' },
       { name: 'Timer / Stopwatch', status: 'soon' },
       { name: 'World Time', status: 'soon' },
       { name: 'Compass', status: 'soon' },
       { name: 'Maps / Location', status: 'soon' },
-      { name: 'Quick Notes', status: 'soon' },
+      { name: 'Quick Notes', status: 'live', widget: 'notes' },
       { name: 'To-Do List', status: 'soon' },
       { name: 'Reminders', status: 'soon' },
       { name: 'Clipboard / Saved Items', status: 'soon' },
@@ -113,7 +113,7 @@ const DEPARTMENTS = [
   },
 ];
 
-export default function OrbitalSystems() {
+export default function OrbitalSystems({ onOpenFeature }) {
   const [selectedId, setSelectedId] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
@@ -197,7 +197,29 @@ export default function OrbitalSystems() {
             )}
             {selected.tools.map((t) => (
               <div key={t.name} className={`orb2-tool-row ${t.status === 'soon' ? 'orb2-tool-soon' : ''}`}>
-                {t.status === 'live' ? <a href={t.href}>{t.name}</a> : <span>{t.name}</span>}
+                {t.widget ? (
+                  <span
+                    className="orb2-tool-link"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onOpenFeature && onOpenFeature({ id: t.widget, title: t.name })}
+                    onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: t.widget, title: t.name }); } }}
+                  >
+                    {t.name}
+                  </span>
+                ) : t.status === 'live' ? (
+                  <a href={t.href}>{t.name}</a>
+                ) : (
+                  <span
+                    className="orb2-tool-link"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => onOpenFeature && onOpenFeature({ id: 'soon', title: t.name })}
+                    onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: 'soon', title: t.name }); } }}
+                  >
+                    {t.name}
+                  </span>
+                )}
                 <span className={`orb2-pill ${t.status === 'soon' ? 'orb2-pill-soon' : ''}`}>
                   {t.status === 'live' ? 'LIVE' : 'SOON'}
                 </span>
