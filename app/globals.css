@@ -948,7 +948,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   -webkit-mask:radial-gradient(circle closest-side, transparent 30%, black 40%, black 72%, transparent 80%);
   mask:radial-gradient(circle closest-side, transparent 30%, black 40%, black 72%, transparent 80%);
   opacity:0.65;
-  animation:orb2Spin 240s linear infinite;
+  animation:orb2SpinSelf 240s linear infinite;
 }
 .orb2-ring-accent{
   /* Sized to sit just inside the node ring (nodes are at 78% diameter),
@@ -963,6 +963,12 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .orb2-ring-outer{width:24%; height:24%; animation:orb2Spin 16s linear infinite;}
 .orb2-ring-mid{width:21%; height:21%; border:2px solid transparent; border-top-color:var(--amber); border-right-color:var(--amber); opacity:0.6; animation:orb2Spin 6s linear infinite;}
 @keyframes orb2Spin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}
+/* orb2Spin bakes in translate(-50%,-50%) for elements positioned via
+   left:50%/top:50% (the rings). .orb2-sunburst is positioned via inset:0
+   instead -- it needs a plain rotate with no translate, otherwise the
+   animation's transform overwrites its base position and drags it half
+   its own box-width off-center (this was the "leaking spoke" bug). */
+@keyframes orb2SpinSelf{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .orb2-core{
   position:absolute; left:50%; top:50%; width:19%; height:19%; transform:translate(-50%,-50%); border-radius:50%;
   background:
