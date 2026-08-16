@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import AskShreeChat from './AskShreeChat';
 import AppLauncher from './AppLauncher';
+import HeyShreeReactor from './HeyShreeReactor';
 import ThemeBackground from './ThemeBackground';
 import GestureControl from './GestureControl';
 import { OrbitalStage, FeatureNavPanel, DEPARTMENTS } from './OrbitalSystems';
@@ -19,6 +20,27 @@ const LIVE_COUNT = DEPARTMENTS.filter((d) => d.status === 'live').length;
 const TOOL_NAMES = SEARCH_INDEX.filter((e) => e.status === 'live').map((e) => e.name);
 const LAST_DEPT_KEY = 'askshree_home2_last_dept';
 
+// Shared by the typed search bar AND the voice router -- one matcher, two
+// input methods. Voice phrasing carries lead verbs typed search doesn't
+// ("open calculator" vs "calculator"), so strip those before matching.
+const VOICE_LEAD_VERBS = /^(please\s+)?(open|launch|go to|show me|start|pull up|bring up)\s+/i;
+function matchToolByText(raw) {
+  const q = (raw || '').trim().toLowerCase();
+  if (!q) return null;
+  const stripped = q.replace(VOICE_LEAD_VERBS, '').trim();
+  for (const candidate of [q, stripped]) {
+    if (!candidate) continue;
+    const exact = SEARCH_INDEX.find((e) => e.name.toLowerCase() === candidate);
+    if (exact) return exact;
+  }
+  for (const candidate of [q, stripped]) {
+    if (!candidate) continue;
+    const fuzzy = SEARCH_INDEX.find((e) => e.name.toLowerCase().includes(candidate) || candidate.includes(e.name.toLowerCase()));
+    if (fuzzy) return fuzzy;
+  }
+  return null;
+}
+
 export default function ReactorHome() {
   const [query, setQuery] = useState('');
   const [hintIndex, setHintIndex] = useState(0);
@@ -26,6 +48,7 @@ export default function ReactorHome() {
   const [activeFeature, setActiveFeature] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
   const [waffleOpen, setWaffleOpen] = useState(false);
+  const [voiceOpen, setVoiceOpen] = useState(false);
 
   const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
   const leftFilled = !!activeFeature;
@@ -74,11 +97,9 @@ export default function ReactorHome() {
   }
 
   function runQuery() {
-    const q = query.trim().toLowerCase();
+    const q = query.trim();
     if (!q) return;
-    const match =
-      SEARCH_INDEX.find((e) => e.name.toLowerCase() === q) ||
-      SEARCH_INDEX.find((e) => e.name.toLowerCase().includes(q) || q.includes(e.name.toLowerCase()));
+    const match = matchToolByText(q);
 
     if (!match) {
       document.querySelector('.chat-launcher')?.click();
@@ -89,6 +110,57 @@ export default function ReactorHome() {
     if (match.href) { openFeature({ id: 'iframe', title: match.name, href: match.href }); return; }
     if (match.kind === 'tool') { openFeature({ id: 'soon', title: match.name }); return; }
     // department with no href and no tools yet — just leave it selected on the reactor
+  }
+
+  // The reactor mic's brain. Three tiers, cheapest/fastest first:
+  //  1. Direct tool/widget name match (instant, free, same matcher the
+  //     typed search bar uses) -- "open calculator", "smart source".
+  //  2. A tiny classifier call: is this a candidate-search request? If so,
+  //     open Smart Source.ai with the raw spoken sentence pre-filled into
+  //     its existing AI job-description parser -- reuses the real search
+  //     pipeline instead of re-inventing NLU here.
+  //  3. Otherwise, the existing Ask Shree knowledge-base brain answers it
+  //     as a general question about the site.
+  // Returns the string HeyShreeReactor should speak back.
+  async function handleVoiceCommand(text) {
+    const raw = (text || '').trim();
+    if (!raw) return "I didn't catch that — try again.";
+
+    const match = matchToolByText(raw);
+    if (match) {
+      if (match.deptId) setSelectedId(match.deptId);
+      if (match.widget) { openFeature({ id: match.widget, title: match.name }); return `Opening ${match.name}.`; }
+      if (match.href) { openFeature({ id: 'iframe', title: match.name, href: match.href }); return `Opening ${match.name}.`; }
+      if (match.kind === 'tool') return `${match.name} is on the roadmap — not live yet.`;
+      return `Showing ${match.name}.`;
+    }
+
+    try {
+      const intentRes = await fetch('/api/hey-shree/intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: raw }),
+      });
+      const intentData = await intentRes.json();
+      if (intentData.intent === 'search') {
+        const title = 'Smart Source.ai';
+        const href = `/tools/smart-source-ai?voice_q=${encodeURIComponent(raw)}`;
+        openFeature({ id: 'iframe', title, href });
+        return `Opening Smart Source.ai with your search — ${raw}. Hit search when you're ready.`;
+      }
+    } catch (e) { /* fall through to general Q&A below */ }
+
+    try {
+      const res = await fetch('/api/ask-shree', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: raw, page: 'home2-voice' }),
+      });
+      const data = await res.json();
+      return data.reply || data.error || "I couldn't find an answer for that.";
+    } catch (e) {
+      return 'Network error — try again.';
+    }
   }
 
   return (
@@ -132,7 +204,7 @@ export default function ReactorHome() {
               {LIVE_COUNT} live &middot; {DEPARTMENTS.length} systems
             </span>
           </div>
-          <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} />
+          <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => setVoiceOpen(true)} voiceActive={voiceOpen} />
         </div>
 
         <div className="home2-col">
@@ -180,6 +252,7 @@ export default function ReactorHome() {
 
       <AskShreeChat />
       <AppLauncher open={waffleOpen} onClose={() => setWaffleOpen(false)} />
+      <HeyShreeReactor open={voiceOpen} onClose={() => setVoiceOpen(false)} onTranscript={handleVoiceCommand} />
       </div>
     </div>
   );

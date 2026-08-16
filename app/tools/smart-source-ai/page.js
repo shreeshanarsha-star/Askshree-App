@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AskShreeChat from '../../../components/AskShreeChat';
 import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
@@ -31,6 +31,25 @@ export default function SmartSourceAI() {
 
   const [mode, setMode] = useState('auto');
   const [jobDescription, setJobDescription] = useState('');
+  const [voiceFilled, setVoiceFilled] = useState(false);
+
+  // Landed here from the reactor mic ("find a sales guy in Mexico with
+  // pharma experience")? Drop the raw spoken sentence into the same
+  // auto-mode JD field a pasted job description would go into -- the
+  // existing AI extractor (extractSearchCriteria) already turns messy free
+  // text into role/skills/location, so voice search rides the real
+  // pipeline instead of a separate, weaker parser.
+  useEffect(() => {
+    // Plain browser API, not next/navigation's useSearchParams -- avoids
+    // the Suspense-boundary requirement for a value we only need once, on
+    // first mount, in a component that's entirely client-rendered anyway.
+    const voiceQ = new URLSearchParams(window.location.search).get('voice_q');
+    if (voiceQ && voiceQ.trim()) {
+      setMode('auto');
+      setJobDescription(voiceQ.trim());
+      setVoiceFilled(true);
+    }
+  }, []);
   const [jdFile, setJdFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [skillsInput, setSkillsInput] = useState('');
@@ -260,10 +279,15 @@ export default function SmartSourceAI() {
 
               <div className="dropzone-divider">or</div>
 
+              {voiceFilled && (
+                <div style={{ fontSize: 11.5, color: 'var(--amber)', marginBottom: 6 }}>
+                  Filled from your voice search — review and hit Search below.
+                </div>
+              )}
               <textarea className="free-text-input" style={{ minHeight: 140, resize: 'vertical' }}
                 placeholder="Paste the job description, a short role summary, or specific keywords…"
                 value={jobDescription}
-                onChange={(e) => { setJobDescription(e.target.value); if (e.target.value) setJdFile(null); }} />
+                onChange={(e) => { setJobDescription(e.target.value); if (e.target.value) setJdFile(null); setVoiceFilled(false); }} />
             </>
           )}
 

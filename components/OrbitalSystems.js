@@ -105,7 +105,7 @@ const DEPARTMENTS = [
   },
 ];
 
-export function OrbitalStage({ selectedId, onSelect }) {
+export function OrbitalStage({ selectedId, onSelect, onMicClick, voiceActive }) {
   const n = DEPARTMENTS.length;
   const R = 39;
   const [hintOn, setHintOn] = useState(true);
@@ -160,7 +160,16 @@ export function OrbitalStage({ selectedId, onSelect }) {
 
         <div className="orb2-ring orb2-ring-outer" />
         <div className="orb2-ring orb2-ring-mid" />
-        <div className="orb2-core" id="reactor-core">
+        <div
+          className={`orb2-core${voiceActive ? ' orb2-awake' : ''}`}
+          id="reactor-core"
+          role="button"
+          tabIndex={0}
+          aria-label="Talk to Hey Shree"
+          title="Talk to Hey Shree"
+          onClick={() => onMicClick && onMicClick()}
+          onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onMicClick) { e.preventDefault(); onMicClick(); } }}
+        >
           <Icon name="mic" size={24} />
         </div>
       </div>

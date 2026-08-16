@@ -937,8 +937,9 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   overflow:hidden;
   animation:orb2Pulse 2.6s ease-in-out infinite, orb2Flicker 4.2s ease-in-out infinite;
   transition:box-shadow .3s;
-  z-index:3; color:rgba(var(--amber-rgb),0.95);
+  z-index:3; color:rgba(var(--amber-rgb),0.95); cursor:pointer;
 }
+.orb2-core:focus-visible{outline:2px solid rgba(var(--amber-rgb),0.8); outline-offset:4px;}
 .orb2-core::before{
   content:''; position:absolute; inset:0; border-radius:50%;
   background:repeating-conic-gradient(rgba(var(--amber-rgb),0.95) 0deg 6deg, transparent 6deg 22.5deg);
