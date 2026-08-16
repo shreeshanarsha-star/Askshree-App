@@ -81,22 +81,24 @@ export default function MarginAI() {
 
             <div className="panel">
               <div className="panel-head"><h3>Biggest margin leaks</h3></div>
-              <table className="admin-table">
-                <thead><tr><th>Product</th><th>Margin</th><th>Revenue</th><th>Root cause</th><th>Status</th><th></th></tr></thead>
-                <tbody>
-                  {data.leaks.map((p) => (
-                    <tr key={p.id}>
-                      <td className="name-cell">{p.product_name}{p.customer_name ? <span style={{ color: 'var(--slate)' }}> — {p.customer_name}</span> : ''}</td>
-                      <td style={{ color: p.margin_pct < 0 ? '#e28080' : 'var(--amber)' }}>{p.margin_pct}%</td>
-                      <td>{money(p.revenue_monthly)}</td>
-                      <td className="dim">{p.root_cause || '—'}</td>
-                      <td><span className={`status-pill ${p.status}`}>{p.status}</span></td>
-                      <td><a href={`/tools/margin-ai/product/${p.id}`} className="row-action">View</a></td>
-                    </tr>
-                  ))}
-                  {data.leaks.length === 0 && <tr><td colSpan={6} className="dim">Nothing flagged — everything's healthy.</td></tr>}
-                </tbody>
-              </table>
+              <div className="table-wrap">
+                <table className="admin-table" style={{ minWidth: 640 }}>
+                  <thead><tr><th>Product</th><th>Margin</th><th>Revenue</th><th>Root cause</th><th>Status</th><th></th></tr></thead>
+                  <tbody>
+                    {data.leaks.map((p) => (
+                      <tr key={p.id}>
+                        <td className="name-cell">{p.product_name}{p.customer_name ? <span style={{ color: 'var(--slate)' }}> — {p.customer_name}</span> : ''}</td>
+                        <td style={{ color: p.margin_pct < 0 ? '#e28080' : 'var(--amber)' }}>{p.margin_pct}%</td>
+                        <td>{money(p.revenue_monthly)}</td>
+                        <td className="dim">{p.root_cause || '—'}</td>
+                        <td><span className={`status-pill ${p.status}`}>{p.status}</span></td>
+                        <td><a href={`/tools/margin-ai/product/${p.id}`} className="row-action">View</a></td>
+                      </tr>
+                    ))}
+                    {data.leaks.length === 0 && <tr><td colSpan={6} className="dim">Nothing flagged — everything's healthy.</td></tr>}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             {data.drivers.length > 0 && (
