@@ -1,6 +1,9 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import GauriFace3D from '../../components/GauriFace3D';
+import ThemeBackground from '../../components/ThemeBackground';
+import { useTheme } from '../../lib/useTheme';
+import { getThemeAccentStyle } from '../../lib/themes';
 
 // The Gauri.ai expressive avatar — farmer intake, reimagined as a hands-free
 // conversation. Greets automatically, guesses the farmer's language from
@@ -49,6 +52,7 @@ const STATE_LANGUAGE = {
 };
 
 export default function GauriAvatarPage() {
+  const { themeId, ready: themeReady } = useTheme();
   const [language, setLanguage] = useState('Hindi');
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -331,7 +335,9 @@ export default function GauriAvatarPage() {
 
   if (caseCreated) {
     return (
-      <div style={{ padding: '44px 24px 80px', maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
+      <div style={{ position: 'relative', minHeight: '100vh', ...(themeReady ? getThemeAccentStyle(themeId) : {}) }}>
+        {themeReady && <ThemeBackground themeId={themeId} />}
+        <div style={{ position: 'relative', zIndex: 1, padding: '44px 24px 80px', maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
         <div className="eyebrow">Gauri.ai</div>
         <h1 className="serif" style={{ fontSize: 24, color: 'var(--cream)', margin: '8px 0 12px' }}>A vet will call you shortly</h1>
         <p style={{ color: 'var(--slate)', fontSize: 14, lineHeight: 1.7, marginTop: 12 }}>
@@ -343,12 +349,15 @@ export default function GauriAvatarPage() {
         <button className="primary-btn" style={{ marginTop: 24 }} onClick={() => window.location.reload()}>
           Report another issue
         </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '36px 24px 80px', maxWidth: 900, margin: '0 auto' }}>
+    <div style={{ position: 'relative', minHeight: '100vh', ...(themeReady ? getThemeAccentStyle(themeId) : {}) }}>
+      {themeReady && <ThemeBackground themeId={themeId} />}
+      <div style={{ position: 'relative', zIndex: 1, padding: '36px 24px 80px', maxWidth: 1080, margin: '0 auto' }}>
       <div className="eyebrow" style={{ textAlign: 'center' }}>Gauri.ai</div>
 
       <div className="gav-shell">
@@ -421,6 +430,7 @@ export default function GauriAvatarPage() {
       </div>
 
       {note && <div className="file-hint" style={{ textAlign: 'center', marginTop: 14 }}>{note}</div>}
+      </div>
     </div>
   );
 }
