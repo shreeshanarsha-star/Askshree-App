@@ -158,9 +158,9 @@ export default function GauriFace3D({ mode, viseme }) {
       for (let i = 0; i <= segs; i++) {
         const t = i / segs;
         const x = sign * THREE.MathUtils.lerp(0.42, 1.12, t);
-        const arch = Math.sin(t * Math.PI) * 0.05;
-        const lift = t * 0.1;
-        const baseY = 0.72 + arch + lift;
+        const arch = Math.sin(t * Math.PI) * 0.035;
+        const slope = -t * 0.05;
+        const baseY = 0.74 + arch + slope;
         const thickness = THREE.MathUtils.lerp(0.1, 0.045, t);
         upper.push(new THREE.Vector3(x, baseY + thickness / 2, 0));
         lower.push(new THREE.Vector3(x, baseY - thickness / 2, 0));
@@ -178,6 +178,48 @@ export default function GauriFace3D({ mode, viseme }) {
       return mesh;
     }
     group.add(makeBrow(-1), makeBrow(1));
+
+    // Nose: bridge converging to the tip, a base arc suggesting the
+    // underside/nostril flare, two subtle nostril dots, and a philtrum
+    // line down to the upper lip -- fills what was a blank gap between
+    // the eyes and mouth with the single feature that reads as "human"
+    // fastest.
+    function makeNose() {
+      const noseGroup = new THREE.Group();
+      const bridgeMat = new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.3 });
+      const bridgeL = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(-0.055, 0.5, 2.16), new THREE.Vector3(-0.095, -0.35, 2.34),
+      ]);
+      const bridgeR = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0.055, 0.5, 2.16), new THREE.Vector3(0.095, -0.35, 2.34),
+      ]);
+      noseGroup.add(new THREE.Line(bridgeL, bridgeMat), new THREE.Line(bridgeR, bridgeMat));
+
+      const baseSegs = 10;
+      const basePts = [];
+      for (let i = 0; i <= baseSegs; i++) {
+        const t = i / baseSegs;
+        const x = THREE.MathUtils.lerp(-0.17, 0.17, t);
+        const y = -0.35 - Math.sin(t * Math.PI) * 0.09;
+        basePts.push(new THREE.Vector3(x, y, 2.32));
+      }
+      const baseGeo = new THREE.BufferGeometry().setFromPoints(basePts);
+      noseGroup.add(new THREE.Line(baseGeo, new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.42 })));
+
+      const nostrilMat = new THREE.MeshBasicMaterial({ color: DARK, transparent: true, opacity: 0.6 });
+      const nostrilL = new THREE.Mesh(new THREE.CircleGeometry(0.032, 12), nostrilMat);
+      nostrilL.position.set(-0.1, -0.4, 2.3);
+      const nostrilR = new THREE.Mesh(new THREE.CircleGeometry(0.032, 12), nostrilMat);
+      nostrilR.position.set(0.1, -0.4, 2.3);
+      noseGroup.add(nostrilL, nostrilR);
+
+      const philtrumPts = [new THREE.Vector3(0, -0.44, 2.27), new THREE.Vector3(0, -0.7, 2.23)];
+      const philtrumGeo = new THREE.BufferGeometry().setFromPoints(philtrumPts);
+      noseGroup.add(new THREE.Line(philtrumGeo, new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.22 })));
+
+      return noseGroup;
+    }
+    group.add(makeNose());
 
     // --- Eyes: eyelid silhouette + socket fill + iris + pupil, each an
     // independent group we scale for blink ---
