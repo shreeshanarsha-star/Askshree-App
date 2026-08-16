@@ -13,9 +13,21 @@ export default function AddToProjectButton({ siteFetch, selectedCount, getSelect
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState('');
 
+  // Refetch the project list every time the panel opens rather than caching
+  // it for the component's lifetime. The old `if (!projects)` guard treated
+  // "already fetched once" and "there are no projects" the same way -- an
+  // empty array is truthy in JS, so after the very first open (when the
+  // recruiter had zero projects yet) it never fetched again for the rest of
+  // that page session. Create a project through this same panel, select a
+  // new candidate, reopen it, and the project you just made -- which very
+  // much exists on the server -- still wasn't in the dropdown. This is what
+  // made "add to existing project" look broken: there was never a second
+  // request to find out a project now existed.
   async function openPanel() {
-    setOpen((v) => !v);
-    if (!projects) {
+    const next = !open;
+    setOpen(next);
+    if (next) {
+      setProjects(null);
       const res = await siteFetch('/api/tools/projects');
       const data = await res.json().catch(() => null);
       setProjects(data?.projects || []);
