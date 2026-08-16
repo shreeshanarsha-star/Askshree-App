@@ -21,8 +21,15 @@ export async function POST(req) {
   // the default for a bare "what's the news" with no topic.
   const hasTopic = !!(query && query.trim());
   const endpoint = hasTopic ? 'everything' : 'top-headlines';
-  const params = new URLSearchParams({ apiKey: key, pageSize: '6', language: 'en' });
-  if (hasTopic) { params.set('q', query.trim()); params.set('sortBy', 'publishedAt'); }
+  const params = new URLSearchParams({ apiKey: key, pageSize: '15', language: 'en' });
+  // sortBy=publishedAt on /everything ranks purely by recency across a huge,
+  // loosely-matched source pool -- confirmed live: "artificial intelligence"
+  // returned Brazil youth-football and Star Wars articles, because NewsAPI's
+  // free tier treats multi-word queries as a loose OR match with no
+  // relevance weighting under that sort. sortBy=relevancy actually ranks by
+  // how well the article matches the query, which is what a spoken topic
+  // request needs.
+  if (hasTopic) { params.set('q', query.trim()); params.set('sortBy', 'relevancy'); }
   else params.set('country', 'us');
 
   try {
@@ -31,9 +38,16 @@ export async function POST(req) {
     if (data.status !== 'ok') {
       return NextResponse.json({ error: data.message || "Couldn't fetch news right now." });
     }
-    const items = (data.articles || [])
-      .filter((a) => a.title && a.title !== '[Removed]')
-      .map((a) => ({ title: a.title, url: a.url, source: a.source?.name || '' }));
+    const seen = new Set();
+    const items = [];
+    for (const a of data.articles || []) {
+      if (!a.title || a.title === '[Removed]') continue;
+      const titleKey = a.title.trim().toLowerCase();
+      if (seen.has(titleKey)) continue; // /everything frequently returns the same
+      seen.add(titleKey);               // story syndicated across multiple sources
+      items.push({ title: a.title, url: a.url, source: a.source?.name || '' });
+      if (items.length >= 6) break;
+    }
     return NextResponse.json({ items });
   } catch (e) {
     return NextResponse.json({ error: 'Network error reaching the news service.' });
