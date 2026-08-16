@@ -148,11 +148,13 @@ export default function GauriFace3D({ mode, viseme }) {
         let fz = 1;
         if (v.y < -0.25) {
           // jaw -> chin taper, easing in so the cheek stays full and only
-          // the lower third pulls inward toward the chin point
+          // the lower third pulls inward -- capped before the pole so the
+          // chin rounds off instead of pinching to a point
           const t = THREE.MathUtils.clamp((-0.25 - v.y) / 2.15, 0, 1);
-          const ease = t * t;
-          fx = 1 - ease * 0.44;
-          fz = 1 - ease * 0.16;
+          const te = Math.min(t, 0.72);
+          const ease = te * te;
+          fx = 1 - ease * 0.3;
+          fz = 1 - ease * 0.1;
         } else if (v.y > 1.25) {
           // forehead -> temple taper, subtler
           const t = THREE.MathUtils.clamp((v.y - 1.25) / 1.55, 0, 1);
