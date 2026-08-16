@@ -54,21 +54,29 @@ function rgbToThreeColor([r, g, b]) {
 }
 
 // Eyelid silhouette: upper lid arches up, lower lid curves down less, the
-// two meeting at the inner/outer corners so it reads as one closed eye
-// shape rather than two disconnected lines.
-function buildEyeLidPoints(segments) {
+// two meeting at the inner/outer corners. Asymmetric on purpose -- fuller
+// and rounder at the inner corner (toward the nose, where a real tear duct
+// rounds the shape out), tapering to a narrower point at the outer corner.
+// A symmetric almond reads closer to a cartoon circle; this reads closer
+// to a real eye.
+function buildEyeLidPoints(segments, innerSide) {
+  // innerSide: -1 -> inner corner is the low-x end, +1 -> inner corner is
+  // the high-x end (lets the same builder serve either eye by mirroring
+  // which end tapers vs rounds).
   const pts = [];
   for (let i = 0; i <= segments; i++) {
     const t = i / segments;
-    const x = THREE.MathUtils.lerp(-0.34, 0.34, t);
-    const y = Math.sin(t * Math.PI) * 0.205;
-    pts.push(new THREE.Vector3(x, y, 0));
+    const x = THREE.MathUtils.lerp(-0.36, 0.36, t);
+    const innerAmt = innerSide < 0 ? 1 - t : t;
+    const arch = Math.sin(t * Math.PI) * (0.15 + innerAmt * 0.075);
+    pts.push(new THREE.Vector3(x, arch, 0));
   }
   for (let i = segments; i >= 0; i--) {
     const t = i / segments;
-    const x = THREE.MathUtils.lerp(-0.34, 0.34, t);
-    const y = -Math.sin(t * Math.PI) * 0.125;
-    pts.push(new THREE.Vector3(x, y, 0));
+    const x = THREE.MathUtils.lerp(-0.36, 0.36, t);
+    const innerAmt = innerSide < 0 ? 1 - t : t;
+    const dip = Math.sin(t * Math.PI) * (0.09 + innerAmt * 0.045);
+    pts.push(new THREE.Vector3(x, -dip, 0));
   }
   return pts;
 }
@@ -160,6 +168,13 @@ export default function GauriFace3D({ mode, viseme }) {
           const t = THREE.MathUtils.clamp((v.y - 1.25) / 1.55, 0, 1);
           fx = 1 - t * 0.15;
         }
+        // Cheekbone: a soft outward bump centered just below eye height,
+        // independent of the jaw/forehead branch above -- gives the
+        // cheek-to-jaw transition an actual corner instead of one
+        // continuous smooth curve from crown to chin.
+        const cheekFalloff = Math.max(0, 1 - Math.abs((v.y - 0.05) / 0.32));
+        fx *= 1 + cheekFalloff * 0.05;
+
         v.x *= fx;
         v.z *= fz;
         pos.setXYZ(i, v.x, v.y, v.z);
@@ -274,6 +289,24 @@ export default function GauriFace3D({ mode, viseme }) {
     }
     group.add(makeCheekLine(-1), makeCheekLine(1));
 
+    // Ears: a simple outward-curving loop at ear height on each side of
+    // the head, at the widened cheekbone x-extent. Mostly visible at the
+    // silhouette edge given the idle head turn, not full anatomical ears
+    // -- enough to stop the head reading as earless.
+    function makeEar(sign) {
+      const segs = 12;
+      const pts = [];
+      for (let i = 0; i <= segs; i++) {
+        const t = i / segs;
+        const bulge = Math.sin(t * Math.PI) * 0.24;
+        const y = THREE.MathUtils.lerp(0.18, -0.5, t);
+        pts.push(new THREE.Vector3(sign * (2.05 + bulge), y, 0.1));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      return new THREE.Line(geo, new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.3 }));
+    }
+    group.add(makeEar(-1), makeEar(1));
+
     // Jaw / chin line: a shallow, correctly-oriented U tracing the
     // sculpted chin taper, low opacity, purely as a definition accent on
     // top of the geometry (not a substitute for it).
@@ -295,10 +328,10 @@ export default function GauriFace3D({ mode, viseme }) {
 
     // --- Eyes: eyelid silhouette + socket fill + iris + pupil, each an
     // independent group we scale for blink ---
-    function makeEye(x) {
+    function makeEye(x, innerSide) {
       const eyeGroup = new THREE.Group();
 
-      const lidPts = buildEyeLidPoints(18);
+      const lidPts = buildEyeLidPoints(18, innerSide);
       const lidGeo = new THREE.BufferGeometry().setFromPoints(lidPts);
       const lid = new THREE.LineLoop(lidGeo, new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.85 }));
       eyeGroup.add(lid);
@@ -319,13 +352,13 @@ export default function GauriFace3D({ mode, viseme }) {
       eyeGroup.add(glow);
 
       const iris = new THREE.Mesh(
-        new THREE.CircleGeometry(0.135, 26),
+        new THREE.CircleGeometry(0.115, 26),
         new THREE.MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.9 })
       );
       iris.position.z = 0.01;
       eyeGroup.add(iris);
 
-      const pupil = new THREE.Mesh(new THREE.CircleGeometry(0.058, 20), new THREE.MeshBasicMaterial({ color: DARK }));
+      const pupil = new THREE.Mesh(new THREE.CircleGeometry(0.05, 20), new THREE.MeshBasicMaterial({ color: DARK }));
       pupil.position.z = 0.02;
       eyeGroup.add(pupil);
 
@@ -336,8 +369,10 @@ export default function GauriFace3D({ mode, viseme }) {
       eyeGroup.position.set(x, 0.32, 2.18);
       return eyeGroup;
     }
-    const eyeL = makeEye(-0.74);
-    const eyeR = makeEye(0.74);
+    // Left eye's inner corner (toward the nose) is on its high-x side;
+    // right eye's inner corner is on its low-x side.
+    const eyeL = makeEye(-0.74, 1);
+    const eyeR = makeEye(0.74, -1);
     group.add(eyeL, eyeR);
 
     // --- Mouth: closed lip silhouette (outline) + dark cavity fill behind it ---
