@@ -1030,8 +1030,8 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 
 /* ---- Home v2: Google-style app launcher (replaces sidebar) ---- */
 .home2-full{margin-left:0; position:relative; height:100vh; overflow:hidden; display:flex; flex-direction:column;}
-.home2-shell .chat-launcher{top:24px; left:28px; bottom:auto; right:auto;}
-.home2-shell .chat-panel{top:76px; left:28px; bottom:auto; right:auto;}
+.home2-shell .chat-launcher{top:22px; right:32px; left:auto; bottom:auto;}
+.home2-shell .chat-panel{top:74px; right:32px; left:auto; bottom:auto;}
 
 .applauncher-backdrop{position:fixed; inset:0; z-index:41; background:transparent;}
 .applauncher-btn{
@@ -1216,13 +1216,13 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 
 
 /* ---- Home v2: compact top bar + 3-column triptych ---- */
-.home2-topbar{padding:18px 32px 10px 190px; position:relative; z-index:1; flex:0 0 auto;}
+.home2-topbar{padding:22px 190px 10px 32px; position:relative; z-index:1; flex:0 0 auto; display:flex; align-items:center; min-height:44px;}
 
 .home2-engage-fixed{
   position:fixed; top:24px; right:28px; z-index:42;
   display:flex; align-items:center; gap:10px;
 }
-.home2-topbar-h1{margin:0; font-family:'Fraunces',serif; font-weight:500; font-size:22px; line-height:1.4; color:var(--cream); max-width:640px;}
+.home2-topbar-h1{margin:0; font-family:'Fraunces',serif; font-weight:500; font-size:clamp(20px,2.15vw,26px); line-height:1.32; letter-spacing:-0.01em; color:var(--cream); max-width:640px;}
 .home2-topbar-h1 em{color:var(--amber); font-style:italic;}
 
 .home2-triptych{
@@ -1366,8 +1366,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   .home2-triptych{grid-template-columns:1fr;}
 }
 @media (max-width:640px){
-  .home2-topbar{padding:130px 20px 20px;}
-  .home2-engage-fixed{position:static; margin:12px 20px 0; justify-content:flex-start;}
+  .home2-topbar{padding:76px 20px 16px; display:block;}
   .home2-triptych{padding:0 20px;}
 }
 /* redeploy trigger 1786824606 */
