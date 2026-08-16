@@ -1,8 +1,9 @@
 'use client';
+import ThemeShell from './ThemeShell';
 
 export function WritingsGate({ error, keyVal, setKey, submit, checking }) {
   return (
-    <div className="margin-gate">
+    <ThemeShell className="margin-gate">
       <div className="margin-gate-card">
         <div className="logo">Ask <span>Shree</span></div>
         <div className="sub">my writings — enter code</div>
@@ -14,6 +15,6 @@ export function WritingsGate({ error, keyVal, setKey, submit, checking }) {
         </button>
         {error && <div className="err">{error}</div>}
       </div>
-    </div>
+    </ThemeShell>
   );
 }
