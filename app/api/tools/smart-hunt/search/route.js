@@ -1,4 +1,10 @@
 import { NextResponse } from 'next/server';
+
+// Multi-page SerpApi fetch + batched Claude scoring for large result sets
+// can run past the default serverless timeout -- ask for more budget where
+// the hosting plan allows it (Vercel silently caps this at the plan's own
+// ceiling if lower, so this is a safe no-op on plans that don't allow 60s).
+export const maxDuration = 60;
 import { getClientIp, logToolRun } from '../../../../../lib/gating';
 import { checkAndRecordSmartHuntUsage } from '../../../../../lib/smartHuntGating';
 import { buildSearchQuery, searchSerpApiWithFallback, scoreResults } from '../../../../../lib/smartSource';

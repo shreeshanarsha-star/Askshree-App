@@ -290,7 +290,7 @@ export default function CandidateResults({
           <button type="button" onClick={() => changePage(currentPage + 1)} disabled={currentPage === pageCount}>&#8250;</button>
         </div>
         <select className="cand-pagination-size" value={pageSize} onChange={(e) => changePageSize(Number(e.target.value))}>
-          {[10, 25, 50, 100].map((n) => <option key={n} value={n}>{n} / page</option>)}
+          {[10, 25, 50, 100, 200].map((n) => <option key={n} value={n}>{n} / page</option>)}
         </select>
       </div>
     );
