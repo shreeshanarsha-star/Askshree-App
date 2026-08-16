@@ -925,7 +925,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 @keyframes orb2LineFlow{ from{background-position:0% 0;} to{background-position:-200% 0;} }
 .orb2-ring{position:absolute; left:50%; top:50%; border:1px dashed var(--line); border-radius:50%; transform:translate(-50%,-50%);}
 .orb2-ring-outer{width:24%; height:24%; animation:orb2Spin 16s linear infinite;}
-.orb2-ring-mid{width:21%; height:21%; border:2px solid transparent; border-top-color:var(--amber); border-right-color:var(--amber); opacity:0.6; animation:orb2Spin 6s linear infinite reverse;}
+.orb2-ring-mid{width:21%; height:21%; border:2px solid transparent; border-top-color:var(--amber); border-right-color:var(--amber); opacity:0.6; animation:orb2Spin 6s linear infinite;}
 @keyframes orb2Spin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}
 .orb2-core{position:absolute; left:50%; top:50%; width:19%; height:19%; transform:translate(-50%,-50%); border-radius:50%; background:radial-gradient(circle at 45% 40%, rgba(var(--amber-rgb),0.22), rgba(11,15,26,0.88) 72%); border:1px solid rgba(var(--amber-rgb),0.55); backdrop-filter:blur(1px); display:flex; align-items:center; justify-content:center; animation:orb2Pulse 2.6s ease-in-out infinite; transition:box-shadow .3s; z-index:3; color:rgba(var(--amber-rgb),0.9);}
 .orb2-core.orb2-awake{box-shadow:0 0 70px rgba(var(--amber-rgb),0.85) !important;}
