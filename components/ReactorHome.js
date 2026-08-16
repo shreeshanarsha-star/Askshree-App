@@ -41,6 +41,24 @@ function matchToolByText(raw) {
   return null;
 }
 
+// Phase 2: media commands. The roadmap's stated scope is "open/embed, not
+// remote-control a separate app" -- so "play <x>" opens YouTube's public,
+// no-API-key search-embed (listType=search) inside the workspace panel, and
+// a bare "open youtube" opens youtube.com in a new tab (its homepage can't
+// be iframed -- YouTube sends X-Frame-Options -- so a new tab is the honest
+// version of "open" for that case).
+const MEDIA_PLAY_PATTERN = /^(please\s+)?(play|put on|listen to)\s+(.+?)[.!?]?$/i;
+const MEDIA_OPEN_YT_PATTERN = /^(please\s+)?open\s+youtube\s*(?:and\s+(?:play|search(?:\s+for)?)\s+(.+?))?[.!?]?$/i;
+function matchMediaCommand(raw) {
+  const q = (raw || '').trim();
+  if (!q) return null;
+  let m = q.match(MEDIA_PLAY_PATTERN);
+  if (m && m[3] && m[3].trim()) return { query: m[3].trim() };
+  m = q.match(MEDIA_OPEN_YT_PATTERN);
+  if (m) return { query: (m[2] || '').trim() || null };
+  return null;
+}
+
 export default function ReactorHome() {
   const [query, setQuery] = useState('');
   const [hintIndex, setHintIndex] = useState(0);
@@ -133,6 +151,17 @@ export default function ReactorHome() {
       if (match.href) { openFeature({ id: 'iframe', title: match.name, href: match.href }); return `Opening ${match.name}.`; }
       if (match.kind === 'tool') return `${match.name} is on the roadmap — not live yet.`;
       return `Showing ${match.name}.`;
+    }
+
+    const media = matchMediaCommand(raw);
+    if (media) {
+      if (media.query) {
+        const href = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(media.query)}`;
+        openFeature({ id: 'iframe', title: `YouTube — ${media.query}`, href });
+        return `Playing ${media.query} on YouTube.`;
+      }
+      if (typeof window !== 'undefined') window.open('https://www.youtube.com/', '_blank', 'noopener');
+      return 'Opening YouTube in a new tab.';
     }
 
     try {

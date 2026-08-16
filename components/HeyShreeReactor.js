@@ -58,7 +58,7 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
   }
 
   function greet() {
-    const text = "Hey, I'm Shree. Try “open calculator”, “find a sales candidate in Mexico”, or ask me anything about this site.";
+    const text = "Hey, I'm Shree. Try “open calculator”, “find a sales candidate in Mexico”, “play some lofi music”, or ask me anything about this site.";
     setReply(text);
     speak(text, autoListen);
   }
