@@ -208,7 +208,15 @@ export function FeatureNavPanel({ selected, onOpenFeature }) {
             {t.name}
           </span>
         ) : t.status === 'live' ? (
-          <a href={t.href}>{t.name}</a>
+          <span
+            className="orb2-tool-link"
+            role="button"
+            tabIndex={0}
+            onClick={() => onOpenFeature && onOpenFeature({ id: 'iframe', title: t.name, href: t.href })}
+            onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: 'iframe', title: t.name, href: t.href }); } }}
+          >
+            {t.name}
+          </span>
         ) : (
           <span
             className="orb2-tool-link"
@@ -248,7 +256,15 @@ export function FeatureNavPanel({ selected, onOpenFeature }) {
           </div>
 
           {selected.tools.length === 0 && selected.href && (
-            <a className="orb2-open-link" href={selected.href}>Open {selected.name} &rarr;</a>
+            <span
+              className="orb2-open-link"
+              role="button"
+              tabIndex={0}
+              onClick={() => onOpenFeature && onOpenFeature({ id: 'iframe', title: selected.name, href: selected.href })}
+              onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onOpenFeature) { e.preventDefault(); onOpenFeature({ id: 'iframe', title: selected.name, href: selected.href }); } }}
+            >
+              Open {selected.name} &rarr;
+            </span>
           )}
           {selected.tools.length === 0 && !selected.href && (
             <div className="orb2-panel-empty">{selected.name} is being built — check back soon.</div>

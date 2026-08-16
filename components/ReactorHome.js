@@ -28,7 +28,6 @@ export default function ReactorHome() {
   const [shareNote, setShareNote] = useState('');
   const [shareOpen, setShareOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(null);
-  const [workspaceExpanded, setWorkspaceExpanded] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [waffleOpen, setWaffleOpen] = useState(false);
 
@@ -103,12 +102,10 @@ export default function ReactorHome() {
 
   function openFeature(feature) {
     setActiveFeature(feature);
-    setWorkspaceExpanded(false);
   }
 
   function closeFeature() {
     setActiveFeature(null);
-    setWorkspaceExpanded(false);
   }
 
   function wakeReactor() {
@@ -132,7 +129,7 @@ export default function ReactorHome() {
     }
     if (match.deptId) setSelectedId(match.deptId);
     if (match.widget) { openFeature({ id: match.widget, title: match.name }); return; }
-    if (match.href) { window.location.href = match.href; return; }
+    if (match.href) { openFeature({ id: 'iframe', title: match.name, href: match.href }); return; }
     if (match.kind === 'tool') { openFeature({ id: 'soon', title: match.name }); return; }
     // department with no href and no tools yet — just leave it selected on the reactor
   }
@@ -192,8 +189,6 @@ export default function ReactorHome() {
           {activeFeature ? (
             <FeatureWorkspace
               feature={activeFeature}
-              expanded={workspaceExpanded}
-              onToggleExpand={() => setWorkspaceExpanded((e) => !e)}
               onClose={closeFeature}
             />
           ) : (
