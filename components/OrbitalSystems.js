@@ -234,6 +234,7 @@ export function OrbitalStageDial({ selectedId, onSelect, onMicClick, voiceActive
         <div className="dial-ticks" />
         <div className="dial-ring-dashed" />
         <div className="dial-ring-outer" />
+        <div className="dial-orbit-track"><div className="dial-orbit-dot" /></div>
         {DEPARTMENTS.map((d, i) => {
           const angle = -90 + (360 / n) * i;
           const rad = (angle * Math.PI) / 180;
