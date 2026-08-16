@@ -115,7 +115,7 @@ export default function FeatureWorkspace({ feature, onClose }) {
         {feature.id === 'sunrise-sunset' && <SunriseSunsetWidget />}
         {feature.id === 'iframe' && feature.href && (
           <iframe
-            src={feature.href}
+            src={`${feature.href}${feature.href.includes('?') ? '&' : '?'}embed=1`}
             className="home2-workspace-iframe"
             title={feature.title}
             loading="lazy"
