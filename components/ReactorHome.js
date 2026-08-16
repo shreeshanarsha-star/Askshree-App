@@ -59,6 +59,19 @@ function matchMediaCommand(raw) {
   return null;
 }
 
+// Phase 3: "what's the news" / "news about X". A single, specific trigger
+// word ("news" or "headlines") keeps this fast-path free of false positives
+// against tool names and general questions -- everything else routes to the
+// server-side /api/hey-shree/news route (see that file for why this can't
+// be called directly from the browser).
+function matchNewsCommand(raw) {
+  const q = (raw || '').trim();
+  if (!q) return null;
+  if (!/\bnews\b|\bheadlines\b/i.test(q)) return null;
+  const topicMatch = q.match(/\b(?:news|headlines)\s+(?:about|on|for)\s+(.+?)[.!?]?$/i);
+  return { query: topicMatch ? topicMatch[1].trim() : null };
+}
+
 export default function ReactorHome() {
   const [query, setQuery] = useState('');
   const [hintIndex, setHintIndex] = useState(0);
@@ -179,6 +192,26 @@ export default function ReactorHome() {
       return media.query
         ? `Here's a link to play ${media.query} on YouTube — tap it in the workspace panel.`
         : "Here's a link to YouTube — tap it in the workspace panel.";
+    }
+
+    const news = matchNewsCommand(raw);
+    if (news) {
+      try {
+        const res = await fetch('/api/hey-shree/news', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: news.query }),
+        });
+        const data = await res.json();
+        if (data.error) return data.error;
+        const items = data.items || [];
+        if (!items.length) return "I couldn't find any headlines right now.";
+        openFeature({ id: 'news', title: news.query ? `News — ${news.query}` : 'Top Headlines', items });
+        const spoken = items.slice(0, 3).map((it, i) => `${i + 1}. ${it.title}`).join('. ');
+        return `Here are the top headlines. ${spoken}. More in the workspace panel.`;
+      } catch (e) {
+        return "I couldn't reach the news service — try again in a bit.";
+      }
     }
 
     try {

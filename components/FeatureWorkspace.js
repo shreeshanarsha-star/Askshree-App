@@ -121,6 +121,30 @@ export default function FeatureWorkspace({ feature, onClose }) {
             loading="lazy"
           />
         )}
+        {feature.id === 'news' && (
+          <div className="home2-workspace-soon" style={{ textAlign: 'left' }}>
+            <div className="home2-workspace-soon-title">{feature.title}</div>
+            {(feature.items || []).map((it, i) => (
+              <a
+                key={i}
+                href={it.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block',
+                  padding: '10px 0',
+                  borderBottom: '1px solid rgba(255,255,255,0.08)',
+                  color: 'var(--cream)',
+                  textDecoration: 'none',
+                }}
+              >
+                <div style={{ fontSize: '13px', lineHeight: 1.4 }}>{it.title}</div>
+                <div style={{ fontSize: '11px', color: 'var(--slate)', marginTop: '4px' }}>{it.source}</div>
+              </a>
+            ))}
+            {(!feature.items || feature.items.length === 0) && <p>No headlines available right now.</p>}
+          </div>
+        )}
         {feature.id === 'external-link' && (
           <div className="home2-workspace-soon">
             <div className="home2-workspace-soon-title">{feature.title}</div>
