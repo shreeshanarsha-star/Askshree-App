@@ -221,7 +221,18 @@ export default function CandidateResults({
         <div className="cand-chips">
           {c.location && <span className="cand-chip">{c.location}</span>}
           {c.notice_period && <span className="cand-chip">Notice: {c.notice_period}</span>}
+          {c.signalhire?.experience_years != null && (
+            <span className="cand-chip" title="Verified via SignalHire">{c.signalhire.experience_years}+ yrs</span>
+          )}
         </div>
+
+        {c.signalhire?.verified_skills?.length > 0 && (
+          <div className="cand-chips cand-chips-verified" title="Verified via SignalHire">
+            {c.signalhire.verified_skills.slice(0, 5).map((s) => (
+              <span key={s} className="cand-chip cand-chip-verified">{s}</span>
+            ))}
+          </div>
+        )}
 
         {renderOutreachPills(c, key, outreach)}
 

@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 export const maxDuration = 60;
 import { getClientIp, logToolRun } from '../../../../../lib/gating';
 import { checkAndRecordSmartHuntUsage } from '../../../../../lib/smartHuntGating';
-import { buildSearchQuery, searchSerpApiWithFallback, scoreResults } from '../../../../../lib/smartSource';
+import { buildSearchQuery, searchSerpApiWithFallback, scoreResults, enrichTopCandidates } from '../../../../../lib/smartSource';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
 import { getAuthedUser } from '../../../../../lib/authedUser';
 
@@ -48,9 +48,19 @@ export async function POST(req) {
       return NextResponse.json({ ok: true, candidates: [], status: gate.status });
     }
     const scored = await scoreResults(searchResult.results, criteria);
-    const candidates = scored
+    let candidates = scored
       .filter((c) => c.profile_url && c.match_score != null)
       .sort((a, b) => (b.match_score || 0) - (a.match_score || 0));
+
+    // SignalHire enrichment (Phase 2) -- see smart-source's search route for
+    // the full rationale. No-ops silently if not configured/enabled.
+    const enrichment = await enrichTopCandidates(candidates);
+    if (enrichment.size) {
+      candidates = candidates.map((c) => (
+        enrichment.has(c.profile_url) ? { ...c, signalhire: enrichment.get(c.profile_url) } : c
+      ));
+    }
+
     return NextResponse.json({ ok: true, candidates, status: gate.status });
   } catch (e) {
     return NextResponse.json({ error: 'Could not complete that search. Try again in a moment.' }, { status: 500 });

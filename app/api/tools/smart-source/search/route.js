@@ -7,7 +7,7 @@ import { NextResponse } from 'next/server';
 export const maxDuration = 60;
 import { getClientIp, logToolRun } from '../../../../../lib/gating';
 import { checkAndRecordSmartSourceUsage } from '../../../../../lib/smartSourceGating';
-import { extractSearchCriteria, buildSearchQuery, searchSerpApiWithFallback, scoreResults, findCachedSearch } from '../../../../../lib/smartSource';
+import { extractSearchCriteria, buildSearchQuery, searchSerpApiWithFallback, scoreResults, findCachedSearch, enrichTopCandidates } from '../../../../../lib/smartSource';
 import { extractText } from '../../../../../lib/extractText';
 import { supabaseAdmin } from '../../../../../lib/supabase';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
@@ -88,6 +88,11 @@ export async function POST(req) {
     }, { status: 503 });
   }
 
+  // SignalHire enrichment (Phase 2): real skills/experience/education for the
+  // top-scored candidates, at no contact-credit cost. No-ops silently if not
+  // configured/enabled -- results are identical to before if this fails.
+  const enrichment = await enrichTopCandidates(scored);
+
   const db = supabaseAdmin();
   const { data: search, error: searchErr } = await db
     .from('smart_source_searches')
@@ -120,6 +125,11 @@ export async function POST(req) {
   if (rows.length) {
     const { data: inserted } = await db.from('smart_source_candidates').insert(rows).select();
     candidates = inserted || [];
+  }
+  if (enrichment.size) {
+    candidates = candidates.map((c) => (
+      enrichment.has(c.profile_url) ? { ...c, signalhire: enrichment.get(c.profile_url) } : c
+    ));
   }
 
   return NextResponse.json({ ok: true, cached: false, searchId: search.id, candidates });
