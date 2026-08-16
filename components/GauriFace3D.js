@@ -132,9 +132,42 @@ export default function GauriFace3D({ mode, viseme }) {
     const group = new THREE.Group();
     scene.add(group);
 
-    // --- Head shell: layered wireframe ellipsoid, hologram-style ---
+    // --- Head shell: sculpted wireframe ellipsoid, hologram-style ---
+    // A plain scaled sphere reads as an egg/blob -- real heads taper inward
+    // toward a defined jaw and chin below the cheekbone line, and narrow
+    // slightly at the temples above the brow line. Displace the sphere's
+    // own vertices to sculpt that silhouette in, rather than building a
+    // separate custom mesh -- keeps the wireframe/wireshell pairing intact
+    // for free since both are built from the same deformed geometry.
+    function sculptHead(geo) {
+      const pos = geo.attributes.position;
+      const v = new THREE.Vector3();
+      for (let i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i);
+        let fx = 1;
+        let fz = 1;
+        if (v.y < -0.25) {
+          // jaw -> chin taper, easing in so the cheek stays full and only
+          // the lower third pulls inward toward the chin point
+          const t = THREE.MathUtils.clamp((-0.25 - v.y) / 2.15, 0, 1);
+          const ease = t * t;
+          fx = 1 - ease * 0.44;
+          fz = 1 - ease * 0.16;
+        } else if (v.y > 1.25) {
+          // forehead -> temple taper, subtler
+          const t = THREE.MathUtils.clamp((v.y - 1.25) / 1.55, 0, 1);
+          fx = 1 - t * 0.15;
+        }
+        v.x *= fx;
+        v.z *= fz;
+        pos.setXYZ(i, v.x, v.y, v.z);
+      }
+      pos.needsUpdate = true;
+      geo.computeVertexNormals();
+    }
     const headGeo = new THREE.SphereGeometry(2.55, 28, 22);
     headGeo.scale(0.85, 1.12, 0.9);
+    sculptHead(headGeo);
     const headWire = new THREE.LineSegments(
       new THREE.WireframeGeometry(headGeo),
       new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.16 })
@@ -220,6 +253,43 @@ export default function GauriFace3D({ mode, viseme }) {
       return noseGroup;
     }
     group.add(makeNose());
+
+    // Cheek contour: two faint strokes hinting at cheekbone shading below
+    // the outer eye corner, following the sculpted jaw taper down toward
+    // it -- kept low-opacity so it reads as gentle shading, not a line.
+    function makeCheekLine(sign) {
+      const segs = 8;
+      const pts = [];
+      for (let i = 0; i <= segs; i++) {
+        const t = i / segs;
+        const x = sign * THREE.MathUtils.lerp(1.05, 0.72, t);
+        const y = THREE.MathUtils.lerp(0.02, -1.05, t);
+        const z = THREE.MathUtils.lerp(1.82, 1.55, t);
+        pts.push(new THREE.Vector3(x, y, z));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      return new THREE.Line(geo, new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.12 }));
+    }
+    group.add(makeCheekLine(-1), makeCheekLine(1));
+
+    // Jaw / chin line: a shallow, correctly-oriented U tracing the
+    // sculpted chin taper, low opacity, purely as a definition accent on
+    // top of the geometry (not a substitute for it).
+    function makeJawLine() {
+      const segs = 22;
+      const pts = [];
+      for (let i = 0; i <= segs; i++) {
+        const t = i / segs;
+        const x = THREE.MathUtils.lerp(-0.92, 0.92, t);
+        const dip = Math.sin(t * Math.PI);
+        const y = -1.7 - dip * 0.4;
+        const z = 1.55 + dip * 0.35;
+        pts.push(new THREE.Vector3(x, y, z));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      return new THREE.Line(geo, new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.2 }));
+    }
+    group.add(makeJawLine());
 
     // --- Eyes: eyelid silhouette + socket fill + iris + pupil, each an
     // independent group we scale for blink ---
