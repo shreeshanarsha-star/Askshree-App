@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import { revealContactsBatch } from '../../../../../lib/contactEnrich';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
-import { getCachedContact, persistContact } from '../../../../../lib/contactCache';
+import { getCachedContact, persistContact, getMonthlyRevealCount, logReveal, MONTHLY_REVEAL_CAP, CAP_MESSAGE } from '../../../../../lib/contactCache';
 
 // Batched contact reveal for the "Reveal contact (N)" bulk action -- one
 // SignalHire call for whichever candidates aren't already cached (Phase 5),
-// instead of N sequential requests from the client.
+// instead of N sequential requests from the client. Respects the same
+// site-wide monthly cap as the single reveal route: cached hits are free
+// and unlimited, but only as many *fresh* reveals as remain under the cap
+// get sent to SignalHire -- anything past that comes back capped instead
+// of silently over-spending.
 export async function POST(req) {
   const _denied = requireSiteKey(req); if (_denied) return _denied;
   const { candidates } = await req.json();
@@ -24,10 +28,24 @@ export async function POST(req) {
   }
 
   if (uncached.length) {
-    const fresh = await revealContactsBatch(uncached);
-    for (const [key, value] of fresh.entries()) {
-      results[key] = value;
-      if (value.ok && key) await persistContact(key, value);
+    const usedThisMonth = await getMonthlyRevealCount();
+    const remaining = Math.max(0, MONTHLY_REVEAL_CAP - usedThisMonth);
+    const toReveal = uncached.slice(0, remaining);
+    const capped = uncached.slice(remaining);
+
+    for (const c of capped) {
+      results[c.profileUrl || c.name] = { ok: false, reason: 'monthly_cap_reached', message: CAP_MESSAGE };
+    }
+
+    if (toReveal.length) {
+      const fresh = await revealContactsBatch(toReveal);
+      for (const [key, value] of fresh.entries()) {
+        results[key] = value;
+        if (value.ok && key) {
+          await persistContact(key, value);
+          await logReveal(key);
+        }
+      }
     }
   }
 
