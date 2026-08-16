@@ -810,10 +810,25 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .gav-mouth{position:absolute; left:50%; top:56.8%; width:18%; height:5.3%; transform:translate(-50%,-50%);}
 .gav-mouth::before{content:""; position:absolute; left:0; right:0; top:20%; height:52%; border-radius:0 0 50% 50%; background:linear-gradient(#07090b,#161a1e); border:1px solid #b38d49; box-shadow:inset 0 3px 5px #000,0 0 8px #e7c26b33;}
 .gav-mouth::after{content:""; position:absolute; left:9%; right:9%; top:43%; height:1px; background:#e7c26b; box-shadow:0 5px 0 #57451f; opacity:.65;}
-.gav-speaking .gav-mouth::before{animation:gav-jaw .16s infinite alternate ease-in-out;}
-.gav-speaking .gav-mouth::after{animation:gav-tongue .16s infinite alternate ease-in-out;}
-@keyframes gav-jaw{0%{height:28%;border-radius:0 0 45% 45%} 25%{height:52%;border-radius:0 0 42% 42%} 55%{height:76%;border-radius:0 0 35% 35%} 100%{height:42%;border-radius:0 0 48% 48%}}
-@keyframes gav-tongue{from{transform:scaleX(.65);opacity:.35} to{transform:scaleX(1);opacity:.9}}
+/* Was a rigid .16s infinite-alternate flap -- fast enough (6+ direction
+   changes/sec) to read as flickering rather than speech. Slowed down and
+   switched to a one-directional loop (no "alternate" snap-back), with the
+   jaw and tongue running on different periods so they drift in and out of
+   phase instead of moving in lockstep -- much closer to natural talking. */
+.gav-speaking .gav-mouth::before{animation:gav-jaw 0.52s infinite ease-in-out;}
+.gav-speaking .gav-mouth::after{animation:gav-tongue 0.39s infinite ease-in-out;}
+@keyframes gav-jaw{
+  0%{height:30%;border-radius:0 0 46% 46%}
+  20%{height:58%;border-radius:0 0 40% 40%}
+  45%{height:38%;border-radius:0 0 45% 45%}
+  70%{height:70%;border-radius:0 0 36% 36%}
+  100%{height:30%;border-radius:0 0 46% 46%}
+}
+@keyframes gav-tongue{
+  0%{transform:scaleX(.7);opacity:.3}
+  40%{transform:scaleX(1);opacity:.85}
+  100%{transform:scaleX(.7);opacity:.3}
+}
 .gav-smile{position:absolute; left:50%; top:59.2%; width:15%; height:2%; transform:translateX(-50%); border-bottom:2px solid #d8b46a; border-radius:0 0 50% 50%; opacity:0;}
 .gav-listening .gav-smile{opacity:.35;} .gav-speaking .gav-smile{opacity:.15;}
 .gav-lang-row{display:flex; gap:8px; justify-content:center; margin:14px 0;}

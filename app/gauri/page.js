@@ -64,6 +64,7 @@ export default function GauriAvatarPage() {
   const [started, setStarted] = useState(false);
   const [needsTap, setNeedsTap] = useState(false);
   const [micBlocked, setMicBlocked] = useState(false);
+  const [blinking, setBlinking] = useState(false);
 
   const blinkTimer = useRef(null);
   const chatRef = useRef(null);
@@ -87,11 +88,16 @@ export default function GauriAvatarPage() {
     return () => clearTimeout(blinkTimer.current);
   }, []);
 
+  // Blinking is driven through React state (not direct DOM classList
+  // manipulation) so it can't be silently wiped mid-blink by an unrelated
+  // re-render -- e.g. the render that fires the instant speech starts or
+  // ends (setMode('speaking') / setMode('')) used to erase an in-flight
+  // blink early, since that render recomputed the stage's className from
+  // scratch without knowing a blink class had been poked onto the DOM
+  // directly. Now the blink is just part of the same render.
   function blinkNow() {
-    const stage = document.getElementById('gav-stage');
-    if (!stage) return;
-    stage.classList.add('gav-blink');
-    setTimeout(() => stage.classList.remove('gav-blink'), 145);
+    setBlinking(true);
+    setTimeout(() => setBlinking(false), 145);
   }
 
   useEffect(() => {
@@ -328,7 +334,7 @@ export default function GauriAvatarPage() {
         ))}
       </div>
 
-      <div id="gav-stage" className={`gav-stage ${mode === 'speaking' ? 'gav-speaking' : ''} ${mode === 'listening' ? 'gav-listening' : ''}`}>
+      <div id="gav-stage" className={`gav-stage ${mode === 'speaking' ? 'gav-speaking' : ''} ${mode === 'listening' ? 'gav-listening' : ''} ${blinking ? 'gav-blink' : ''}`}>
         <img className="gav-face" src="/gauri/avatar-face.jpg" alt="Gauri" />
         <div className="gav-fx">
           <div className="gav-eyeL"></div><div className="gav-eyeR"></div>
