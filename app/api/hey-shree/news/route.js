@@ -14,12 +14,19 @@ export async function POST(req) {
     return NextResponse.json({ error: "News isn't set up yet — ask the site owner to add a news API key." });
   }
 
+  // top-headlines only searches a small curated set, so a topic "q" against
+  // it (confirmed live: "artificial intelligence" -> 0 results) very often
+  // comes back empty. /v2/everything searches the full article archive and
+  // is the right endpoint once there's an actual topic; top-headlines stays
+  // the default for a bare "what's the news" with no topic.
+  const hasTopic = !!(query && query.trim());
+  const endpoint = hasTopic ? 'everything' : 'top-headlines';
   const params = new URLSearchParams({ apiKey: key, pageSize: '6', language: 'en' });
-  if (query && query.trim()) params.set('q', query.trim());
+  if (hasTopic) { params.set('q', query.trim()); params.set('sortBy', 'publishedAt'); }
   else params.set('country', 'us');
 
   try {
-    const res = await fetch(`https://newsapi.org/v2/top-headlines?${params.toString()}`);
+    const res = await fetch(`https://newsapi.org/v2/${endpoint}?${params.toString()}`);
     const data = await res.json();
     if (data.status !== 'ok') {
       return NextResponse.json({ error: data.message || "Couldn't fetch news right now." });
