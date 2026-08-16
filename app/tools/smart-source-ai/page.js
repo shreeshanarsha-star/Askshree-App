@@ -74,7 +74,7 @@ export default function SmartSourceAI() {
       });
       const data = await res.json();
       if (data.ok) {
-        setContactState((prev) => ({ ...prev, [key]: { loading: false, revealed: true, email: data.email, phone: data.phone } }));
+        setContactState((prev) => ({ ...prev, [key]: { loading: false, revealed: true, email: data.email, phone: data.phone, emailConfidence: data.emailConfidence, phoneConfidence: data.phoneConfidence } }));
       } else {
         setContactState((prev) => ({ ...prev, [key]: { loading: false, revealed: false, message: data.message } }));
       }
@@ -102,7 +102,7 @@ export default function SmartSourceAI() {
           const key = candidateKey(c);
           const r = data?.results?.[c.profile_url];
           next[key] = r?.ok
-            ? { loading: false, revealed: true, email: r.email, phone: r.phone }
+            ? { loading: false, revealed: true, email: r.email, phone: r.phone, emailConfidence: r.emailConfidence, phoneConfidence: r.phoneConfidence }
             : { loading: false, revealed: false, message: r?.message || 'Could not look up contact details.' };
         }
         return next;

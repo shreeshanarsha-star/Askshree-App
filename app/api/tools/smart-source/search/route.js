@@ -109,28 +109,46 @@ export async function POST(req) {
 
   const rows = scored
     .filter((c) => c.profile_url)
-    .map((c) => ({
-      search_id: search.id,
-      name: c.name,
-      company: c.company,
-      designation: c.designation,
-      location: c.location,
-      profile_url: c.profile_url,
-      match_score: c.match_score,
-      match_reason: c.match_reason || null,
-      source: 'linkedin',
-    }));
+    .map((c) => {
+      const e = enrichment.get(c.profile_url);
+      return {
+        search_id: search.id,
+        name: c.name,
+        company: c.company,
+        designation: c.designation,
+        location: c.location,
+        profile_url: c.profile_url,
+        match_score: c.match_score,
+        match_reason: c.match_reason || null,
+        source: 'linkedin',
+        // Persisted immediately (Phase 5) so a later cached search, or a
+        // later fresh search that resurfaces the same profile, doesn't
+        // re-spend SignalHire quota re-fetching what we already have.
+        signalhire_skills: e?.verified_skills || null,
+        signalhire_experience_years: e?.experience_years ?? null,
+        signalhire_industry: e?.current_company_industry || null,
+        signalhire_company_size: e?.current_company_size || null,
+        signalhire_education: e?.education_summary || null,
+        signalhire_headline: e?.headline || null,
+      };
+    });
 
   let candidates = [];
   if (rows.length) {
     const { data: inserted } = await db.from('smart_source_candidates').insert(rows).select();
     candidates = inserted || [];
   }
-  if (enrichment.size) {
-    candidates = candidates.map((c) => (
-      enrichment.has(c.profile_url) ? { ...c, signalhire: enrichment.get(c.profile_url) } : c
-    ));
-  }
+  candidates = candidates.map((c) => ({
+    ...c,
+    signalhire: (c.signalhire_skills?.length || c.signalhire_experience_years != null || c.signalhire_industry || c.signalhire_company_size)
+      ? {
+          verified_skills: c.signalhire_skills || [],
+          experience_years: c.signalhire_experience_years,
+          current_company_industry: c.signalhire_industry,
+          current_company_size: c.signalhire_company_size,
+        }
+      : null,
+  }));
 
   return NextResponse.json({ ok: true, cached: false, searchId: search.id, candidates });
 }

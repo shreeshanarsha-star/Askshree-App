@@ -272,7 +272,18 @@ export default function CandidateResults({
 
         <div className="cand-actions">
           {cs.revealed ? (
-            <span style={{ fontSize: 11.5, color: 'var(--cream)' }}>{cs.email || cs.phone || '—'}</span>
+            <span style={{ fontSize: 11.5, color: 'var(--cream)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              {cs.email || cs.phone || '—'}
+              {(Math.max(cs.emailConfidence || 0, cs.phoneConfidence || 0)) > 0 && (
+                <span
+                  className="cand-chip cand-chip-verified"
+                  style={{ fontSize: 9.5, padding: '2px 7px' }}
+                  title="Confidence rating from SignalHire"
+                >
+                  {Math.max(cs.emailConfidence || 0, cs.phoneConfidence || 0) >= 100 ? 'Verified' : 'Likely'}
+                </span>
+              )}
+            </span>
           ) : (
             <button
               type="button"
