@@ -3,6 +3,19 @@ import { useEffect, useRef, useState } from 'react';
 
 const LANG = 'en-IN';
 
+// Web Speech API's SpeechRecognition times out silently after a few
+// seconds of no detected speech (fires a 'no-speech' error, then 'onend'
+// with an empty transcript). The mic loop was only re-arming itself on a
+// SUCCESSFUL turn -- any pause longer than that timeout just died with no
+// explanation, which is exactly what "stops after one task" looks like
+// from the outside. Retry a couple of times before actually giving up.
+const MAX_NO_SPEECH_RETRIES = 2;
+
+// Explicit ways to end the conversation by voice, so a real back-and-forth
+// session (not just one command) has a clean way to close instead of
+// relying on the person to notice and tap the X.
+const STOP_PATTERN = /^(stop( listening)?|that'?s all|that'?ll be all|goodbye|bye( bye)?|close( this)?|end( conversation)?|i'?m done|we'?re done|nothing else|no more questions?|thanks?,? that'?s it)\.?!?$/i;
+
 // The reactor mic's voice UI. Deliberately "dumb" about what a transcript
 // means -- it only listens, speaks, and shows status; the caller (ReactorHome)
 // supplies onTranscript(text) => Promise<string> and owns all the actual
@@ -20,6 +33,7 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
   const micBlockedRef = useRef(false);
   const recognitionRef = useRef(null);
   const startedOnceRef = useRef(false);
+  const noSpeechRetriesRef = useRef(0);
 
   useEffect(() => { openRef.current = open; }, [open]);
   useEffect(() => { micBlockedRef.current = micBlocked; }, [micBlocked]);
@@ -33,6 +47,7 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
       window.speechSynthesis?.cancel();
       recognitionRef.current?.abort?.();
       startedOnceRef.current = false;
+      noSpeechRetriesRef.current = 0;
       setMode('idle');
       setTranscript('');
       setReply('');
@@ -77,6 +92,7 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
   function startListening() {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { setMicBlocked(true); return; }
+    if (recognitionRef.current) { try { recognitionRef.current.abort(); } catch (e) { /* already stopped */ } }
     const r = new SR();
     r.lang = LANG;
     r.continuous = false;
@@ -93,17 +109,44 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
       setTranscript(finalText || interim);
     };
     r.onerror = (e) => {
+      // Only a real permission problem should stop the loop and show the
+      // "mic blocked" state. Everything else ('no-speech', 'aborted',
+      // 'network', ...) is recoverable -- onend below decides what to do.
       if (e.error === 'not-allowed' || e.error === 'service-not-allowed') setMicBlocked(true);
     };
     r.onend = () => {
-      if (finalText.trim()) resolveTranscript(finalText.trim());
-      else setMode('idle');
+      recognitionRef.current = null;
+      const text = finalText.trim();
+      if (text) {
+        noSpeechRetriesRef.current = 0;
+        resolveTranscript(text);
+        return;
+      }
+      if (!openRef.current || micBlockedRef.current) { setMode('idle'); return; }
+      if (noSpeechRetriesRef.current < MAX_NO_SPEECH_RETRIES) {
+        noSpeechRetriesRef.current += 1;
+        setTimeout(() => { if (openRef.current) startListening(); }, 250);
+        return;
+      }
+      // Gave it a couple of quiet retries -- rather than silently dying,
+      // say so and offer a tap to pick the conversation back up.
+      noSpeechRetriesRef.current = 0;
+      const nudge = "Still there? Tap the mic whenever you'd like to continue.";
+      setReply(nudge);
+      speak(nudge, () => setNeedsTap(true));
     };
     recognitionRef.current = r;
     try { r.start(); } catch (e) { setMode('idle'); }
   }
 
   async function resolveTranscript(text) {
+    if (STOP_PATTERN.test(text.trim())) {
+      const bye = 'Got it — talk soon.';
+      setTranscript('');
+      setReply(bye);
+      speak(bye, () => onClose && onClose());
+      return;
+    }
     setMode('thinking');
     try {
       const spoken = (await onTranscript(text)) || "Sorry, I didn't catch that.";
