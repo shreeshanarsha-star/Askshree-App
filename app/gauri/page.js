@@ -329,11 +329,6 @@ export default function GauriAvatarPage() {
     speak(bye, autoListenAfterSpeak);
   }
 
-  function changeLanguage(code) {
-    setLanguage(code);
-    languageRef.current = code;
-  }
-
   if (caseCreated) {
     return (
       <div style={{ padding: '44px 24px 80px', maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
@@ -353,69 +348,77 @@ export default function GauriAvatarPage() {
   }
 
   return (
-    <div style={{ padding: '36px 24px 80px', maxWidth: 640, margin: '0 auto' }}>
+    <div style={{ padding: '36px 24px 80px', maxWidth: 900, margin: '0 auto' }}>
       <div className="eyebrow" style={{ textAlign: 'center' }}>Gauri.ai</div>
-      <h1 className="serif" style={{ fontSize: 24, color: 'var(--cream)', margin: '8px 0 6px', textAlign: 'center' }}>Talk to Gauri about your cow</h1>
 
-      <div className="gav-lang-row">
-        {LANGUAGES.map((l) => (
-          <button key={l.code} className={`gav-lang-btn ${language === l.code ? 'active' : ''}`} onClick={() => changeLanguage(l.code)}>{l.label}</button>
-        ))}
-      </div>
+      <div className="gav-shell">
+        <span className="orb2-corner orb2-corner-tl" />
+        <span className="orb2-corner orb2-corner-tr" />
+        <span className="orb2-corner orb2-corner-bl" />
+        <span className="orb2-corner orb2-corner-br" />
 
-      <div id="gav-stage" className={`gav-stage ${mode === 'speaking' ? 'gav-speaking' : ''} ${mode === 'listening' ? 'gav-listening' : ''}`}>
-        <GauriFace3D mode={mode} viseme={viseme} />
-        <div className="gav-status">{mode === 'speaking' ? 'Gauri is speaking…' : mode === 'listening' ? 'Listening…' : started ? 'Ready' : 'Getting ready…'}</div>
-        {needsTap && (
-          <div className="gav-tap-overlay" onClick={tapToBegin}>
-            <div className="gav-tap-card">Tap to start</div>
-          </div>
-        )}
-      </div>
-
-      {started && (
-        <>
-          <div className="gav-chat" ref={chatRef}>
-            {messages.map((m, i) => (
-              <div key={i} className={`gav-bubble ${m.role}`}>{m.text}</div>
-            ))}
-            {busy && <div className="gav-bubble gauri" style={{ opacity: 0.6 }}>…</div>}
-          </div>
-
-          {!showConfirmForm && (
-            <div className="gav-controls">
-              <input className="free-text-input" placeholder="Just speak — or type here…" value={input}
-                onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendMessage()} />
-              <button className="primary-btn" style={{ marginTop: 0 }} onClick={() => sendMessage()} disabled={busy}>Send</button>
-              <button className="primary-btn" style={{ marginTop: 0, background: 'transparent', color: 'var(--amber)' }} onClick={startListening} disabled={busy || micBlocked}>🎙</button>
-            </div>
-          )}
-
-          {showConfirmForm && confirmData && (
-            <div className="gav-confirm">
-              <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber)', textTransform: 'uppercase', marginBottom: 8 }}>
-                Confirm to get a vet callback
+        <div className="gav-shell-col">
+          <div className="gav-shell-label">Face</div>
+          <div id="gav-stage" className={`gav-stage ${mode === 'speaking' ? 'gav-speaking' : ''} ${mode === 'listening' ? 'gav-listening' : ''}`}>
+            <GauriFace3D mode={mode} viseme={viseme} />
+            <div className="gav-status">{mode === 'speaking' ? 'Gauri is speaking…' : mode === 'listening' ? 'Listening…' : started ? 'Ready' : 'Getting ready…'}</div>
+            {needsTap && (
+              <div className="gav-tap-overlay" onClick={tapToBegin}>
+                <div className="gav-tap-card">Tap to start</div>
               </div>
-              <div style={{ fontSize: 13, color: 'var(--cream)', marginBottom: 4 }}><b>At a surface level:</b> {confirmData.surfaceDiagnosis}</div>
-              {confirmData.suggestedProductName && (
-                <div style={{ fontSize: 13, color: 'var(--cream)' }}><b>May help:</b> {confirmData.suggestedProductName}</div>
+            )}
+          </div>
+        </div>
+
+        <div className="gav-shell-col">
+          <div className="gav-shell-label">Workspace</div>
+          {started ? (
+            <>
+              <div className="gav-chat" ref={chatRef}>
+                {messages.map((m, i) => (
+                  <div key={i} className={`gav-bubble ${m.role}`}>{m.text}</div>
+                ))}
+                {busy && <div className="gav-bubble gauri" style={{ opacity: 0.6 }}>…</div>}
+              </div>
+
+              {!showConfirmForm && (
+                <div className="gav-controls">
+                  <input className="free-text-input" placeholder="Just speak — or type here…" value={input}
+                    onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && sendMessage()} />
+                  <button className="primary-btn" style={{ marginTop: 0 }} onClick={() => sendMessage()} disabled={busy}>Send</button>
+                  <button className="primary-btn" style={{ marginTop: 0, background: 'transparent', color: 'var(--amber)' }} onClick={startListening} disabled={busy || micBlocked}>🎙</button>
+                </div>
               )}
-              <div className="row">
-                <input className="free-text-input" placeholder="Your name" value={farmerName} onChange={(e) => setFarmerName(e.target.value)} />
-                <input className="free-text-input" placeholder="Phone number (required)" value={farmerPhone} onChange={(e) => setFarmerPhone(e.target.value)} />
-              </div>
-              <div className="row">
-                <input className="free-text-input" placeholder="Village / address (for delivery)" value={farmerAddress} onChange={(e) => setFarmerAddress(e.target.value)} />
-                <input className="free-text-input" placeholder="Cow details — breed, age" value={cowDetails} onChange={(e) => setCowDetails(e.target.value)} />
-              </div>
-              <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
-                <button className="primary-btn" style={{ marginTop: 0 }} onClick={confirmYes} disabled={busy}>Yes, have a vet call me</button>
-                <button className="primary-btn" style={{ marginTop: 0, background: 'transparent', color: 'var(--slate)', borderColor: 'var(--line)' }} onClick={confirmNo} disabled={busy}>Not now</button>
-              </div>
-            </div>
+
+              {showConfirmForm && confirmData && (
+                <div className="gav-confirm">
+                  <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 500, fontSize: 11, color: 'var(--amber)', textTransform: 'uppercase', marginBottom: 8 }}>
+                    Confirm to get a vet callback
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--cream)', marginBottom: 4 }}><b>At a surface level:</b> {confirmData.surfaceDiagnosis}</div>
+                  {confirmData.suggestedProductName && (
+                    <div style={{ fontSize: 13, color: 'var(--cream)' }}><b>May help:</b> {confirmData.suggestedProductName}</div>
+                  )}
+                  <div className="row">
+                    <input className="free-text-input" placeholder="Your name" value={farmerName} onChange={(e) => setFarmerName(e.target.value)} />
+                    <input className="free-text-input" placeholder="Phone number (required)" value={farmerPhone} onChange={(e) => setFarmerPhone(e.target.value)} />
+                  </div>
+                  <div className="row">
+                    <input className="free-text-input" placeholder="Village / address (for delivery)" value={farmerAddress} onChange={(e) => setFarmerAddress(e.target.value)} />
+                    <input className="free-text-input" placeholder="Cow details — breed, age" value={cowDetails} onChange={(e) => setCowDetails(e.target.value)} />
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                    <button className="primary-btn" style={{ marginTop: 0 }} onClick={confirmYes} disabled={busy}>Yes, have a vet call me</button>
+                    <button className="primary-btn" style={{ marginTop: 0, background: 'transparent', color: 'var(--slate)', borderColor: 'var(--line)' }} onClick={confirmNo} disabled={busy}>Not now</button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="gav-shell-empty">Gauri will start the conversation as soon as she&rsquo;s ready — just a moment…</div>
           )}
-        </>
-      )}
+        </div>
+      </div>
 
       {note && <div className="file-hint" style={{ textAlign: 'center', marginTop: 14 }}>{note}</div>}
     </div>

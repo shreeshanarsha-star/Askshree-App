@@ -796,56 +796,48 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .logo-wrap:hover .logo-tooltip{opacity:1; transform:translateY(0);}
 
 /* ---------- GAURI.AI EXPRESSIVE AVATAR ---------- */
-.gav-stage{position:relative; overflow:hidden; border-radius:24px; background:#090b0e; aspect-ratio:750/937; box-shadow:0 20px 70px #000c; max-width:340px; margin:0 auto;}
-.gav-face{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+/* Two-section glass shell matching the homepage triptych's visual language
+   (border, corner brackets, gradient background, amber column divider) --
+   just two columns here instead of three: face, then workspace. */
+.gav-shell{
+  position:relative; display:grid; grid-template-columns:0.9fr 1.1fr; gap:0; align-items:stretch;
+  border:1.5px solid rgba(var(--amber-rgb),0.24); border-radius:20px; padding:26px 30px; margin-top:6px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.008));
+  box-shadow:0 0 60px rgba(0,0,0,0.25) inset;
+}
+.gav-shell-col{display:flex; flex-direction:column; min-width:0; padding:0 26px;}
+.gav-shell-col:first-child{padding-left:0;}
+.gav-shell-col:last-child{padding-right:0; position:relative;}
+.gav-shell-col:last-child::before{
+  content:''; position:absolute; left:0; top:4px; bottom:4px; width:1.5px;
+  background:linear-gradient(180deg, transparent, rgba(var(--amber-rgb),0.28) 15%, rgba(var(--amber-rgb),0.28) 85%, transparent);
+}
+.gav-shell-label{font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:10.5px; letter-spacing:0.14em; color:var(--amber); text-transform:uppercase; margin-bottom:14px;}
+.gav-shell-empty{flex:1; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--slate); font-family:'Plus Jakarta Sans',sans-serif; font-size:12.5px; line-height:1.7; padding:24px 10px;}
+@media(max-width:760px){
+  .gav-shell{grid-template-columns:1fr; padding:20px;}
+  .gav-shell-col{padding:0 !important;}
+  .gav-shell-col:last-child::before{display:none;}
+  .gav-shell-col:last-child{margin-top:26px; padding-top:22px !important; position:relative;}
+  .gav-shell-col:last-child::after{
+    content:''; position:absolute; top:0; left:4px; right:4px; height:1.5px;
+    background:linear-gradient(90deg, transparent, rgba(var(--amber-rgb),0.28) 15%, rgba(var(--amber-rgb),0.28) 85%, transparent);
+  }
+}
+
+.gav-stage{position:relative; overflow:hidden; border-radius:20px; background:#090b0e; aspect-ratio:750/937; box-shadow:0 20px 70px #000c; max-width:280px; margin:0 auto;}
 .gav-face3d-mount{position:absolute; inset:0; width:100%; height:100%;}
 .gav-face3d-mount canvas{display:block; width:100% !important; height:100% !important;}
 .gav-status{position:absolute; top:12px; left:12px; padding:6px 12px; border-radius:99px; background:#090d12cc; border:1px solid #fff2; backdrop-filter:blur(10px); font-size:11px; font-family:'Plus Jakarta Sans',sans-serif; font-weight:500; letter-spacing:0.01em; color:var(--cream); z-index:20;}
-.gav-fx{position:absolute; inset:0; pointer-events:none; z-index:10;}
-.gav-eyeL,.gav-eyeR{position:absolute; top:38.7%; width:11.8%; height:4.9%; border-radius:50%; background:#080a0c; opacity:0; transform:scaleY(.03);}
-.gav-eyeL{left:33.4%;} .gav-eyeR{right:33.4%;}
-.gav-blink .gav-eyeL,.gav-blink .gav-eyeR{opacity:.82; animation:gav-blink .14s ease-in-out;}
-@keyframes gav-blink{0%{transform:scaleY(.03)} 35%{transform:scaleY(1)} 100%{transform:scaleY(.03)}}
-.gav-eyeGlowL,.gav-eyeGlowR{position:absolute; top:39.5%; width:5.5%; height:1.8%; border-radius:50%; background:#f1c96d; filter:blur(6px); opacity:.07;}
-.gav-eyeGlowL{left:36.5%;} .gav-eyeGlowR{right:36.5%;}
-.gav-listening .gav-eyeGlowL,.gav-listening .gav-eyeGlowR{opacity:.28;}
-.gav-mouth{position:absolute; left:50%; top:56.8%; width:18%; height:5.3%; transform:translate(-50%,-50%);}
-.gav-mouth::before{content:""; position:absolute; left:0; right:0; top:20%; height:52%; border-radius:0 0 50% 50%; background:linear-gradient(#07090b,#161a1e); border:1px solid #b38d49; box-shadow:inset 0 3px 5px #000,0 0 8px #e7c26b33;}
-.gav-mouth::after{content:""; position:absolute; left:9%; right:9%; top:43%; height:1px; background:#e7c26b; box-shadow:0 5px 0 #57451f; opacity:.65;}
-/* Was a rigid .16s infinite-alternate flap -- fast enough (6+ direction
-   changes/sec) to read as flickering rather than speech. Slowed down and
-   switched to a one-directional loop (no "alternate" snap-back), with the
-   jaw and tongue running on different periods so they drift in and out of
-   phase instead of moving in lockstep -- much closer to natural talking. */
-.gav-speaking .gav-mouth::before{animation:gav-jaw 0.52s infinite ease-in-out;}
-.gav-speaking .gav-mouth::after{animation:gav-tongue 0.39s infinite ease-in-out;}
-@keyframes gav-jaw{
-  0%{height:30%;border-radius:0 0 46% 46%}
-  20%{height:58%;border-radius:0 0 40% 40%}
-  45%{height:38%;border-radius:0 0 45% 45%}
-  70%{height:70%;border-radius:0 0 36% 36%}
-  100%{height:30%;border-radius:0 0 46% 46%}
-}
-@keyframes gav-tongue{
-  0%{transform:scaleX(.7);opacity:.3}
-  40%{transform:scaleX(1);opacity:.85}
-  100%{transform:scaleX(.7);opacity:.3}
-}
-.gav-smile{position:absolute; left:50%; top:59.2%; width:15%; height:2%; transform:translateX(-50%); border-bottom:2px solid #d8b46a; border-radius:0 0 50% 50%; opacity:0;}
-.gav-listening .gav-smile{opacity:.35;} .gav-speaking .gav-smile{opacity:.15;}
-.gav-lang-row{display:flex; gap:8px; justify-content:center; margin:14px 0;}
-.gav-lang-row{flex-wrap:wrap;}
 .gav-tap-overlay{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#000a; cursor:pointer; z-index:30;}
 .gav-tap-card{font-family:'Plus Jakarta Sans',sans-serif; font-weight:500; letter-spacing:0.01em; font-size:13px; color:var(--cream); border:1px solid var(--amber-dim); background:#090d12ee; padding:12px 22px; border-radius:99px;}
 
-.gav-lang-btn{font-family:'Plus Jakarta Sans',sans-serif; font-weight:500; letter-spacing:0.01em; font-size:11px; padding:6px 14px; border-radius:16px; border:1px solid var(--line); background:transparent; color:var(--slate); cursor:pointer;}
-.gav-lang-btn.active{border-color:var(--amber-dim); color:var(--amber);}
-.gav-chat{max-width:520px; margin:18px auto 0; max-height:280px; overflow-y:auto; padding:4px 4px 0;}
-.gav-bubble{margin-bottom:10px; max-width:82%; font-size:13px; line-height:1.6; padding:10px 14px; border-radius:14px;}
+.gav-chat{flex:1; min-height:0; margin:0; max-height:340px; overflow-y:auto; padding:2px 4px 0;}
+.gav-bubble{margin-bottom:10px; max-width:90%; font-size:13px; line-height:1.6; padding:10px 14px; border-radius:14px;}
 .gav-bubble.farmer{margin-left:auto; background:rgba(var(--amber-rgb),0.12); color:var(--cream); border:1px solid var(--amber-dim);}
 .gav-bubble.gauri{margin-right:auto; background:rgba(255,255,255,0.03); color:var(--cream); border:1px solid var(--line);}
-.gav-controls{display:grid; grid-template-columns:1fr auto auto; gap:9px; max-width:520px; margin:14px auto 0;}
-.gav-confirm{max-width:520px; margin:18px auto 0; border:1px solid var(--amber-dim); border-radius:12px; padding:18px; background:rgba(var(--amber-rgb),0.06);}
+.gav-controls{display:grid; grid-template-columns:1fr auto auto; gap:9px; margin-top:14px;}
+.gav-confirm{margin-top:14px; border:1px solid var(--amber-dim); border-radius:12px; padding:18px; background:rgba(var(--amber-rgb),0.06);}
 .gav-confirm .row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;}
 @media(max-width:600px){.gav-confirm .row{grid-template-columns:1fr;}}
 
