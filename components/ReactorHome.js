@@ -155,19 +155,30 @@ export default function ReactorHome() {
 
     const media = matchMediaCommand(raw);
     if (media) {
-      // YouTube's old listType=search embed is deprecated (confirmed: it
-      // now shows "video unavailable" instead of results), and YouTube's
-      // own homepage/search pages refuse to be iframed at all (X-Frame-
-      // Options). The only honest, always-working, no-API-key version of
-      // "play X" / "open youtube" is a real new tab to YouTube search --
-      // so that's what this does, rather than shipping a broken embed.
+      // YouTube's old listType=search embed is deprecated (confirmed live:
+      // it renders "video unavailable"), and YouTube's own pages refuse to
+      // be iframed (X-Frame-Options) -- so a new tab is the only honest way
+      // to actually play something. But window.open() called from an async
+      // voice-transcript callback loses the browser's "user gesture" token
+      // by the time speech recognition resolves (confirmed: popup blocked
+      // in testing), so firing it programmatically here would silently do
+      // nothing. Instead, open a workspace card with a real link the person
+      // clicks themselves -- that's a guaranteed-real gesture, so it always
+      // works, with no popup-blocker roulette.
       const url = media.query
         ? `https://www.youtube.com/results?search_query=${encodeURIComponent(media.query)}`
         : 'https://www.youtube.com/';
-      if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
+      openFeature({
+        id: 'external-link',
+        title: media.query ? `YouTube — ${media.query}` : 'YouTube',
+        subtitle: media.query
+          ? `Your browser blocks auto-opened tabs from voice, so tap below to play "${media.query}" on YouTube.`
+          : 'Your browser blocks auto-opened tabs from voice, so tap below to open YouTube.',
+        href: url,
+      });
       return media.query
-        ? `Opening YouTube search results for ${media.query} in a new tab.`
-        : 'Opening YouTube in a new tab.';
+        ? `Here's a link to play ${media.query} on YouTube — tap it in the workspace panel.`
+        : "Here's a link to YouTube — tap it in the workspace panel.";
     }
 
     try {

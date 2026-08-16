@@ -121,6 +121,30 @@ export default function FeatureWorkspace({ feature, onClose }) {
             loading="lazy"
           />
         )}
+        {feature.id === 'external-link' && (
+          <div className="home2-workspace-soon">
+            <div className="home2-workspace-soon-title">{feature.title}</div>
+            <p>{feature.subtitle}</p>
+            <a
+              href={feature.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                marginTop: '14px',
+                padding: '10px 22px',
+                borderRadius: '999px',
+                border: '1px solid var(--amber)',
+                color: 'var(--amber)',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '13px',
+                textDecoration: 'none',
+              }}
+            >
+              Open in new tab &#8599;
+            </a>
+          </div>
+        )}
         {feature.id === 'soon' && (
           <div className="home2-workspace-soon">
             <div className="home2-workspace-soon-title">{feature.title}</div>
