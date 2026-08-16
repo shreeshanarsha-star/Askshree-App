@@ -18,6 +18,8 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [layout, setLayout] = useState(null);
   const [layoutSaving, setLayoutSaving] = useState(false);
+  const [reactorStyle, setReactorStyleState] = useState(null);
+  const [reactorStyleSaving, setReactorStyleSaving] = useState(false);
 
   async function load() {
     const res = await fetch('/api/admin/site-theme', { headers: { Authorization: `Bearer ${token}` } });
@@ -26,6 +28,9 @@ export default function SettingsPage() {
     const layoutRes = await fetch('/api/admin/homepage-layout', { headers: { Authorization: `Bearer ${token}` } });
     const layoutData = await layoutRes.json();
     setLayout(layoutData.layout);
+    const styleRes = await fetch('/api/admin/reactor-style', { headers: { Authorization: `Bearer ${token}` } });
+    const styleData = await styleRes.json();
+    setReactorStyleState(styleData.style);
   }
   useEffect(() => { if (ready) load(); }, [ready]);
 
@@ -40,6 +45,17 @@ export default function SettingsPage() {
     setLayoutSaving(false);
   }
 
+  async function setReactorStyle(id) {
+    setReactorStyleSaving(true);
+    await fetch('/api/admin/reactor-style', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ style: id }),
+    });
+    setReactorStyleState(id);
+    setReactorStyleSaving(false);
+  }
+
   async function setTheme(id) {
     setSaving(true);
     await fetch('/api/admin/site-theme', {
@@ -51,7 +67,7 @@ export default function SettingsPage() {
     setSaving(false);
   }
 
-  if (!ready || current === null || layout === null) return <div className="admin-main">Loading…</div>;
+  if (!ready || current === null || layout === null || reactorStyle === null) return <div className="admin-main">Loading…</div>;
 
   return (
     <ThemeShell className="admin-shell" rawChildren>
@@ -110,6 +126,41 @@ export default function SettingsPage() {
                   <div style={{ fontSize: 13.5, color: 'var(--cream)', fontWeight: 500, marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     {opt.label}
                     {layout === opt.id && <span style={{ color: 'var(--amber)' }}>✓</span>}
+                  </div>
+                  <div style={{ fontSize: 11.5, color: 'var(--slate)' }}>{opt.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="panel">
+          <div className="panel-head">
+            <h3>Reactor style</h3>
+            {reactorStyleSaving && <span className="action">Saving…</span>}
+          </div>
+          <div style={{ padding: 18 }}>
+            <p className="file-hint" style={{ marginBottom: 14 }}>
+              Only applies when Homepage layout above is set to Reactor Console. Sunburst is the current default
+              (dashed lines from each system to the core); Dial is the rotary-style alternate (solid ring, tick
+              marks, bright core, no center lines) -- the shape a future gesture-rotate-to-select control would use.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
+              {[
+                { id: 'sunburst', label: 'Sunburst', desc: 'Dashed spoke lines radiate from the core to each system — current default' },
+                { id: 'dial', label: 'Dial', desc: 'Rotary dial — solid ring, clock ticks, bright core, nodes sit on the ring' },
+              ].map((opt) => (
+                <div
+                  key={opt.id}
+                  onClick={() => setReactorStyle(opt.id)}
+                  style={{
+                    cursor: 'pointer', border: `1px solid ${reactorStyle === opt.id ? 'var(--amber)' : 'var(--line)'}`,
+                    borderRadius: 10, padding: '14px 16px', background: reactorStyle === opt.id ? 'rgba(var(--amber-rgb),0.08)' : 'rgba(255,255,255,0.015)',
+                  }}
+                >
+                  <div style={{ fontSize: 13.5, color: 'var(--cream)', fontWeight: 500, marginBottom: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    {opt.label}
+                    {reactorStyle === opt.id && <span style={{ color: 'var(--amber)' }}>✓</span>}
                   </div>
                   <div style={{ fontSize: 11.5, color: 'var(--slate)' }}>{opt.desc}</div>
                 </div>

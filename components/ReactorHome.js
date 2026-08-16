@@ -4,7 +4,7 @@ import AskShreeChat from './AskShreeChat';
 import AppLauncher from './AppLauncher';
 import HeyShreeReactor from './HeyShreeReactor';
 import GestureControl from './GestureControl';
-import { OrbitalStage, FeatureNavPanel, DEPARTMENTS } from './OrbitalSystems';
+import { OrbitalStage, OrbitalStageDial, FeatureNavPanel, DEPARTMENTS } from './OrbitalSystems';
 import FeatureWorkspace from './FeatureWorkspace';
 import { useTheme } from '../lib/useTheme';
 import { getThemeAccentStyle } from '../lib/themes';
@@ -79,6 +79,7 @@ export default function ReactorHome() {
   const [selectedId, setSelectedId] = useState(null);
   const [waffleOpen, setWaffleOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
+  const [reactorStyle, setReactorStyle] = useState('sunburst');
 
   const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
   const leftFilled = !!activeFeature;
@@ -94,6 +95,14 @@ export default function ReactorHome() {
   useEffect(() => {
     const id = setInterval(() => setHintIndex((i) => (i + 1) % TOOL_NAMES.length), 2200);
     return () => clearInterval(id);
+  }, []);
+
+  // Which reactor visual (sunburst vs dial) to render -- an admin-wide
+  // setting, same read pattern as the site theme.
+  useEffect(() => {
+    fetch('/api/reactor-style').then((r) => r.json()).then((d) => {
+      if (d.style === 'dial') setReactorStyle('dial');
+    }).catch(() => {});
   }, []);
 
   // Remember the last department the person had open, so a return visit
@@ -281,7 +290,11 @@ export default function ReactorHome() {
               {LIVE_COUNT} live &middot; {DEPARTMENTS.length} systems
             </span>
           </div>
-          <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => setVoiceOpen(true)} voiceActive={voiceOpen} />
+          {reactorStyle === 'dial' ? (
+            <OrbitalStageDial selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => setVoiceOpen(true)} voiceActive={voiceOpen} />
+          ) : (
+            <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => setVoiceOpen(true)} voiceActive={voiceOpen} />
+          )}
         </div>
 
         <div className="home2-col">

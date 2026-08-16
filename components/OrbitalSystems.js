@@ -185,6 +185,95 @@ export function OrbitalStage({ selectedId, onSelect, onMicClick, voiceActive }) 
   );
 }
 
+// ---- Alternate reactor style: "Dial" -----------------------------------
+// Same DEPARTMENTS data, same click/keyboard/selection contract as
+// OrbitalStage (selectedId, onSelect, onMicClick, voiceActive) so
+// ReactorHome can swap between the two styles with no other code changes.
+// Visual language is a rotary dial instead of a center-radiating sunburst:
+// a solid outer ring, short clock-style tick marks around it, a slow
+// counter-rotating dashed ring just inside, and one bright, dominant core.
+// No lines connect the nodes to the core -- each node sits directly on the
+// ring. This also reads naturally as a "things sit on a ring you could
+// rotate" layout, which is the shape a future gesture-rotate-to-select
+// interaction would want.
+export function OrbitalStageDial({ selectedId, onSelect, onMicClick, voiceActive }) {
+  const n = DEPARTMENTS.length;
+  const R = 39;
+  const [hintOn, setHintOn] = useState(true);
+  const selectedDept = DEPARTMENTS.find((d) => d.id === selectedId) || null;
+
+  useEffect(() => {
+    if (selectedId) setHintOn(false);
+  }, [selectedId]);
+
+  function onNodeKeyDown(e, id) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelect(id);
+    }
+  }
+
+  return (
+    <div className="dial-stage-card">
+      {selectedDept && (
+        <div className="dial-tag">
+          {selectedDept.name}
+          <span className={`dial-tag-badge ${selectedDept.status === 'live' ? 'dial-live' : 'dial-soon'}`}>
+            {selectedDept.status === 'live' ? 'LIVE' : 'SOON'}
+          </span>
+        </div>
+      )}
+      <div className="dial-stage">
+        <div className="dial-ticks" />
+        <div className="dial-ring-dashed" />
+        <div className="dial-ring-outer" />
+        {DEPARTMENTS.map((d, i) => {
+          const angle = -90 + (360 / n) * i;
+          const rad = (angle * Math.PI) / 180;
+          const left = 50 + R * Math.cos(rad);
+          const top = 50 + R * Math.sin(rad);
+          const labelAbove = Math.sin(rad) < -0.15;
+          return (
+            <div
+              key={d.id}
+              role="button"
+              tabIndex={0}
+              aria-label={d.name}
+              className={`dial-node-wrap dial-${d.status} ${selectedId === d.id ? 'dial-selected' : ''} ${labelAbove ? 'dial-label-above' : 'dial-label-below'}`}
+              style={{ left: `${left}%`, top: `${top}%` }}
+              onClick={() => onSelect(d.id)}
+              onKeyDown={(e) => onNodeKeyDown(e, d.id)}
+            >
+              <div className="dial-node">
+                <Icon name={d.icon} />
+              </div>
+              <span className="dial-nm">{d.name}</span>
+            </div>
+          );
+        })}
+
+        <div
+          className={`dial-core${voiceActive ? ' dial-awake' : ''}`}
+          id="reactor-core-dial"
+          role="button"
+          tabIndex={0}
+          aria-label="Talk to Hey Shree"
+          title="Talk to Hey Shree"
+          onClick={() => onMicClick && onMicClick()}
+          onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && onMicClick) { e.preventDefault(); onMicClick(); } }}
+        >
+          <Icon name="mic" size={22} />
+        </div>
+      </div>
+      {!selectedId && (
+        <div className={`dial-hint ${hintOn ? 'dial-hint-on' : 'dial-hint-off'}`}>
+          Tap a system to begin
+        </div>
+      )}
+    </div>
+  );
+}
+
 const PAGE_SIZE = 6;
 
 export function FeatureNavPanel({ selected, onOpenFeature }) {
