@@ -147,25 +147,37 @@ export default function GauriFace3D({ mode, viseme }) {
     );
     group.add(headShell);
 
-    // Jaw accent ring (lower face contour)
-    const jawGeo = new THREE.TorusGeometry(1.55, 0.012, 6, 40, Math.PI * 1.15);
-    const jaw = new THREE.LineSegments(
-      new THREE.WireframeGeometry(jawGeo),
-      new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.4 })
-    );
-    jaw.rotation.z = Math.PI * 1.32;
-    jaw.position.set(0, -1.15, 2.05);
-    group.add(jaw);
-
-    // Brow accent line
-    const browGeoL = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(-1.12, 0.78, 2.05), new THREE.Vector3(-0.44, 0.9, 2.15),
-    ]);
-    const browGeoR = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(1.12, 0.78, 2.05), new THREE.Vector3(0.44, 0.9, 2.15),
-    ]);
-    const browMat = new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.35 });
-    group.add(new THREE.Line(browGeoL, browMat), new THREE.Line(browGeoR, browMat));
+    // Eyebrows: filled arched bands (not thin lines) so they read as real
+    // brow strokes sitting above each eye, angled the way brows actually
+    // taper -- fuller and slightly lower near the nose, tapering thinner
+    // and lifting a touch toward the outer corner.
+    function buildBrowPoints(sign) {
+      const segs = 12;
+      const upper = [];
+      const lower = [];
+      for (let i = 0; i <= segs; i++) {
+        const t = i / segs;
+        const x = sign * THREE.MathUtils.lerp(0.42, 1.12, t);
+        const arch = Math.sin(t * Math.PI) * 0.05;
+        const lift = t * 0.1;
+        const baseY = 0.72 + arch + lift;
+        const thickness = THREE.MathUtils.lerp(0.1, 0.045, t);
+        upper.push(new THREE.Vector3(x, baseY + thickness / 2, 0));
+        lower.push(new THREE.Vector3(x, baseY - thickness / 2, 0));
+      }
+      return upper.concat(lower.reverse());
+    }
+    function makeBrow(sign) {
+      const pts = buildBrowPoints(sign);
+      const shape = new THREE.Shape(pts.map((p) => new THREE.Vector2(p.x, p.y)));
+      const mesh = new THREE.Mesh(
+        new THREE.ShapeGeometry(shape),
+        new THREE.MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
+      );
+      mesh.position.z = 2.07;
+      return mesh;
+    }
+    group.add(makeBrow(-1), makeBrow(1));
 
     // --- Eyes: eyelid silhouette + socket fill + iris + pupil, each an
     // independent group we scale for blink ---
@@ -227,6 +239,15 @@ export default function GauriFace3D({ mode, viseme }) {
     mouthLine.position.set(0, -0.92, 2.21);
     group.add(mouthLine);
     const currentMouth = mouthShapes.closed.map((p) => p.clone());
+
+    // Lip seam: a thin bright line along where the lips actually meet at
+    // rest, drawn just in front of the outline -- gives the mouth a real
+    // "closed lip line" instead of reading as a single hollow outline.
+    const seamPts = buildMouthShape(0, 0, MOUTH_SEGS).slice(0, MOUTH_SEGS + 1);
+    const seamGeo = new THREE.BufferGeometry().setFromPoints(seamPts);
+    const seamLine = new THREE.Line(seamGeo, new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.5 }));
+    seamLine.position.set(0, -0.92, 2.215);
+    group.add(seamLine);
 
     const cavity = new THREE.Mesh(
       new THREE.CircleGeometry(1, 24),
@@ -350,9 +371,9 @@ export default function GauriFace3D({ mode, viseme }) {
       ro.disconnect();
       renderer.dispose();
       headGeo.dispose();
-      jawGeo.dispose();
       particleGeo.dispose();
       mouthGeo.dispose();
+      seamGeo.dispose();
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
   }, []);
