@@ -71,6 +71,39 @@ export default function SmartHuntAI() {
     }
   }
 
+  async function bulkRevealContactsFor(list) {
+    const keys = list.map((c) => candidateKey(c));
+    setContactState((prev) => {
+      const next = { ...prev };
+      for (const k of keys) next[k] = { loading: true };
+      return next;
+    });
+    try {
+      const res = await siteFetch('/api/tools/smart-source/reveal-contact-batch', {
+        method: 'POST',
+        body: JSON.stringify({ candidates: list.map((c) => ({ name: c.name, company: c.company, profileUrl: c.profile_url })) }),
+      });
+      const data = await res.json();
+      setContactState((prev) => {
+        const next = { ...prev };
+        for (const c of list) {
+          const key = candidateKey(c);
+          const r = data?.results?.[c.profile_url];
+          next[key] = r?.ok
+            ? { loading: false, revealed: true, email: r.email, phone: r.phone }
+            : { loading: false, revealed: false, message: r?.message || 'Could not look up contact details.' };
+        }
+        return next;
+      });
+    } catch (e) {
+      setContactState((prev) => {
+        const next = { ...prev };
+        for (const c of list) next[candidateKey(c)] = { loading: false, revealed: false, message: 'Could not look up contact details.' };
+        return next;
+      });
+    }
+  }
+
   async function exportToExcel() {
     const XLSX = await import('xlsx');
     const rows = candidates
@@ -216,6 +249,7 @@ export default function SmartHuntAI() {
               setSelected={setSelected}
               contactState={contactState}
               revealContactFor={revealContactFor}
+              bulkRevealContactsFor={bulkRevealContactsFor}
               updateCandidateField={updateCandidateField}
               siteFetch={siteFetch}
               shareOpen={shareOpen}

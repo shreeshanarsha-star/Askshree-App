@@ -41,7 +41,7 @@ const LAYOUTS = [
 //    power-user option, not the default)
 export default function CandidateResults({
   candidates, candidateKey, selected, toggleSelect, setSelected,
-  contactState, revealContactFor, updateCandidateField,
+  contactState, revealContactFor, bulkRevealContactsFor, updateCandidateField,
   siteFetch, cached,
   shareOpen, setShareOpen, shareTo, setShareTo, shareNote, sharing, sendShareEmail,
   exportToExcel,
@@ -135,8 +135,14 @@ export default function CandidateResults({
   async function bulkRevealContact() {
     setBulkRevealing(true);
     const targets = candidates.filter((c) => selected.has(candidateKey(c)) && !(contactState[candidateKey(c)] || {}).revealed);
-    for (const c of targets) {
-      await revealContactFor(c);
+    if (bulkRevealContactsFor) {
+      // Single batched SignalHire request for all targets instead of N
+      // sequential ones.
+      await bulkRevealContactsFor(targets);
+    } else {
+      for (const c of targets) {
+        await revealContactFor(c);
+      }
     }
     setBulkRevealing(false);
   }
@@ -231,6 +237,17 @@ export default function CandidateResults({
             {c.signalhire.verified_skills.slice(0, 5).map((s) => (
               <span key={s} className="cand-chip cand-chip-verified">{s}</span>
             ))}
+          </div>
+        )}
+
+        {(c.signalhire?.current_company_industry || c.signalhire?.current_company_size) && (
+          <div className="cand-chips cand-chips-verified" title="Current employer, verified via SignalHire">
+            {c.signalhire.current_company_industry && (
+              <span className="cand-chip cand-chip-verified">{c.signalhire.current_company_industry}</span>
+            )}
+            {c.signalhire.current_company_size && (
+              <span className="cand-chip cand-chip-verified">{c.signalhire.current_company_size} employees</span>
+            )}
           </div>
         )}
 
