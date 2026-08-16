@@ -155,13 +155,19 @@ export default function ReactorHome() {
 
     const media = matchMediaCommand(raw);
     if (media) {
-      if (media.query) {
-        const href = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(media.query)}`;
-        openFeature({ id: 'iframe', title: `YouTube — ${media.query}`, href });
-        return `Playing ${media.query} on YouTube.`;
-      }
-      if (typeof window !== 'undefined') window.open('https://www.youtube.com/', '_blank', 'noopener');
-      return 'Opening YouTube in a new tab.';
+      // YouTube's old listType=search embed is deprecated (confirmed: it
+      // now shows "video unavailable" instead of results), and YouTube's
+      // own homepage/search pages refuse to be iframed at all (X-Frame-
+      // Options). The only honest, always-working, no-API-key version of
+      // "play X" / "open youtube" is a real new tab to YouTube search --
+      // so that's what this does, rather than shipping a broken embed.
+      const url = media.query
+        ? `https://www.youtube.com/results?search_query=${encodeURIComponent(media.query)}`
+        : 'https://www.youtube.com/';
+      if (typeof window !== 'undefined') window.open(url, '_blank', 'noopener');
+      return media.query
+        ? `Opening YouTube search results for ${media.query} in a new tab.`
+        : 'Opening YouTube in a new tab.';
     }
 
     try {
