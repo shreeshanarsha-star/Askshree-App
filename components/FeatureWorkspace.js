@@ -65,7 +65,18 @@ export default function FeatureWorkspace({ feature, onClose }) {
         <div className="home2-workspace-title">{feature.title}</div>
         <div className="home2-workspace-actions">
           {feature.href && (
-            <a className="orb2-fs-btn" href={feature.href} target="_blank" rel="noopener noreferrer">Open in new tab &#8599;</a>
+            <a
+              className="orb2-fs-icon-btn"
+              href={feature.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open in new tab"
+              title="Open in new tab"
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" />
+              </svg>
+            </a>
           )}
           <button
             type="button"
