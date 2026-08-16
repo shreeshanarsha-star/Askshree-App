@@ -67,8 +67,22 @@ export default function FeatureWorkspace({ feature, onClose }) {
           {feature.href && (
             <a className="orb2-fs-btn" href={feature.href} target="_blank" rel="noopener noreferrer">Open in new tab &#8599;</a>
           )}
-          <button type="button" className="orb2-fs-btn" onClick={toggleFullscreen}>
-            {fullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          <button
+            type="button"
+            className="orb2-fs-icon-btn"
+            onClick={toggleFullscreen}
+            aria-label={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+            title={fullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          >
+            {fullscreen ? (
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 3v4a2 2 0 0 1-2 2H3M15 3v4a2 2 0 0 0 2 2h4M21 15h-4a2 2 0 0 0-2 2v4M3 15h4a2 2 0 0 1 2 2v4" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9V5a2 2 0 0 1 2-2h4M15 3h4a2 2 0 0 1 2 2v4M21 15v4a2 2 0 0 1-2 2h-4M9 21H5a2 2 0 0 1-2-2v-4" />
+              </svg>
+            )}
           </button>
           <button type="button" className="home2-workspace-close" onClick={onClose} aria-label="Close">&times;</button>
         </div>
