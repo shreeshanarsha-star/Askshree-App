@@ -34,6 +34,12 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
   const recognitionRef = useRef(null);
   const startedOnceRef = useRef(false);
   const noSpeechRetriesRef = useRef(0);
+  const audioRef = useRef(null);
+  // If a call to the ElevenLabs route ever fails (not configured, quota,
+  // network), stop trying it for the rest of this session and just use the
+  // browser voice -- avoids a failed fetch + fallback round-trip delay
+  // before every single line once we already know it's unavailable.
+  const elevenLabsDownRef = useRef(false);
 
   useEffect(() => { openRef.current = open; }, [open]);
   useEffect(() => { micBlockedRef.current = micBlocked; }, [micBlocked]);
@@ -45,6 +51,7 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
     }
     if (!open) {
       window.speechSynthesis?.cancel();
+      if (audioRef.current) { try { audioRef.current.pause(); } catch (e) {} audioRef.current = null; }
       recognitionRef.current?.abort?.();
       startedOnceRef.current = false;
       noSpeechRetriesRef.current = 0;
@@ -56,7 +63,7 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  function speak(text, onDone) {
+  function speakBrowser(text, onDone) {
     window.speechSynthesis?.cancel();
     if (!window.speechSynthesis) { onDone?.(); return; }
     const u = new SpeechSynthesisUtterance(text);
@@ -70,6 +77,44 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
     u.onerror = () => { setMode('idle'); onDone?.(); };
     window.speechSynthesis.speak(u);
     setTimeout(() => { if (!started) setNeedsTap(true); }, 1200);
+  }
+
+  // Real, natural voice via ElevenLabs when it's configured; the free
+  // browser voice (speakBrowser, above) is the automatic fallback -- on a
+  // missing/failed key, a network error, or simply not being open anymore
+  // by the time the audio would be ready. The caller never needs to know
+  // which one actually spoke.
+  async function speak(text, onDone) {
+    if (audioRef.current) { try { audioRef.current.pause(); } catch (e) {} audioRef.current = null; }
+    window.speechSynthesis?.cancel();
+
+    if (elevenLabsDownRef.current) { speakBrowser(text, onDone); return; }
+
+    try {
+      const res = await fetch('/api/hey-shree/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) throw new Error('tts_unavailable');
+      if (!openRef.current) return; // panel was closed while we were waiting on the network
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+      let started = false;
+      audio.onplay = () => { started = true; setNeedsTap(false); setMode('speaking'); };
+      audio.onended = () => { URL.revokeObjectURL(url); if (audioRef.current === audio) audioRef.current = null; setMode('idle'); onDone?.(); };
+      audio.onerror = () => { URL.revokeObjectURL(url); if (audioRef.current === audio) audioRef.current = null; setMode('idle'); onDone?.(); };
+      audio.play().catch(() => { setNeedsTap(true); });
+      setTimeout(() => { if (!started) setNeedsTap(true); }, 1200);
+    } catch (e) {
+      // Not configured, quota exceeded, or a network hiccup -- don't make
+      // the person sit through a failed request every single turn.
+      elevenLabsDownRef.current = true;
+      speakBrowser(text, onDone);
+    }
   }
 
   function greet() {
