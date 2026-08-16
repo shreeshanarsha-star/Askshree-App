@@ -369,7 +369,7 @@ export default function GauriAvatarPage() {
         <div className="gav-shell-col">
           <div className="gav-shell-label">Face</div>
           <div id="gav-stage" className={`gav-stage ${mode === 'speaking' ? 'gav-speaking' : ''} ${mode === 'listening' ? 'gav-listening' : ''}`}>
-            <GauriFace3D mode={mode} viseme={viseme} />
+            {themeReady && <GauriFace3D mode={mode} viseme={viseme} />}
             <div className="gav-status">{mode === 'speaking' ? 'Gauri is speaking…' : mode === 'listening' ? 'Listening…' : started ? 'Ready' : 'Getting ready…'}</div>
             {needsTap && (
               <div className="gav-tap-overlay" onClick={tapToBegin}>
