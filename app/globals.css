@@ -948,7 +948,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   -webkit-mask:radial-gradient(circle closest-side, transparent 30%, black 40%, black 72%, transparent 80%);
   mask:radial-gradient(circle closest-side, transparent 30%, black 40%, black 72%, transparent 80%);
   opacity:0.65;
-  animation:orb2SpinSelf 40s linear infinite;
+  animation:orb2SpinSelf 16s linear infinite;
 }
 .orb2-ring-accent{
   /* Sized to sit just inside the node ring (nodes are at 78% diameter),
@@ -957,11 +957,26 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   position:absolute; left:50%; top:50%; width:74%; height:74%; transform:translate(-50%,-50%);
   border-radius:50%; pointer-events:none; z-index:0;
   border:1px dashed rgba(var(--amber-rgb),0.3);
-  animation:orb2Spin 18s linear infinite reverse;
+  animation:orb2Spin 9s linear infinite reverse;
 }
 .orb2-ring{position:absolute; left:50%; top:50%; border:1px dashed var(--line); border-radius:50%; transform:translate(-50%,-50%);}
 .orb2-ring-outer{width:24%; height:24%; animation:orb2Spin 16s linear infinite;}
 .orb2-ring-mid{width:21%; height:21%; border:2px solid transparent; border-top-color:var(--amber); border-right-color:var(--amber); opacity:0.6; animation:orb2Spin 6s linear infinite;}
+/* The one guaranteed-visible motion cue: a bright dot orbiting the same
+   78%-diameter ring the department nodes sit on, once every 7 seconds.
+   Uses the shared orb2Spin keyframe (translate(-50%,-50%) + rotate) since
+   this track is centered the same way the rings above are -- left:50%/
+   top:50% + transform:translate(-50%,-50%) as its resting position. */
+.orb2-orbit-track{
+  position:absolute; left:50%; top:50%; width:78%; height:78%; transform:translate(-50%,-50%);
+  border-radius:50%; pointer-events:none; z-index:2;
+  animation:orb2Spin 7s linear infinite;
+}
+.orb2-orbit-dot{
+  position:absolute; top:-4px; left:50%; width:8px; height:8px; margin-left:-4px;
+  border-radius:50%; background:#fff;
+  box-shadow:0 0 8px 3px rgba(var(--amber-rgb),1), 0 0 18px 7px rgba(var(--amber-rgb),0.65), 0 0 32px 13px rgba(var(--amber-rgb),0.35);
+}
 @keyframes orb2Spin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}
 /* orb2Spin bakes in translate(-50%,-50%) for elements positioned via
    left:50%/top:50% (the rings). .orb2-sunburst is positioned via inset:0

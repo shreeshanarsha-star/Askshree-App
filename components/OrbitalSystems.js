@@ -163,6 +163,13 @@ export function OrbitalStage({ selectedId, onSelect, onMicClick, voiceActive }) 
         <div className="orb2-ring-accent" />
         <div className="orb2-ring orb2-ring-outer" />
         <div className="orb2-ring orb2-ring-mid" />
+        {/* A single unmistakable bright point traveling the node ring, on
+            top of everything else. Gradient-texture rotation (the sunburst,
+            the dashed rings) is real motion but reads as "static" to a
+            quick glance -- a discrete dot with a hard-edged glow is the one
+            thing nobody can miss, and it doubles as visible proof the
+            reactor is alive even at a standstill screenshot cadence. */}
+        <div className="orb2-orbit-track"><div className="orb2-orbit-dot" /></div>
         <div
           className={`orb2-core${voiceActive ? ' orb2-awake' : ''}`}
           id="reactor-core"
