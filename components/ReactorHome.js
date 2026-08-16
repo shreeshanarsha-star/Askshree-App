@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import AskShreeChat from './AskShreeChat';
 import AppLauncher from './AppLauncher';
 import HeyShreeReactor from './HeyShreeReactor';
-import ThemeBackground from './ThemeBackground';
 import GestureControl from './GestureControl';
 import { OrbitalStage, FeatureNavPanel, DEPARTMENTS } from './OrbitalSystems';
 import FeatureWorkspace from './FeatureWorkspace';
@@ -245,7 +244,10 @@ export default function ReactorHome() {
   return (
     <div className="home2-shell" style={{ position: 'relative', ...(themeReady ? getThemeAccentStyle(themeId) : {}) }}>
       <div className="home2-full">
-      {themeReady && <ThemeBackground themeId={themeId} />}
+      {/* No animated particle background on the reactor page -- it read as
+          visual clutter behind the reactor's own glow/sunburst, not premium.
+          A plain dark surface (with a subtle static glow via CSS, see
+          .home2-full in globals.css) matches the approved mockup instead. */}
       <GestureControl />
 
       <div className="home2-topbar">

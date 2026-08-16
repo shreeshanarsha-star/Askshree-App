@@ -908,7 +908,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .orb2-wrap.orb2-expanded{grid-template-columns:0px 1fr;}
 .orb2-wrap.orb2-expanded .orb2-stage-card{display:none;}
 .orb2-stage-card{padding:8px 12px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; min-height:0;}
-.orb2-stage{position:relative; width:min(400px, 84%, calc(100vh - 300px)); aspect-ratio:1/1; margin:0 auto;}
+.orb2-stage{position:relative; width:min(460px, 88%, calc(100vh - 280px)); aspect-ratio:1/1; margin:0 auto;}
 .orb2-line{
   position:absolute; left:50%; top:50%; height:1px; transform-origin:0 0;
   background-image:repeating-linear-gradient(to right, rgba(255,255,255,0.38) 0 3px, transparent 3px 9px);
@@ -1057,7 +1057,10 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 }
 
 /* ---- Home v2: Google-style app launcher (replaces sidebar) ---- */
-.home2-full{margin-left:0; position:relative; height:100vh; overflow:hidden; display:flex; flex-direction:column;}
+.home2-full{
+  margin-left:0; position:relative; height:100vh; overflow:hidden; display:flex; flex-direction:column;
+  background:radial-gradient(ellipse 1100px 600px at 50% -8%, rgba(var(--amber-rgb),0.10), transparent 62%), var(--navy);
+}
 .home2-shell .chat-launcher{top:22px; right:32px; left:auto; bottom:auto;}
 .home2-shell .chat-panel{top:74px; right:32px; left:auto; bottom:auto;}
 
