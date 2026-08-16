@@ -948,7 +948,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   -webkit-mask:radial-gradient(circle closest-side, transparent 30%, black 40%, black 72%, transparent 80%);
   mask:radial-gradient(circle closest-side, transparent 30%, black 40%, black 72%, transparent 80%);
   opacity:0.65;
-  animation:orb2SpinSelf 240s linear infinite;
+  animation:orb2SpinSelf 40s linear infinite;
 }
 .orb2-ring-accent{
   /* Sized to sit just inside the node ring (nodes are at 78% diameter),
@@ -957,7 +957,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   position:absolute; left:50%; top:50%; width:74%; height:74%; transform:translate(-50%,-50%);
   border-radius:50%; pointer-events:none; z-index:0;
   border:1px dashed rgba(var(--amber-rgb),0.3);
-  animation:orb2Spin 50s linear infinite reverse;
+  animation:orb2Spin 18s linear infinite reverse;
 }
 .orb2-ring{position:absolute; left:50%; top:50%; border:1px dashed var(--line); border-radius:50%; transform:translate(-50%,-50%);}
 .orb2-ring-outer{width:24%; height:24%; animation:orb2Spin 16s linear infinite;}
@@ -970,9 +970,17 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
    its own box-width off-center (this was the "leaking spoke" bug). */
 @keyframes orb2SpinSelf{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .orb2-core{
+  /* An actual black-hole read: a dark void at the center (not a bright
+     orb) with a fast-spinning bright accretion ring right around it --
+     the thing that was missing was a genuinely dark center; everything
+     was uniformly bright before, so "sitting inside a black hole" never
+     read even though the pieces were animating. */
   position:absolute; left:50%; top:50%; width:19%; height:19%; transform:translate(-50%,-50%); border-radius:50%;
   background:
-    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, rgba(var(--amber-rgb),0.55) 16%, rgba(var(--amber-rgb),0.22) 38%, rgba(11,15,26,0.92) 74%);
+    radial-gradient(circle at 50% 50%,
+      rgba(3,4,8,0.97) 0%, rgba(3,4,8,0.94) 32%,
+      rgba(var(--amber-rgb),0.55) 47%, rgba(255,255,255,0.95) 55%, rgba(var(--amber-rgb),0.45) 63%,
+      rgba(11,15,26,0.92) 82%);
   border:1px solid rgba(var(--amber-rgb),0.65);
   backdrop-filter:blur(1px);
   display:flex; align-items:center; justify-content:center;
@@ -984,17 +992,17 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .orb2-core:focus-visible{outline:2px solid rgba(var(--amber-rgb),0.8); outline-offset:4px;}
 .orb2-core::before{
   content:''; position:absolute; inset:0; border-radius:50%;
-  background:repeating-conic-gradient(rgba(var(--amber-rgb),0.95) 0deg 6deg, transparent 6deg 22.5deg);
-  -webkit-mask:radial-gradient(circle, transparent 58%, black 61%, black 82%, transparent 85%);
-  mask:radial-gradient(circle, transparent 58%, black 61%, black 82%, transparent 85%);
-  animation:orb2Spin 9s linear infinite;
-  opacity:0.85;
+  background:conic-gradient(rgba(var(--amber-rgb),0.15) 0deg, rgba(255,255,255,0.95) 60deg, rgba(var(--amber-rgb),0.95) 140deg, rgba(var(--amber-rgb),0.1) 220deg, transparent 300deg, rgba(var(--amber-rgb),0.15) 360deg);
+  -webkit-mask:radial-gradient(circle, transparent 42%, black 46%, black 68%, transparent 72%);
+  mask:radial-gradient(circle, transparent 42%, black 46%, black 68%, transparent 72%);
+  animation:orb2Spin 3.2s linear infinite;
+  opacity:0.95;
 }
 .orb2-core::after{
-  content:''; position:absolute; left:50%; top:50%; width:46%; height:46%; border-radius:50%; transform:translate(-50%,-50%);
-  background:radial-gradient(circle, rgba(255,255,255,0.95), rgba(var(--amber-rgb),0.65) 45%, transparent 75%);
-  filter:blur(1.5px);
+  content:''; position:absolute; left:50%; top:50%; width:30%; height:30%; border-radius:50%; transform:translate(-50%,-50%);
+  background:radial-gradient(circle, rgba(3,4,8,0.98), rgba(3,4,8,0.85) 70%, transparent 100%);
   animation:orb2CoreGlow 2.6s ease-in-out infinite;
+  z-index:1;
 }
 .orb2-core svg{position:relative; z-index:2; filter:drop-shadow(0 0 5px rgba(var(--amber-rgb),0.75));}
 .orb2-core.orb2-awake{box-shadow:0 0 22px rgba(var(--amber-rgb),0.6), 0 0 70px rgba(var(--amber-rgb),0.85), inset 0 0 22px rgba(var(--amber-rgb),0.5) !important;}

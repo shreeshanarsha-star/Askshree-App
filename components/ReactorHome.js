@@ -79,7 +79,14 @@ export default function ReactorHome() {
   const [selectedId, setSelectedId] = useState(null);
   const [waffleOpen, setWaffleOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
-  const [reactorStyle, setReactorStyle] = useState('sunburst');
+  // Same flash-avoidance trick as useTheme: paint with whatever style was
+  // cached from the last successful fetch instead of always starting at
+  // 'sunburst' and popping to the real value once /api/reactor-style
+  // responds.
+  const [reactorStyle, setReactorStyle] = useState(() => {
+    if (typeof window === 'undefined') return 'sunburst';
+    try { return window.localStorage.getItem('askshree_reactor_style_cache') || 'sunburst'; } catch (e) { return 'sunburst'; }
+  });
 
   const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
   const leftFilled = !!activeFeature;
@@ -101,7 +108,9 @@ export default function ReactorHome() {
   // setting, same read pattern as the site theme.
   useEffect(() => {
     fetch('/api/reactor-style').then((r) => r.json()).then((d) => {
-      if (d.style === 'dial') setReactorStyle('dial');
+      const style = d.style === 'dial' ? 'dial' : 'sunburst';
+      setReactorStyle(style);
+      try { window.localStorage.setItem('askshree_reactor_style_cache', style); } catch (e) { /* ignore */ }
     }).catch(() => {});
   }, []);
 
