@@ -158,6 +158,9 @@ export function OrbitalStage({ selectedId, onSelect, onMicClick, voiceActive }) 
           );
         })}
 
+        <div className="orb2-glow-halo" />
+        <div className="orb2-sunburst" />
+        <div className="orb2-ring-accent" />
         <div className="orb2-ring orb2-ring-outer" />
         <div className="orb2-ring orb2-ring-mid" />
         <div
