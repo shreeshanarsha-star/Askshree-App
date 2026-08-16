@@ -56,7 +56,7 @@ export default function MarginAI() {
   if (!data) return <div className="admin-main">Loading…</div>;
 
   return (
-    <ThemeShell className="admin-shell">
+    <ThemeShell className="admin-shell" rawChildren>
       <MarginNav active="dashboard" />
       <div className="admin-main">
         <div className="admin-header"><h2>Margin.ai — Command Center</h2></div>

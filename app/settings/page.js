@@ -54,7 +54,7 @@ export default function SettingsPage() {
   if (!ready || current === null || layout === null) return <div className="admin-main">Loading…</div>;
 
   return (
-    <ThemeShell className="admin-shell">
+    <ThemeShell className="admin-shell" rawChildren>
       <div className="admin-side">
         <div className="logo">Ask <span>Shree</span> admin</div>
         <div className="admin-nav">
