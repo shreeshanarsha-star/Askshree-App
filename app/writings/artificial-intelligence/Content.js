@@ -1,5 +1,6 @@
 'use client';
 import { useWritingsKey } from '../../../lib/useWritingsKey';
+import ThemeShell from '../../../components/ThemeShell';
 import { WritingsGate } from '../../../components/WritingsGate';
 
 const TOPICS = [
@@ -12,7 +13,7 @@ const TOPICS = [
 
 function ArtificialIntelligenceContent() {
   return (
-    <div style={{ position: 'relative' }}>
+    <ThemeShell>
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
         <a href="/" style={{ fontSize: 13, color: 'var(--slate)', textDecoration: 'none' }}>&larr; back to home</a>
@@ -44,7 +45,7 @@ function ArtificialIntelligenceContent() {
           ))}
         </div>
       </div>
-    </div>
+    </ThemeShell>
   );
 }
 

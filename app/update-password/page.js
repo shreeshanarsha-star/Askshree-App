@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import ThemeShell from '../../components/ThemeShell';
 import { supabasePublic } from '../../lib/supabase';
 
 export default function UpdatePasswordPage() {
@@ -25,7 +26,7 @@ export default function UpdatePasswordPage() {
   }
 
   return (
-    <div className="login-screen">
+    <ThemeShell className="login-screen">
       <div className="login-card">
         <div className="mark">S</div>
         <div className="logo">Set a new password</div>
@@ -36,6 +37,6 @@ export default function UpdatePasswordPage() {
         <button onClick={save} disabled={loading}>{loading ? 'Saving…' : 'Save password'}</button>
         {status && <div style={{ color: 'var(--amber)', fontSize: 12, marginTop: 10 }}>{status}</div>}
       </div>
-    </div>
+    </ThemeShell>
   );
 }

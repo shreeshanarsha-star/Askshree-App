@@ -1,8 +1,10 @@
 export const metadata = { title: 'Terms & Conditions — Ask Shree' };
 
+import ThemeShell from '../../components/ThemeShell';
+
 export default function TermsPage() {
   return (
-    <div style={{ position: 'relative' }}>
+    <ThemeShell>
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
       </div>
@@ -33,6 +35,6 @@ export default function TermsPage() {
           <p style={{ marginTop: 28, fontSize: 11.5, color: 'var(--slate)' }}>This is a plain-language summary, not a substitute for formal legal advice. Questions: shreesha.narsha@gmail.com.</p>
         </div>
       </div>
-    </div>
+    </ThemeShell>
   );
 }

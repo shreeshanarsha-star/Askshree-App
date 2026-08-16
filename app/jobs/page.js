@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '../../lib/supabase';
+import ThemeShell from '../../components/ThemeShell';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +24,7 @@ export default async function JobsIndexPage() {
   const postings = await getOpenPostings();
 
   return (
-    <div style={{ position: 'relative' }}>
+    <ThemeShell>
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
       </div>
@@ -53,6 +54,6 @@ export default async function JobsIndexPage() {
           ))}
         </div>
       </div>
-    </div>
+    </ThemeShell>
   );
 }

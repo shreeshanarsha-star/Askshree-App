@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import ThemeShell from '../../components/ThemeShell';
 
 export default function SubscribePage() {
   const [email, setEmail] = useState('');
@@ -25,7 +26,7 @@ export default function SubscribePage() {
   }
 
   return (
-    <div className="section" style={{ maxWidth: 480, margin: '80px auto' }}>
+    <ThemeShell className="section" style={{ maxWidth: 480, margin: '80px auto' }}>
       <h2>Subscribe to Ask Shree</h2>
       <p className="lead">Your free trial has ended. Subscribe to keep using the toolkit.</p>
       <input
@@ -40,6 +41,6 @@ export default function SubscribePage() {
         {loading ? 'redirecting…' : 'Continue to payment'}
       </button>
       {error && <div style={{ marginTop: 14, color: '#e28080' }}>{error}</div>}
-    </div>
+    </ThemeShell>
   );
 }

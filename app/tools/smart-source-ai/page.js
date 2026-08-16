@@ -7,6 +7,7 @@ import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
 import CandidateResults from '../../../components/CandidateResults';
 import SavedSearches from '../../../components/SavedSearches';
+import ThemeShell from '../../../components/ThemeShell';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -198,7 +199,7 @@ export default function SmartSourceAI() {
   }
 
   return (
-    <div style={{ position: 'relative' }}>
+    <ThemeShell>
       <AccountBadge />
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
@@ -310,6 +311,6 @@ export default function SmartSourceAI() {
         </div>
       </div>
       <AskShreeChat />
-    </div>
+    </ThemeShell>
   );
 }

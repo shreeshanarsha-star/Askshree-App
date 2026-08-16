@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { supabaseAdmin } from '../../../lib/supabase';
 import { buildJobPostingSchema } from '../../../lib/jobPostingSchema';
+import ThemeShell from '../../../components/ThemeShell';
 
 // Public, unauthenticated job detail page -- no site key, no login. This is
 // the actual page Google for Jobs indexes: it needs to be crawlable and
@@ -38,7 +39,7 @@ export default async function JobDetailPage({ params }) {
   const goodToHave = posting.good_to_have_skills || [];
 
   return (
-    <div style={{ position: 'relative' }}>
+    <ThemeShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
@@ -90,6 +91,6 @@ export default async function JobDetailPage({ params }) {
           {posting.expires_at && ` · Open through ${new Date(posting.expires_at).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}`}
         </div>
       </div>
-    </div>
+    </ThemeShell>
   );
 }

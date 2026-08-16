@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import ThemeShell from '../../components/ThemeShell';
 import { useAdminSession } from '../../lib/useAdminSession';
 import { THEMES } from '../../lib/themes';
 
@@ -53,7 +54,7 @@ export default function SettingsPage() {
   if (!ready || current === null || layout === null) return <div className="admin-main">Loading…</div>;
 
   return (
-    <div className="admin-shell">
+    <ThemeShell className="admin-shell">
       <div className="admin-side">
         <div className="logo">Ask <span>Shree</span> admin</div>
         <div className="admin-nav">
@@ -137,6 +138,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </ThemeShell>
   );
 }

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useMarginKey } from '../../../lib/useMarginKey';
 import { KeyGate, MarginNav } from '../../../components/MarginShell';
+import ThemeShell from '../../../components/ThemeShell';
 
 function money(n) {
   if (n == null) return '—';
@@ -55,7 +56,7 @@ export default function MarginAI() {
   if (!data) return <div className="admin-main">Loading…</div>;
 
   return (
-    <div className="admin-shell">
+    <ThemeShell className="admin-shell">
       <MarginNav active="dashboard" />
       <div className="admin-main">
         <div className="admin-header"><h2>Margin.ai — Command Center</h2></div>
@@ -135,6 +136,6 @@ export default function MarginAI() {
           </div>
         </div>
       </div>
-    </div>
+    </ThemeShell>
   );
 }

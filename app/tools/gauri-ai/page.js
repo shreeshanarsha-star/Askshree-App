@@ -5,6 +5,7 @@ import { useSiteKey } from '../../../lib/useSiteKey';
 import { KeyGate } from '../../../components/KeyGate';
 import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
+import ThemeShell from '../../../components/ThemeShell';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -149,7 +150,7 @@ export default function GauriAI() {
   }
 
   return (
-    <div style={{ position: 'relative' }}>
+    <ThemeShell>
       <AccountBadge />
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
@@ -235,6 +236,6 @@ export default function GauriAI() {
         </div>
       </div>
       <AskShreeChat />
-    </div>
+    </ThemeShell>
   );
 }

@@ -7,6 +7,7 @@ import { useOptionalSession } from '../../../lib/useOptionalSession';
 import { AccountBadge } from '../../../components/AccountBadge';
 import CandidateResults from '../../../components/CandidateResults';
 import SavedSearches from '../../../components/SavedSearches';
+import ThemeShell from '../../../components/ThemeShell';
 
 
 // Smart Hunt.ai — original spec: manual X-ray search across public
@@ -196,7 +197,7 @@ export default function SmartHuntAI() {
   }
 
   return (
-    <div style={{ position: 'relative' }}>
+    <ThemeShell>
       <AccountBadge />
       <div className="nav">
         <div className="logo"><a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Ask <span>Shree</span></a></div>
@@ -265,6 +266,6 @@ export default function SmartHuntAI() {
         </div>
       </div>
       <AskShreeChat />
-    </div>
+    </ThemeShell>
   );
 }

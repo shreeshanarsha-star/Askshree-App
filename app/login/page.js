@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import ThemeShell from '../../components/ThemeShell';
 import { supabasePublic } from '../../lib/supabase';
 
 // Public account login/signup — separate from /admin/login. Any account
@@ -64,7 +65,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="login-screen">
+    <ThemeShell className="login-screen">
       <div className="login-card">
         <div className="mark">S</div>
         <div className="logo">Ask <span>Shree</span></div>
@@ -105,6 +106,6 @@ export default function LoginPage() {
           </div>
         )}
       </div>
-    </div>
+    </ThemeShell>
   );
 }
