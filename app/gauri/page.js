@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import GauriFace3D from '../../components/GauriFace3D';
 
 // The Gauri.ai expressive avatar — farmer intake, reimagined as a hands-free
 // conversation. Greets automatically, guesses the farmer's language from
@@ -64,9 +65,11 @@ export default function GauriAvatarPage() {
   const [started, setStarted] = useState(false);
   const [needsTap, setNeedsTap] = useState(false);
   const [micBlocked, setMicBlocked] = useState(false);
-  const [blinking, setBlinking] = useState(false);
+  const [viseme, setViseme] = useState('closed');
 
-  const blinkTimer = useRef(null);
+  const visemeTimer = useRef(null);
+  const boundaryFired = useRef(false);
+  const wordIndex = useRef(0);
   const chatRef = useRef(null);
   const languageRef = useRef(language);
   const showConfirmFormRef = useRef(false);
@@ -79,26 +82,11 @@ export default function GauriAvatarPage() {
   useEffect(() => { caseCreatedRef.current = caseCreated; }, [caseCreated]);
   useEffect(() => { micBlockedRef.current = micBlocked; }, [micBlocked]);
 
-  // Blink loop for the avatar face.
-  useEffect(() => {
-    blinkTimer.current = setTimeout(function loop() {
-      blinkNow();
-      blinkTimer.current = setTimeout(loop, 2800 + Math.random() * 4500);
-    }, 1800);
-    return () => clearTimeout(blinkTimer.current);
-  }, []);
-
-  // Blinking is driven through React state (not direct DOM classList
-  // manipulation) so it can't be silently wiped mid-blink by an unrelated
-  // re-render -- e.g. the render that fires the instant speech starts or
-  // ends (setMode('speaking') / setMode('')) used to erase an in-flight
-  // blink early, since that render recomputed the stage's className from
-  // scratch without knowing a blink class had been poked onto the DOM
-  // directly. Now the blink is just part of the same render.
-  function blinkNow() {
-    setBlinking(true);
-    setTimeout(() => setBlinking(false), 145);
-  }
+  // Blink is now handled inside GauriFace3D's own animation loop (real 3D
+  // eye geometry scaled through an eased curve), so the page no longer
+  // needs to drive a separate 2D blink class. Just make sure the viseme
+  // fallback interval doesn't leak across unmounts.
+  useEffect(() => () => stopVisemeFallback(), []);
 
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
@@ -137,7 +125,28 @@ export default function GauriAvatarPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Picks which mouth shape Gauri's face should move toward for a given
+  // spoken word. Uses a light vowel heuristic for Latin script (English
+  // voice fallback, romanized fragments); for non-Latin scripts (Hindi,
+  // Kannada, etc. -- the actual common case here) there's no "vowel" regex
+  // that applies, so it cycles through shapes deterministically by word
+  // position/length instead of freezing on one static mouth shape for the
+  // entire sentence.
+  function pickViseme(word, index) {
+    const w = (word || '').toLowerCase();
+    if (/[oôöòóõu]/.test(w)) return 'round';
+    if (/[aáàâäeéèêë]/.test(w)) return 'wide';
+    if (/[a-z]/.test(w)) return 'narrow';
+    const cycle = ['narrow', 'wide', 'round', 'wide'];
+    return cycle[(index + w.length) % cycle.length];
+  }
+
+  function stopVisemeFallback() {
+    if (visemeTimer.current) { clearInterval(visemeTimer.current); visemeTimer.current = null; }
+  }
+
   function speak(text, onDone) {
+    stopVisemeFallback();
     if (!window.speechSynthesis) { onDone?.(); return; }
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
@@ -148,9 +157,29 @@ export default function GauriAvatarPage() {
     u.lang = langInfo.speechLang;
     u.rate = 0.88; u.pitch = 0.98; u.volume = 1;
     let started = false;
-    u.onstart = () => { started = true; setNeedsTap(false); setMode('speaking'); };
-    u.onend = () => { setMode(''); onDone?.(); };
-    u.onerror = () => { setMode(''); onDone?.(); };
+    boundaryFired.current = false;
+    wordIndex.current = 0;
+    // Real lip-sync timing: each word-boundary event from the speech engine
+    // reshapes the mouth toward a viseme for that word. Chrome fires this
+    // reliably; some browsers/voices never do, so a fallback cycle (below)
+    // covers those cases instead of leaving the mouth frozen shut.
+    u.onboundary = (e) => {
+      boundaryFired.current = true;
+      const word = text.substr(e.charIndex, e.charLength || 6);
+      setViseme(pickViseme(word, wordIndex.current++));
+    };
+    u.onstart = () => {
+      started = true; setNeedsTap(false); setMode('speaking');
+      setTimeout(() => {
+        if (!boundaryFired.current && window.speechSynthesis.speaking) {
+          const cycle = ['narrow', 'wide', 'round', 'wide', 'narrow'];
+          let i = 0;
+          visemeTimer.current = setInterval(() => { setViseme(cycle[i++ % cycle.length]); }, 200);
+        }
+      }, 450);
+    };
+    u.onend = () => { stopVisemeFallback(); setViseme('closed'); setMode(''); onDone?.(); };
+    u.onerror = () => { stopVisemeFallback(); setViseme('closed'); setMode(''); onDone?.(); };
     window.speechSynthesis.speak(u);
     // Some mobile browsers silently block speechSynthesis without a prior
     // user gesture. If it hasn't actually started shortly after we asked
@@ -334,13 +363,8 @@ export default function GauriAvatarPage() {
         ))}
       </div>
 
-      <div id="gav-stage" className={`gav-stage ${mode === 'speaking' ? 'gav-speaking' : ''} ${mode === 'listening' ? 'gav-listening' : ''} ${blinking ? 'gav-blink' : ''}`}>
-        <img className="gav-face" src="/gauri/avatar-face.jpg" alt="Gauri" />
-        <div className="gav-fx">
-          <div className="gav-eyeL"></div><div className="gav-eyeR"></div>
-          <div className="gav-eyeGlowL"></div><div className="gav-eyeGlowR"></div>
-          <div className="gav-mouth"></div><div className="gav-smile"></div>
-        </div>
+      <div id="gav-stage" className={`gav-stage ${mode === 'speaking' ? 'gav-speaking' : ''} ${mode === 'listening' ? 'gav-listening' : ''}`}>
+        <GauriFace3D mode={mode} viseme={viseme} />
         <div className="gav-status">{mode === 'speaking' ? 'Gauri is speaking…' : mode === 'listening' ? 'Listening…' : started ? 'Ready' : 'Getting ready…'}</div>
         {needsTap && (
           <div className="gav-tap-overlay" onClick={tapToBegin}>
