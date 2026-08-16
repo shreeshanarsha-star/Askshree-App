@@ -64,6 +64,7 @@ export default function AdminJobPostings() {
           {approved.map((j) => (
             <div key={j.id} style={{ padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', fontSize: 13, color: 'var(--cream)' }}>
               {j.title} — {j.company} <span style={{ color: 'var(--slate)', fontSize: 11 }}> · expires {new Date(j.expires_at).toLocaleDateString()}</span>
+              <a href={`/jobs/${j.id}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 10, fontSize: 11, color: 'var(--amber-dim)' }}>View public page ↗</a>
             </div>
           ))}
         </div>
