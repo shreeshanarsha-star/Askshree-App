@@ -6,36 +6,96 @@ import * as THREE from 'three';
 // Three.js, replacing the old static photo + CSS-overlay approach.
 //
 // Why procedural instead of a sourced human face model: it stays consistent
-// with the site's amber/JARVIS visual language everywhere else, needs no
+// with the site's own animated visual language everywhere else, needs no
 // external rigged asset (licensing-free, fully ours), and every animated
 // part below — the blink curve and the mouth shape — is real geometry moving
 // in real 3D space, not a sprite or gif.
 //
-// Blink: a hand-authored easing curve (fast close, brief hold, slower
-// re-open), randomized timing, occasional double-blink — this is the same
-// technique real blendshape rigs use, just driven by a small state machine
-// here instead of an imported animation clip.
+// Eyes: an actual eyelid silhouette (upper lid arch + lower lid curve
+// meeting at two corners) with an eye-socket fill, iris, and pupil inside —
+// not a plain ring, so a blink reads as eyelids closing over an eye rather
+// than a shape vanishing.
 //
-// Mouth: built as a line of points we reshape every frame by lerping toward
-// one of four named "viseme" target shapes (closed / narrow / wide / round).
-// The parent page picks which shape to move toward — see the `viseme` prop —
-// driven by real word-boundary timing from SpeechSynthesisUtterance, with a
-// graceful fallback cycle if the browser/voice never fires that event. This
-// is the same underlying idea as morph-target blendshape lip-sync: named
-// poses, interpolated in real time.
+// Mouth: a closed lip silhouette (upper lip with a soft cupid's-bow dip,
+// fuller lower lip, corners meeting) plus a dark mouth-cavity fill that
+// grows behind it as the mouth opens — reshaped every frame by lerping
+// toward one of four named "viseme" target shapes (closed / narrow / wide /
+// round). The parent page picks which shape to move toward — see the
+// `viseme` prop — driven by real word-boundary timing from
+// SpeechSynthesisUtterance, with a graceful fallback cycle if the
+// browser/voice never fires that event. This is the same underlying idea as
+// morph-target blendshape lip-sync: named poses, interpolated in real time.
+//
+// Color: instead of a hardcoded brand color, the face reads the page's
+// live `--amber-rgb` CSS variable at mount (the same variable the rest of
+// the site's glass panels use, and which the theme system already
+// re-points at each theme's own accent color — mint on the current
+// Stellar Network theme). So the face always matches whatever theme is
+// active instead of being stuck on one fixed hue.
 
-const AMBER = 0xe8a33d;
+const FALLBACK_ACCENT = [232, 163, 61]; // used only if the CSS variable can't be read
 
-function buildMouthArc(openAmt, widenAmt, points) {
+function readAccentRGB(el) {
+  try {
+    const cs = getComputedStyle(el);
+    const raw = cs.getPropertyValue('--amber-rgb').trim();
+    if (raw) {
+      const parts = raw.split(',').map((s) => parseInt(s.trim(), 10));
+      if (parts.length === 3 && parts.every((n) => !Number.isNaN(n))) return parts;
+    }
+  } catch (e) {
+    // getComputedStyle unavailable or var missing -- fall through
+  }
+  return FALLBACK_ACCENT;
+}
+
+function rgbToThreeColor([r, g, b]) {
+  return new THREE.Color(r / 255, g / 255, b / 255);
+}
+
+// Eyelid silhouette: upper lid arches up, lower lid curves down less, the
+// two meeting at the inner/outer corners so it reads as one closed eye
+// shape rather than two disconnected lines.
+function buildEyeLidPoints(segments) {
   const pts = [];
-  for (let i = 0; i <= points; i++) {
-    const t = i / points;
-    const x = THREE.MathUtils.lerp(-0.55 - widenAmt, 0.55 + widenAmt, t);
-    const y = -Math.sin(t * Math.PI) * openAmt;
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const x = THREE.MathUtils.lerp(-0.34, 0.34, t);
+    const y = Math.sin(t * Math.PI) * 0.205;
+    pts.push(new THREE.Vector3(x, y, 0));
+  }
+  for (let i = segments; i >= 0; i--) {
+    const t = i / segments;
+    const x = THREE.MathUtils.lerp(-0.34, 0.34, t);
+    const y = -Math.sin(t * Math.PI) * 0.125;
     pts.push(new THREE.Vector3(x, y, 0));
   }
   return pts;
 }
+
+// Lip silhouette: upper lip gets a soft cupid's-bow dip at center, lower
+// lip is fuller. Both curves meet at (±half, 0) at the mouth corners, so
+// the loop stays closed and correctly-shaped at every viseme.
+function buildMouthShape(openAmt, widenAmt, segments) {
+  const half = 0.5 + widenAmt;
+  const pts = [];
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const x = THREE.MathUtils.lerp(-half, half, t);
+    const bow = Math.exp(-Math.pow((t - 0.5) * 7, 2)) * 0.03;
+    const y = Math.sin(t * Math.PI) * 0.02 - bow;
+    pts.push(new THREE.Vector3(x, y, 0));
+  }
+  for (let i = segments; i >= 0; i--) {
+    const t = i / segments;
+    const x = THREE.MathUtils.lerp(-half, half, t);
+    const y = -Math.sin(t * Math.PI) * (openAmt + 0.012);
+    pts.push(new THREE.Vector3(x, y, 0));
+  }
+  return pts;
+}
+
+const OPEN_LEVELS = { closed: 0.012, narrow: 0.095, wide: 0.165, round: 0.115 };
 
 export default function GauriFace3D({ mode, viseme }) {
   const mountRef = useRef(null);
@@ -53,8 +113,12 @@ export default function GauriFace3D({ mode, viseme }) {
     const mount = mountRef.current;
     if (!mount) return undefined;
 
-    let width = mount.clientWidth || 340;
-    let height = mount.clientHeight || 424;
+    const accentRGB = readAccentRGB(mount);
+    const ACCENT = rgbToThreeColor(accentRGB);
+    const DARK = new THREE.Color(0x05070a);
+
+    let width = mount.clientWidth || 336;
+    let height = mount.clientHeight || 420;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(30, width / height, 0.1, 100);
@@ -73,13 +137,13 @@ export default function GauriFace3D({ mode, viseme }) {
     headGeo.scale(0.85, 1.12, 0.9);
     const headWire = new THREE.LineSegments(
       new THREE.WireframeGeometry(headGeo),
-      new THREE.LineBasicMaterial({ color: AMBER, transparent: true, opacity: 0.16 })
+      new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.16 })
     );
     group.add(headWire);
 
     const headShell = new THREE.Mesh(
       headGeo,
-      new THREE.MeshBasicMaterial({ color: AMBER, transparent: true, opacity: 0.035, side: THREE.DoubleSide })
+      new THREE.MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.035, side: THREE.DoubleSide })
     );
     group.add(headShell);
 
@@ -87,7 +151,7 @@ export default function GauriFace3D({ mode, viseme }) {
     const jawGeo = new THREE.TorusGeometry(1.55, 0.012, 6, 40, Math.PI * 1.15);
     const jaw = new THREE.LineSegments(
       new THREE.WireframeGeometry(jawGeo),
-      new THREE.LineBasicMaterial({ color: AMBER, transparent: true, opacity: 0.4 })
+      new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.4 })
     );
     jaw.rotation.z = Math.PI * 1.32;
     jaw.position.set(0, -1.15, 2.05);
@@ -100,27 +164,49 @@ export default function GauriFace3D({ mode, viseme }) {
     const browGeoR = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(1.12, 0.78, 2.05), new THREE.Vector3(0.44, 0.9, 2.15),
     ]);
-    const browMat = new THREE.LineBasicMaterial({ color: AMBER, transparent: true, opacity: 0.35 });
+    const browMat = new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.35 });
     group.add(new THREE.Line(browGeoL, browMat), new THREE.Line(browGeoR, browMat));
 
-    // --- Eyes: glowing ring + pupil, each an independent group we scale for blink ---
+    // --- Eyes: eyelid silhouette + socket fill + iris + pupil, each an
+    // independent group we scale for blink ---
     function makeEye(x) {
       const eyeGroup = new THREE.Group();
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(0.32, 0.032, 10, 30),
-        new THREE.MeshBasicMaterial({ color: AMBER })
+
+      const lidPts = buildEyeLidPoints(18);
+      const lidGeo = new THREE.BufferGeometry().setFromPoints(lidPts);
+      const lid = new THREE.LineLoop(lidGeo, new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.85 }));
+      eyeGroup.add(lid);
+
+      const socketShape = new THREE.Shape(lidPts.map((p) => new THREE.Vector2(p.x, p.y)));
+      const socket = new THREE.Mesh(
+        new THREE.ShapeGeometry(socketShape),
+        new THREE.MeshBasicMaterial({ color: DARK, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
       );
-      const pupil = new THREE.Mesh(
-        new THREE.CircleGeometry(0.1, 20),
-        new THREE.MeshBasicMaterial({ color: AMBER })
-      );
-      pupil.position.z = 0.02;
+      socket.position.z = -0.01;
+      eyeGroup.add(socket);
+
       const glow = new THREE.Mesh(
-        new THREE.CircleGeometry(0.48, 24),
-        new THREE.MeshBasicMaterial({ color: AMBER, transparent: true, opacity: 0.06 })
+        new THREE.CircleGeometry(0.5, 24),
+        new THREE.MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.05 })
       );
-      glow.position.z = -0.01;
-      eyeGroup.add(glow, ring, pupil);
+      glow.position.z = -0.02;
+      eyeGroup.add(glow);
+
+      const iris = new THREE.Mesh(
+        new THREE.CircleGeometry(0.135, 26),
+        new THREE.MeshBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.9 })
+      );
+      iris.position.z = 0.01;
+      eyeGroup.add(iris);
+
+      const pupil = new THREE.Mesh(new THREE.CircleGeometry(0.058, 20), new THREE.MeshBasicMaterial({ color: DARK }));
+      pupil.position.z = 0.02;
+      eyeGroup.add(pupil);
+
+      const catchlight = new THREE.Mesh(new THREE.CircleGeometry(0.02, 12), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 }));
+      catchlight.position.set(0.045, 0.05, 0.03);
+      eyeGroup.add(catchlight);
+
       eyeGroup.position.set(x, 0.32, 2.18);
       return eyeGroup;
     }
@@ -128,19 +214,28 @@ export default function GauriFace3D({ mode, viseme }) {
     const eyeR = makeEye(0.74);
     group.add(eyeL, eyeR);
 
-    // --- Mouth: point-array line, reshaped every frame toward a named viseme ---
-    const MOUTH_SEGS = 14;
+    // --- Mouth: closed lip silhouette (outline) + dark cavity fill behind it ---
+    const MOUTH_SEGS = 16;
     const mouthShapes = {
-      closed: buildMouthArc(0.015, 0, MOUTH_SEGS),
-      narrow: buildMouthArc(0.11, 0.02, MOUTH_SEGS),
-      wide: buildMouthArc(0.2, 0.09, MOUTH_SEGS),
-      round: buildMouthArc(0.13, -0.12, MOUTH_SEGS),
+      closed: buildMouthShape(OPEN_LEVELS.closed, 0, MOUTH_SEGS),
+      narrow: buildMouthShape(OPEN_LEVELS.narrow, 0.02, MOUTH_SEGS),
+      wide: buildMouthShape(OPEN_LEVELS.wide, 0.09, MOUTH_SEGS),
+      round: buildMouthShape(OPEN_LEVELS.round, -0.1, MOUTH_SEGS),
     };
     const mouthGeo = new THREE.BufferGeometry().setFromPoints(mouthShapes.closed);
-    const mouthLine = new THREE.Line(mouthGeo, new THREE.LineBasicMaterial({ color: AMBER, linewidth: 2 }));
-    mouthLine.position.set(0, -0.92, 2.2);
+    const mouthLine = new THREE.LineLoop(mouthGeo, new THREE.LineBasicMaterial({ color: ACCENT, transparent: true, opacity: 0.85 }));
+    mouthLine.position.set(0, -0.92, 2.21);
     group.add(mouthLine);
     const currentMouth = mouthShapes.closed.map((p) => p.clone());
+
+    const cavity = new THREE.Mesh(
+      new THREE.CircleGeometry(1, 24),
+      new THREE.MeshBasicMaterial({ color: DARK, transparent: true, opacity: 0.8 })
+    );
+    cavity.position.set(0, -0.92, 2.195);
+    cavity.scale.set(0.46, 0.05, 1);
+    group.add(cavity);
+    let currentOpen = OPEN_LEVELS.closed;
 
     // --- Fine particle field for a "digital" texture, orbiting loosely around the head ---
     const PARTICLE_COUNT = 90;
@@ -157,7 +252,7 @@ export default function GauriFace3D({ mode, viseme }) {
     particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
     const particles = new THREE.Points(
       particleGeo,
-      new THREE.PointsMaterial({ color: AMBER, size: 0.028, transparent: true, opacity: 0.35 })
+      new THREE.PointsMaterial({ color: ACCENT, size: 0.028, transparent: true, opacity: 0.35 })
     );
     group.add(particles);
 
@@ -222,6 +317,10 @@ export default function GauriFace3D({ mode, viseme }) {
         posAttr.setXYZ(i, currentMouth[i].x, currentMouth[i].y, currentMouth[i].z);
       }
       posAttr.needsUpdate = true;
+
+      currentOpen += (OPEN_LEVELS[mouthTarget] - currentOpen) * 0.22;
+      cavity.scale.set(0.42, Math.max(0.045, currentOpen * 5.6), 1);
+      cavity.position.y = -0.92 - currentOpen * 0.55;
 
       // --- listening / speaking ambient glow pulse on the head shell ---
       const listening = liveRef.current.mode === 'listening';
