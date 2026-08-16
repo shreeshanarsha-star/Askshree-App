@@ -937,17 +937,26 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 }
 @keyframes orb2HaloPulse{ 0%,100%{opacity:0.7;} 50%{opacity:1;} }
 .orb2-sunburst{
+  /* "circle closest-side" makes the gradient's 100% == the container's
+     half-width, i.e. the SAME percentage scale the department nodes use
+     (R=39 out of a max of 50). Without this, the default farthest-corner
+     sizing made the spoke band fade out around 62% of the width -- well
+     short of the 78%-diameter node ring -- leaving a dead empty gap that
+     read as sparse instead of a dense reactor texture. */
   position:absolute; inset:0; border-radius:50%; pointer-events:none; z-index:0;
   background:repeating-conic-gradient(rgba(var(--amber-rgb),0.55) 0deg 1deg, transparent 1deg 15deg);
-  -webkit-mask:radial-gradient(circle, transparent 13%, black 16%, black 40%, transparent 44%);
-  mask:radial-gradient(circle, transparent 13%, black 16%, black 40%, transparent 44%);
-  opacity:0.6;
+  -webkit-mask:radial-gradient(circle closest-side, transparent 30%, black 40%, black 72%, transparent 80%);
+  mask:radial-gradient(circle closest-side, transparent 30%, black 40%, black 72%, transparent 80%);
+  opacity:0.65;
   animation:orb2Spin 240s linear infinite;
 }
 .orb2-ring-accent{
-  position:absolute; left:50%; top:50%; width:58%; height:58%; transform:translate(-50%,-50%);
+  /* Sized to sit just inside the node ring (nodes are at 78% diameter),
+     framing the departments the way the mockup's near-outer dashed ring
+     does, instead of floating small and central. */
+  position:absolute; left:50%; top:50%; width:74%; height:74%; transform:translate(-50%,-50%);
   border-radius:50%; pointer-events:none; z-index:0;
-  border:1px dashed rgba(var(--amber-rgb),0.28);
+  border:1px dashed rgba(var(--amber-rgb),0.3);
   animation:orb2Spin 50s linear infinite reverse;
 }
 .orb2-ring{position:absolute; left:50%; top:50%; border:1px dashed var(--line); border-radius:50%; transform:translate(-50%,-50%);}
@@ -1257,24 +1266,25 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .home2-topbar-h1 em{color:var(--amber); font-style:italic;}
 
 .home2-triptych{
-  display:grid; grid-template-columns:repeat(3,1fr); gap:0; align-items:stretch; margin:14px 32px 0;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch; margin:14px 32px 0;
   position:relative; z-index:1; transition:grid-template-columns .45s cubic-bezier(.22,.9,.32,1);
-  border:1.5px solid rgba(var(--amber-rgb),0.24); border-radius:20px; padding:18px 28px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.008));
-  box-shadow:0 0 60px rgba(0,0,0,0.25) inset;
   flex:1 1 auto; min-height:0;
 }
-.orb2-corner{position:absolute; width:16px; height:16px; border:2px solid rgba(var(--amber-rgb),0.6); pointer-events:none;}
-.orb2-corner-tl{top:-1px; left:-1px; border-right:none; border-bottom:none; border-radius:6px 0 0 0;}
-.orb2-corner-tr{top:-1px; right:-1px; border-left:none; border-bottom:none; border-radius:0 6px 0 0;}
-.orb2-corner-bl{bottom:-1px; left:-1px; border-right:none; border-top:none; border-radius:0 0 0 6px;}
-.orb2-corner-br{bottom:-1px; right:-1px; border-left:none; border-top:none; border-radius:0 0 6px 0;}
-.home2-col{display:flex; flex-direction:column; min-width:0; min-height:0; padding:0 24px; position:relative;}
-.home2-col:first-child{padding-left:0;}
-.home2-col:last-child{padding-right:0;}
-.home2-col:not(:first-child)::before{
-  content:''; position:absolute; left:0; top:4px; bottom:4px; width:1.5px;
-  background:linear-gradient(180deg, transparent, rgba(var(--amber-rgb),0.28) 15%, rgba(var(--amber-rgb),0.28) 85%, transparent);
+/* Each column reads as its own floating glass panel (matching the approved
+   mockup's 3-card layout) instead of one single frame with divider lines. */
+.home2-col{
+  display:flex; flex-direction:column; min-width:0; min-height:0; position:relative;
+  padding:20px 22px; border-radius:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.034), rgba(255,255,255,0.011));
+  border:1px solid rgba(var(--amber-rgb),0.16);
+  box-shadow:0 0 40px rgba(0,0,0,0.22) inset, 0 14px 34px rgba(0,0,0,0.2);
+}
+.home2-col::before{
+  content:''; position:absolute; inset:0; border-radius:16px; padding:1px;
+  background:linear-gradient(160deg, rgba(var(--amber-rgb),0.5), transparent 42%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  opacity:0.6; pointer-events:none;
 }
 .home2-col-label{font-family:'Plus Jakarta Sans',sans-serif; font-weight:600; font-size:10.5px; letter-spacing:0.14em; color:var(--amber); text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:10px;}
 
