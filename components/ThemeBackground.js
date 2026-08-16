@@ -200,7 +200,7 @@ export default function ThemeBackground({ themeId }) {
 
   const theme = getTheme(themeId);
   return (
-    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0, background: theme.gradient }}>
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: -1, background: theme.gradient }}>
       <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
     </div>
   );
