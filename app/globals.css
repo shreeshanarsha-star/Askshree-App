@@ -1389,26 +1389,38 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .dial-tag-badge.dial-live{color:var(--amber);}
 .dial-tag-badge.dial-soon{color:var(--slate);}
 
+/* Node icons sit on a circle of radius R=39% (see OrbitalSystems.js) with
+   a visible radius of ~4.6% of the stage around each icon's own center
+   (13.5% wrapper * 68% node-circle-fraction / 2). That put icons spanning
+   roughly 34.4%-43.6% of the stage radius -- which used to be exactly
+   where both rings sat (39% and 34%), so the outer ring cut straight
+   through every icon and the inner ring nearly touched them: the "uneven"
+   look the icons were placed at. Fixed by keeping R (icon position) and
+   icon size untouched and moving the two rings outward/inward instead, so
+   all 12 icons sit cleanly in the gap between them with even breathing
+   room on both sides. */
 .dial-ring-outer{
-  position:absolute; left:50%; top:50%; width:78%; height:78%; transform:translate(-50%,-50%);
+  position:absolute; left:50%; top:50%; width:92%; height:92%; transform:translate(-50%,-50%);
   border-radius:50%; pointer-events:none; z-index:0;
   border:1px solid rgba(var(--amber-rgb),0.32);
   animation:dialSpinSelf 22s linear infinite;
 }
 .dial-ring-dashed{
-  position:absolute; left:50%; top:50%; width:68%; height:68%; transform:translate(-50%,-50%);
+  position:absolute; left:50%; top:50%; width:64%; height:64%; transform:translate(-50%,-50%);
   border-radius:50%; pointer-events:none; z-index:0;
   border:1px dashed rgba(var(--amber-rgb),0.24);
   animation:dialSpinSelf 10s linear infinite reverse;
 }
-/* Short clock-style ticks sitting right at the outer ring -- a masked
-   conic-gradient band the same way the sunburst layout works, just a much
-   narrower ring-hugging band instead of long center-to-rim spokes. */
+/* Short clock-style ticks sitting right at the (now-wider) outer ring -- a
+   masked conic-gradient band the same way the sunburst layout works, just
+   a much narrower ring-hugging band instead of long center-to-rim spokes.
+   Moved outward in lockstep with .dial-ring-outer so ticks stay at the
+   ring instead of cutting back through the icons. */
 .dial-ticks{
   position:absolute; inset:0; border-radius:50%; pointer-events:none; z-index:0;
   background:repeating-conic-gradient(rgba(var(--amber-rgb),0.6) 0deg 1deg, transparent 1deg 15deg);
-  -webkit-mask:radial-gradient(circle closest-side, transparent 74%, black 78%, black 86%, transparent 90%);
-  mask:radial-gradient(circle closest-side, transparent 74%, black 78%, black 86%, transparent 90%);
+  -webkit-mask:radial-gradient(circle closest-side, transparent 88%, black 92%, black 98%, transparent 100%);
+  mask:radial-gradient(circle closest-side, transparent 88%, black 92%, black 98%, transparent 100%);
   opacity:0.8;
 }
 @keyframes dialSpinSelf{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}
@@ -1417,7 +1429,7 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
    that turned out to actually be live on the site -- its only rotation was
    a 55s dashed ring, which is imperceptible; this is the real fix. */
 .dial-orbit-track{
-  position:absolute; left:50%; top:50%; width:78%; height:78%; transform:translate(-50%,-50%);
+  position:absolute; left:50%; top:50%; width:92%; height:92%; transform:translate(-50%,-50%);
   border-radius:50%; pointer-events:none; z-index:2;
   animation:dialSpinSelf 7s linear infinite;
 }
