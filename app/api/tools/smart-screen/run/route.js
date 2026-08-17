@@ -8,16 +8,43 @@ import { requireSiteKey } from '../../../../../lib/siteAuth';
 import { getAuthedUser } from '../../../../../lib/authedUser';
 
 const MAX_CVS = 20;
+const EXTRACT_CONCURRENCY = 4;
 
-// Screening up to 20 CVs each takes a file-text-extraction pass PLUS an AI
-// call PLUS a few DB round-trips, all sequential (one bad CV shouldn't fail
-// the whole batch, which is easiest to guarantee processing one at a time).
-// That easily exceeds Vercel's default serverless timeout well before 20
-// CVs -- Smart Source.ai's equally AI-heavy batch route already opts into
-// 60s for the same reason; this route never had it. Found via a fit/quality
-// audit -- without this, a full 20-CV batch was a likely silent failure
-// ("Something went wrong screening this batch") with zero explanation.
-export const maxDuration = 60;
+// Live evidence this route was STILL failing even after the maxDuration=60
+// fix: a real 9-CV batch (screening_batches aaf65554...) got only 3 of 9
+// screening_results rows before the request died -- the earlier fix
+// reduced timeout odds but a fully sequential extract+AI-call-per-CV loop
+// still had no real ceiling on wall-clock time (varies with PDF size / AI
+// latency per file), so a 9-CV batch could -- and did -- still cross even
+// a 60s budget. Two real, complementary fixes:
+// 1. maxDuration raised to 300s (Vercel clamps this to whatever the actual
+//    plan allows, so it's a safe no-op if the plan's ceiling is lower).
+// 2. The slow part -- per-CV text extraction + the AI screening call -- is
+//    now run with bounded concurrency (4 at a time) instead of one at a
+//    time, which is what actually cuts wall-clock time rather than just
+//    hoping for a bigger time budget. The DB-writing phase (dedupe,
+//    candidate upsert, file upload, result insert) stays sequential and
+//    unchanged, since candidates.email has no unique constraint -- running
+//    THAT part concurrently could race two near-duplicate CVs into two
+//    candidate rows instead of one. Extraction/AI has no such risk (pure
+//    read + compute, no shared state), so it's safe to parallelize.
+export const maxDuration = 300;
+
+// Runs `worker(item, index)` over `items` with at most `limit` in flight at
+// once, returning results in the SAME order as `items` (not completion
+// order) so the rest of the pipeline can stay a simple in-order loop.
+async function mapWithConcurrency(items, limit, worker) {
+  const results = new Array(items.length);
+  let next = 0;
+  async function run() {
+    while (next < items.length) {
+      const i = next++;
+      results[i] = await worker(items[i], i);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, run));
+  return results;
+}
 
 // Screens up to 20 CVs at once against either an uploaded JD or manually
 // entered criteria. Runs freely (no login, no email gate) — the dedicated
@@ -90,13 +117,31 @@ export async function POST(req) {
     .single();
   if (batchError) return NextResponse.json({ error: batchError.message }, { status: 500 });
 
-  const results = [];
-  for (const f of batch) {
+  // Phase 1 (parallel, bounded): text extraction + the AI screening call.
+  // Both are pure read/compute with no shared state -- the part actually
+  // worth parallelizing, since it's what dominates wall-clock time.
+  const screened = await mapWithConcurrency(batch, EXTRACT_CONCURRENCY, async (f) => {
     try {
       const resumeText = await extractText(f.base64, f.mimeType);
-      if (!resumeText || resumeText.trim().length < 20) continue;
-
+      if (!resumeText || resumeText.trim().length < 20) return null;
       const screen = await screenCandidateForBatch(criteria, resumeText);
+      return { f, resumeText, screen };
+    } catch (e) {
+      return null; // one bad CV shouldn't fail the whole batch
+    }
+  });
+
+  // Phase 2 (sequential, in original order): dedupe + candidate upsert +
+  // file upload + result insert. Kept sequential and unchanged from before
+  // -- candidates.email has no unique constraint, so running THIS part
+  // concurrently could race two near-duplicate CVs into two candidate rows
+  // instead of one. It's also the fast part (DB round-trips, no AI call),
+  // so keeping it sequential costs little.
+  const results = [];
+  for (const item of screened) {
+    if (!item) continue;
+    const { f, resumeText, screen } = item;
+    try {
       const p = screen.profile || {};
 
       // Dedupe by exact email/phone match, same v1 approach used by the
