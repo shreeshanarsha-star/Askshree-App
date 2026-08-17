@@ -9,6 +9,16 @@ import { getAuthedUser } from '../../../../../lib/authedUser';
 
 const MAX_CVS = 20;
 
+// Screening up to 20 CVs each takes a file-text-extraction pass PLUS an AI
+// call PLUS a few DB round-trips, all sequential (one bad CV shouldn't fail
+// the whole batch, which is easiest to guarantee processing one at a time).
+// That easily exceeds Vercel's default serverless timeout well before 20
+// CVs -- Smart Source.ai's equally AI-heavy batch route already opts into
+// 60s for the same reason; this route never had it. Found via a fit/quality
+// audit -- without this, a full 20-CV batch was a likely silent failure
+// ("Something went wrong screening this batch") with zero explanation.
+export const maxDuration = 60;
+
 // Screens up to 20 CVs at once against either an uploaded JD or manually
 // entered criteria. Runs freely (no login, no email gate) — the dedicated
 // free-batch counter is the only gate, same non-gating UX rule as the rest

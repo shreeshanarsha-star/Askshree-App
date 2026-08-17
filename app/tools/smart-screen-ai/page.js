@@ -244,6 +244,34 @@ export default function SmartScreenAI() {
     URL.revokeObjectURL(url);
   }
 
+  // Was previously just an alias for exportData() (CSV) under a misleading
+  // "Export Excel" label -- found during a fit/quality audit. Real .xlsx now,
+  // same pattern already used by Smart Source.ai (xlsx is already a project
+  // dependency).
+  async function exportExcel() {
+    const XLSX = await import('xlsx');
+    const rows = sorted.map((r, i) => ({
+      'Sl.': i + 1,
+      Name: r.name || '',
+      'Current Company': r.currentCompany || '',
+      'Current Designation': r.currentDesignation || '',
+      'Total Experience': r.yearsExperience ?? '',
+      Location: r.location || '',
+      'Current CTC': r.currentCtc || '',
+      'Expected CTC': r.expectedCtc || '',
+      'Notice Period': r.noticePeriod || '',
+      'Fit Score': r.fitScore != null ? r.fitScore + '/10' : '',
+      'Red Flags': (r.redFlags || []).join(' | '),
+      Achievement: r.achievement || '',
+      'Next Action': r.nextAction?.label || '',
+      Justification: r.justification || '',
+    }));
+    const sheet = XLSX.utils.json_to_sheet(rows);
+    const book = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(book, sheet, 'Screening Results');
+    XLSX.writeFile(book, 'smart-screen-results.xlsx');
+  }
+
   async function sendVerification() {
     if (!posterEmail.includes('@') || !batchId) return;
     setVerifyNote('Sending confirmation link…');
@@ -334,7 +362,7 @@ export default function SmartScreenAI() {
                 <button className="action-btn" disabled={selectedIds.length === 0} onClick={emailSelected}>Email selected</button>
                 <button className="action-btn" disabled={selectedIds.length === 0} onClick={whatsappSelected}>WhatsApp selected</button>
                 <button className="action-btn" onClick={exportData}>Export CSV</button>
-                <button className="action-btn" onClick={exportData}>Export Excel</button>
+                <button className="action-btn" onClick={exportExcel}>Export Excel</button>
                 <button className="action-btn" onClick={() => alert('PDF export is coming in a later update.')}>Export PDF</button>
               </div>
             </div>
