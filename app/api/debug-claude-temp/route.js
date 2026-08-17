@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { askClaude } from '../../../lib/anthropic';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const reply = await askClaude('Reply with exactly: OK', 'ping', 20);

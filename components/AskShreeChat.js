@@ -2,6 +2,13 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 
+// Chat is temporarily disabled (2026-08-18) but the launcher icon stays
+// visible per request -- clicking it shows a short static notice instead
+// of the interactive panel, and no fetch call is ever made. Flip this to
+// false to restore the full v3 interactive chat (conversation memory +
+// streaming) further down in this file.
+const CHAT_DISABLED = true;
+
 // v3: sends recent conversation history so follow-ups have context, and
 // reads the response as a stream so the reply appears progressively
 // instead of after one long "thinking…" wait. See app/api/ask-shree/route.js
@@ -13,12 +20,6 @@ export default function AskShreeChat() {
   const [messages, setMessages] = useState([
     { role: 'assistant', text: "Hi, I'm Shree. I can answer questions about this site and its tools — what would you like to know?" },
   ]);
-  // Disabled site-wide per request (2026-08-18). Hooks above still run
-  // (cheap, no side effects) so React's rules-of-hooks stay satisfied;
-  // this just short-circuits before anything renders or fetches.
-  // Re-enable by deleting the next line.
-  return null;
-
   const [loading, setLoading] = useState(false);
 
   async function send() {
@@ -83,7 +84,18 @@ export default function AskShreeChat() {
   return (
     <>
       <button className="chat-launcher" onClick={() => setOpen((o) => !o)}>&#9679; Ask Shree</button>
-      {open && (
+      {open && CHAT_DISABLED && (
+        <div className="chat-panel open">
+          <div className="chat-head">
+            <span>Ask Shree</span>
+            <span className="x" onClick={() => setOpen(false)}>&times;</span>
+          </div>
+          <div className="chat-body">
+            <div className="chat-msg">Ask Shree's chat is temporarily paused. Check back soon.</div>
+          </div>
+        </div>
+      )}
+      {open && !CHAT_DISABLED && (
         <div className="chat-panel open">
           <div className="chat-head">
             <span>Ask Shree</span>
