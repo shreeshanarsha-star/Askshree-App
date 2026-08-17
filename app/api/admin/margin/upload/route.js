@@ -4,6 +4,13 @@ import { supabaseAdmin } from '../../../../../lib/supabase';
 import { sendEmail } from '../../../../../lib/email';
 import { parseSalesCsv, parseCostCsv, computeMargins, generateRecommendation } from '../../../../../lib/marginAI';
 
+// Recomputes margin for every product in the uploaded CSV (DB upsert per
+// row), then drafts an AI recommendation for every newly-flagged product,
+// sequentially. A CSV with many rows / several newly-flagged leaks can
+// clear the default serverless timeout -- same bug class as the other
+// sequential-AI-loop routes fixed in this audit.
+export const maxDuration = 60;
+
 // Recomputes margin for every product from a fresh sales + cost export.
 // Deterministic math (see lib/marginAI.js) — AI is only used to draft the
 // recommendation text for whatever's newly flagged. Nothing here executes a

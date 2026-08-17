@@ -4,6 +4,10 @@ import { supabaseAdmin } from '../../../../../lib/supabase';
 import { sendEmail } from '../../../../../lib/email';
 import { parseSalesCsv, parseCostCsv, computeMargins, generateRecommendation } from '../../../../../lib/marginAI';
 
+// See app/api/admin/margin/upload/route.js -- identical sequential
+// per-row/per-flag processing, same timeout risk, same fix.
+export const maxDuration = 60;
+
 // Recomputes margin for every product from a fresh sales + cost export.
 // Deterministic math (see lib/marginAI.js) — AI is only used to draft the
 // recommendation text for whatever's newly flagged. Nothing here executes a

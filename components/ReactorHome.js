@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import AskShreeChat from './AskShreeChat';
 import AppLauncher from './AppLauncher';
 import HeyShreeReactor from './HeyShreeReactor';
@@ -79,14 +79,23 @@ export default function ReactorHome() {
   const [selectedId, setSelectedId] = useState(null);
   const [waffleOpen, setWaffleOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
-  // Same flash-avoidance trick as useTheme: paint with whatever style was
-  // cached from the last successful fetch instead of always starting at
-  // 'sunburst' and popping to the real value once /api/reactor-style
-  // responds.
-  const [reactorStyle, setReactorStyle] = useState(() => {
-    if (typeof window === 'undefined') return 'sunburst';
-    try { return window.localStorage.getItem('askshree_reactor_style_cache') || 'sunburst'; } catch (e) { return 'sunburst'; }
-  });
+  // Reading localStorage inside this initializer used to mismatch the
+  // server render (which has no localStorage and always renders
+  // 'sunburst'), tripping React hydration errors #418/#423 on every
+  // returning visit -- and worse than useTheme's version of this bug,
+  // this one swaps the ENTIRE reactor component tree (OrbitalStage vs
+  // OrbitalStageDial), so the whole reactor got torn down and rebuilt
+  // client-side right after load. Always start SSR-safe at 'sunburst';
+  // the cached value (if any) is applied in a useLayoutEffect below,
+  // synchronously before paint, so there's still no visible flash.
+  const [reactorStyle, setReactorStyle] = useState('sunburst');
+
+  useLayoutEffect(() => {
+    try {
+      const cached = window.localStorage.getItem('askshree_reactor_style_cache');
+      if (cached === 'dial' || cached === 'sunburst') setReactorStyle(cached);
+    } catch (e) { /* ignore */ }
+  }, []);
 
   const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
   const leftFilled = !!activeFeature;

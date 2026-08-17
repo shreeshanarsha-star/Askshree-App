@@ -7,6 +7,14 @@ import { extractOfferDocuments, classifyOfferDocuments } from '../../../../../li
 import { requireSiteKey } from '../../../../../lib/siteAuth';
 import { getAuthedUser } from '../../../../../lib/authedUser';
 
+// Offer.ai lets a recruiter drop in appointment letter + payslips + certs +
+// JD + budget approval in one go, then runs them through sequential
+// text-extraction and TWO separate AI passes (classify, then extract).
+// A multi-document upload can easily clear a default serverless timeout --
+// same fix already applied to Smart screen.ai's batch route for the same
+// reason.
+export const maxDuration = 60;
+
 const SUPPORTED_MIME = new Set([
   'application/pdf',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

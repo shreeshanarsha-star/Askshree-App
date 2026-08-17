@@ -89,7 +89,18 @@ export default function GestureControl() {
           height: 240,
         });
         cameraRef.current = camera;
-        camera.start();
+        // camera.start() (mediapipe's Camera helper) returns a Promise
+        // that internally calls getUserMedia. It was previously called
+        // fire-and-forget (no await, no .catch()) -- when a visitor has
+        // no camera, hasn't granted permission, or the device is busy
+        // (the common case, since this starts with zero user opt-in),
+        // the rejection became an UNHANDLED promise rejection that
+        // bypassed this try/catch entirely (try/catch only catches
+        // synchronous throws and awaited rejections), surfacing as a
+        // raw "NotReadableError: Could not start video source" exception
+        // in every visitor's console on every homepage load. Awaiting it
+        // routes the failure through this catch block as intended.
+        await camera.start();
       } catch (e) {
         // No camera, permission denied, or CDN unreachable — fail silent,
         // gesture control simply isn't available this session.

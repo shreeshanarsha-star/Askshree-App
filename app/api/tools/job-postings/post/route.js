@@ -7,6 +7,12 @@ import { supabaseAdmin } from '../../../../../lib/supabase';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
 import { getAuthedUser } from '../../../../../lib/authedUser';
 
+// Up to 10 JD files, each doing text-extraction + an AI structuring call
+// + a DB insert, sequentially. No override meant a near-full batch (close
+// to the 10-file cap) was a realistic timeout risk -- same bug class
+// found and fixed on Smart screen.ai's and Offer.ai's batch routes.
+export const maxDuration = 60;
+
 // Posts up to 10 JDs at once (PDF/Word, base64-encoded from the browser). AI
 // structures each into a listing. No email is required at this step —
 // postings go in as "pending", and the UI asks for email confirmation as a

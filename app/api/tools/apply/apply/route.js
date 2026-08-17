@@ -9,6 +9,15 @@ import { askClaude } from '../../../../../lib/anthropic';
 import { requireSiteKey } from '../../../../../lib/siteAuth';
 import { getAuthedUser } from '../../../../../lib/authedUser';
 
+// Auto-apply mode screens a candidate's CV against up to 30 recent job
+// postings, ONE SEQUENTIAL AI CALL PER POSTING, then sends a questionnaire
+// email for each qualifying match -- the heaviest sequential-AI loop in
+// the codebase. 30 sequential Claude calls is a near-certain timeout risk
+// on the platform default; 60s reduces but may not fully eliminate it for
+// a full 30-posting scan -- worth revisiting (e.g. lowering the 30-posting
+// cap, or raising this further) if auto-apply keeps failing on busy days.
+export const maxDuration = 60;
+
 const SHORTLIST_THRESHOLD = 70;
 const SHORTLIST_CAP = 5;
 const AUTO_APPLY_CAP = 10;
