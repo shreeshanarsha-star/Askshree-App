@@ -13,6 +13,12 @@ export default function AskShreeChat() {
   const [messages, setMessages] = useState([
     { role: 'assistant', text: "Hi, I'm Shree. I can answer questions about this site and its tools — what would you like to know?" },
   ]);
+  // Disabled site-wide per request (2026-08-18). Hooks above still run
+  // (cheap, no side effects) so React's rules-of-hooks stay satisfied;
+  // this just short-circuits before anything renders or fetches.
+  // Re-enable by deleting the next line.
+  return null;
+
   const [loading, setLoading] = useState(false);
 
   async function send() {
