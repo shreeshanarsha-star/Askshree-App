@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useLayoutEffect } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import AskShreeChat from './AskShreeChat';
 import AppLauncher from './AppLauncher';
 import HeyShreeReactor from './HeyShreeReactor';
@@ -79,6 +79,12 @@ export default function ReactorHome() {
   const [selectedId, setSelectedId] = useState(null);
   const [waffleOpen, setWaffleOpen] = useState(false);
   const [voiceOpen, setVoiceOpen] = useState(false);
+  // True only when the CURRENT voiceOpen session was triggered by the
+  // "hey shree" wake word rather than an explicit reactor click -- lets
+  // HeyShreeReactor greet with a short "Hi Boss" instead of the longer
+  // first-time onboarding line, since the person just spoke to it and is
+  // already mid-conversation, not discovering the feature.
+  const [wakeGreeting, setWakeGreeting] = useState(false);
   // Reading localStorage inside this initializer used to mismatch the
   // server render (which has no localStorage and always renders
   // 'sunburst'), tripping React hydration errors #418/#423 on every
@@ -96,6 +102,87 @@ export default function ReactorHome() {
       if (cached === 'dial' || cached === 'sunburst') setReactorStyle(cached);
     } catch (e) { /* ignore */ }
   }, []);
+
+  // Always-on "hey shree" wake word. Runs a separate, lightweight
+  // SpeechRecognition instance whenever the full Hey Shree conversation
+  // panel is closed, just listening for the wake phrase -- as soon as it's
+  // heard, this hands off to the exact same setVoiceOpen(true) path a
+  // manual reactor click uses, so the reactor glow (voiceActive prop,
+  // already wired below) and the rest of the conversation loop in
+  // HeyShreeReactor need no separate implementation. Only the greeting
+  // differs (see wakeGreeting / the greeting prop passed to HeyShreeReactor
+  // further down).
+  //
+  // Requires the browser to grant mic permission on page load, same as the
+  // existing GestureControl camera prompt already does for gesture swipe --
+  // if permission is denied or SpeechRecognition isn't supported, this
+  // quietly does nothing and the reactor still works fully via click.
+  const voiceOpenRef = useRef(false);
+  useEffect(() => { voiceOpenRef.current = voiceOpen; }, [voiceOpen]);
+
+  useEffect(() => {
+    const SR = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+    if (!SR) return;
+
+    const WAKE_PATTERN = /\b(hey|hi|hay|a)\s*shr[ei]{1,2}\b/i;
+    let recognition = null;
+    let deniedPermanently = false;
+    let restartTimer = null;
+
+    function stopWakeListening() {
+      if (restartTimer) { clearTimeout(restartTimer); restartTimer = null; }
+      if (recognition) {
+        recognition.onend = null;
+        recognition.onerror = null;
+        recognition.onresult = null;
+        try { recognition.abort(); } catch (e) { /* already stopped */ }
+        recognition = null;
+      }
+    }
+
+    function startWakeListening() {
+      if (deniedPermanently || voiceOpenRef.current || document.hidden || recognition) return;
+      const r = new SR();
+      r.lang = 'en-IN';
+      r.continuous = true;
+      r.interimResults = true;
+      r.onresult = (e) => {
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const t = e.results[i][0].transcript || '';
+          if (WAKE_PATTERN.test(t)) {
+            stopWakeListening();
+            setWakeGreeting(true);
+            setVoiceOpen(true);
+            return;
+          }
+        }
+      };
+      r.onerror = (e) => {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') deniedPermanently = true;
+      };
+      r.onend = () => {
+        recognition = null;
+        // Browsers stop continuous recognition on their own every so often
+        // even with no error at all -- just restart it if we should still
+        // be wake-listening.
+        restartTimer = setTimeout(startWakeListening, 300);
+      };
+      recognition = r;
+      try { r.start(); } catch (e) { recognition = null; }
+    }
+
+    function handleVisibility() {
+      if (document.hidden) stopWakeListening();
+      else startWakeListening();
+    }
+
+    if (!voiceOpen) startWakeListening(); else stopWakeListening();
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      stopWakeListening();
+    };
+  }, [voiceOpen]);
 
   const selected = DEPARTMENTS.find((d) => d.id === selectedId) || null;
   const leftFilled = !!activeFeature;
@@ -312,9 +399,9 @@ export default function ReactorHome() {
             </span>
           </div>
           {reactorStyle === 'dial' ? (
-            <OrbitalStageDial selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => setVoiceOpen(true)} voiceActive={voiceOpen} />
+            <OrbitalStageDial selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => { setWakeGreeting(false); setVoiceOpen(true); }} voiceActive={voiceOpen} />
           ) : (
-            <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => setVoiceOpen(true)} voiceActive={voiceOpen} />
+            <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => { setWakeGreeting(false); setVoiceOpen(true); }} voiceActive={voiceOpen} />
           )}
         </div>
 
@@ -363,7 +450,12 @@ export default function ReactorHome() {
 
       <AskShreeChat />
       <AppLauncher open={waffleOpen} onClose={() => setWaffleOpen(false)} />
-      <HeyShreeReactor open={voiceOpen} onClose={() => setVoiceOpen(false)} onTranscript={handleVoiceCommand} />
+      <HeyShreeReactor
+        open={voiceOpen}
+        onClose={() => { setVoiceOpen(false); setWakeGreeting(false); }}
+        onTranscript={handleVoiceCommand}
+        greeting={wakeGreeting ? 'Hi Boss.' : undefined}
+      />
       </div>
     </div>
   );

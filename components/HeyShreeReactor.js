@@ -22,7 +22,7 @@ const STOP_PATTERN = /^(stop( listening)?|that'?s all|that'?ll be all|goodbye|by
 // decision-making (navigate, search, or ask). That keeps this component
 // reusable and keeps the "brain" in one place next to the rest of the
 // reactor's state (openFeature, setSelectedId, etc.).
-export default function HeyShreeReactor({ open, onClose, onTranscript }) {
+export default function HeyShreeReactor({ open, onClose, onTranscript, greeting }) {
   const [mode, setMode] = useState('idle'); // idle | listening | thinking | speaking
   const [transcript, setTranscript] = useState('');
   const [reply, setReply] = useState('');
@@ -118,7 +118,7 @@ export default function HeyShreeReactor({ open, onClose, onTranscript }) {
   }
 
   function greet() {
-    const text = "Hey, I'm Shree. Try “open calculator”, “find a sales candidate in Mexico”, “play some lofi music”, or ask me anything about this site.";
+    const text = greeting || "Hey, I'm Shree. Try “open calculator”, “find a sales candidate in Mexico”, “play some lofi music”, or ask me anything about this site.";
     setReply(text);
     speak(text, autoListen);
   }
