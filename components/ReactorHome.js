@@ -278,9 +278,12 @@ export default function ReactorHome() {
       <GestureControl />
 
       <div className="home2-topbar">
-        <h1 className="home2-topbar-h1">
-          Tell me what you need. <em>AI systems will get you there.</em>
-        </h1>
+        <div>
+          <h1 className="home2-topbar-h1">
+            Tell me what you need. <em>AI systems will get you there.</em>
+          </h1>
+          <p className="home2-topbar-sub">Click reactor and start with &ldquo;Hey Shree&rdquo;</p>
+        </div>
       </div>
 
       <div className="home2-triptych" id="ai-systems" style={{ gridTemplateColumns: triptychCols }}>
