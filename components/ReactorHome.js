@@ -404,8 +404,22 @@ export default function ReactorHome() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: raw, page: 'home2-voice' }),
       });
-      const data = await res.json();
-      return data.reply || data.error || "I couldn't find an answer for that.";
+      // /api/ask-shree returns JSON only on its error paths (400 missing
+      // message, 429 rate-limited) -- a successful reply is a streamed
+      // text/plain body, NOT json. Calling res.json() unconditionally used
+      // to throw a SyntaxError on every successful reply, after the full
+      // stream had already downloaded (hence the long delay the user saw),
+      // which the catch block then reported as a generic "Network error".
+      if (res.status === 429) {
+        const data = await res.json().catch(() => ({}));
+        return data.error || "You've reached today's message limit -- try again tomorrow.";
+      }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        return data.error || "Sorry, I'm not programmed for that.";
+      }
+      const text = (await res.text()).trim();
+      return text || "Sorry, I'm not programmed for that.";
     } catch (e) {
       return 'Network error — try again.';
     }
