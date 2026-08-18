@@ -1364,6 +1364,10 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
   width:6px; height:6px; border-radius:50%; background:var(--amber);
   box-shadow:0 0 6px rgba(var(--amber-rgb),0.7); animation:orb2StatusBlink 1.8s ease-in-out infinite;
 }
+.home2-mic-notice{
+  text-align:center; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--amber);
+  opacity:0.85; margin-top:8px; padding:0 12px;
+}
 .home2-col .home2-workspace, .home2-col .orb2-stage-card, .home2-col .orb2-panel, .home2-col .home2-empty-panel{flex:1; margin:0;}
 .home2-col .orb2-panel-empty{display:flex; align-items:center; justify-content:center; height:100%; text-align:center;}
 

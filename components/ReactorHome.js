@@ -4,6 +4,7 @@ import AskShreeChat from './AskShreeChat';
 import AppLauncher from './AppLauncher';
 import HeyShreeReactor from './HeyShreeReactor';
 import GestureControl from './GestureControl';
+import ThemeBackground from './ThemeBackground';
 import { OrbitalStage, OrbitalStageDial, FeatureNavPanel, DEPARTMENTS } from './OrbitalSystems';
 import FeatureWorkspace from './FeatureWorkspace';
 import { useTheme } from '../lib/useTheme';
@@ -100,6 +101,17 @@ export default function ReactorHome() {
   // clicking a visible "I'm listening now" confirmation instead of a
   // bypass of that wake-word requirement.
   const [wakeArmed, setWakeArmed] = useState(false);
+  // Real, visible feedback for the two ways "listening for the wake word"
+  // can silently go nowhere: SpeechRecognition unsupported in this
+  // browser, or mic permission blocked. Both used to fail with zero
+  // on-screen sign of anything wrong -- from the outside indistinguishable
+  // from "working, just hasn't heard you yet." Reported as "nothing is
+  // happening" -- this makes every failure mode say something instead of
+  // staying silent.
+  const [micNotice, setMicNotice] = useState('');
+  const wakeArmedRef = useRef(false);
+  useEffect(() => { wakeArmedRef.current = wakeArmed; }, [wakeArmed]);
+  const wakeStatusRef = useRef({ supported: true, denied: false });
   // Reading localStorage inside this initializer used to mismatch the
   // server render (which has no localStorage and always renders
   // 'sunburst'), tripping React hydration errors #418/#423 on every
@@ -146,6 +158,7 @@ export default function ReactorHome() {
 
   useEffect(() => {
     const SR = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
+    wakeStatusRef.current.supported = !!SR;
     if (!SR) return;
 
     const WAKE_PATTERN = /\b(hey|hi|hay|a)\s*shr[ei]{1,2}\b/i;
@@ -177,6 +190,7 @@ export default function ReactorHome() {
           if (WAKE_PATTERN.test(t)) {
             stopWakeListening();
             setWakeArmed(false);
+            setMicNotice('');
             setWakeGreeting(true);
             setVoiceOpen(true);
             return;
@@ -184,7 +198,13 @@ export default function ReactorHome() {
         }
       };
       r.onerror = (e) => {
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') deniedPermanently = true;
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          deniedPermanently = true;
+          wakeStatusRef.current.denied = true;
+          if (wakeArmedRef.current) {
+            setMicNotice("Microphone access looks blocked -- allow it in your browser's site settings, then tap the reactor again.");
+          }
+        }
       };
       r.onend = () => {
         recognition = null;
@@ -301,15 +321,26 @@ export default function ReactorHome() {
       setVoiceOpen(false);
       setWakeGreeting(false);
       setWakeArmed(false);
+      setMicNotice('');
     } else if (wakeArmed) {
-      // Second click while already armed -- treat as "never mind", stop
-      // showing the listening glow.
+      // Second click while already armed and listening -- treat it as
+      // "just talk to me now" instead of cancelling. A guaranteed,
+      // click-driven fallback into the real conversation if the wake word
+      // never gets picked up (accent, noisy room, a browser quirk) -- not
+      // something to leave to chance live.
+      stopWakeListeningRef.current();
       setWakeArmed(false);
+      setMicNotice('');
+      setWakeGreeting(false);
+      setVoiceOpen(true);
+    } else if (!wakeStatusRef.current.supported) {
+      setMicNotice("Voice isn't supported in this browser -- try Chrome on desktop or Android.");
     } else {
-      // Arm: the reactor glows to confirm it's listening, but does NOT
-      // greet or open the conversation yet. It only actually starts
-      // interacting once the wake-word recognizer (already running,
-      // above) hears "hey shree" / "shree".
+      // Arm: the reactor glows to confirm it's listening, and a real
+      // status line says so -- no more silent "did it hear me or not".
+      setMicNotice(wakeStatusRef.current.denied
+        ? "Microphone access looks blocked -- allow it in your browser's site settings, then tap again."
+        : 'Listening for \u201chey shree\u201d \u2014 tap the reactor again to talk right now.');
       setWakeArmed(true);
     }
   }
@@ -443,10 +474,8 @@ export default function ReactorHome() {
   return (
     <div className="home2-shell" style={{ position: 'relative', ...(themeReady ? getThemeAccentStyle(themeId) : {}) }}>
       <div className="home2-full">
-      {/* No animated particle background on the reactor page -- it read as
-          visual clutter behind the reactor's own glow/sunburst, not premium.
-          A plain dark surface (with a subtle static glow via CSS, see
-          .home2-full in globals.css) matches the approved mockup instead. */}
+      {themeReady && <ThemeBackground themeId={themeId} />}
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <GestureControl />
 
       <div className="home2-topbar">
@@ -488,6 +517,7 @@ export default function ReactorHome() {
           ) : (
             <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen || wakeArmed} />
           )}
+          {micNotice && <div className="home2-mic-notice">{micNotice}</div>}
         </div>
 
         <div className="home2-col">
@@ -541,6 +571,7 @@ export default function ReactorHome() {
         onTranscript={handleVoiceCommand}
         greeting={wakeGreeting ? 'Hi Boss.' : undefined}
       />
+      </div>
       </div>
     </div>
   );
