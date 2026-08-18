@@ -40,6 +40,7 @@ export default function HeyShreeReactor({ open, onClose, onTranscript, greeting 
   // browser voice -- avoids a failed fetch + fallback round-trip delay
   // before every single line once we already know it's unavailable.
   const elevenLabsDownRef = useRef(false);
+  const announcedMicBlockedRef = useRef(false);
 
   useEffect(() => { openRef.current = open; }, [open]);
   useEffect(() => { micBlockedRef.current = micBlocked; }, [micBlocked]);
@@ -55,6 +56,9 @@ export default function HeyShreeReactor({ open, onClose, onTranscript, greeting 
       recognitionRef.current?.abort?.();
       startedOnceRef.current = false;
       noSpeechRetriesRef.current = 0;
+      announcedMicBlockedRef.current = false;
+      micBlockedRef.current = false;
+      setMicBlocked(false);
       setMode('idle');
       setTranscript('');
       setReply('');
@@ -134,13 +138,26 @@ export default function HeyShreeReactor({ open, onClose, onTranscript, greeting 
   }
 
   function autoListen() {
-    if (!openRef.current || micBlockedRef.current) return;
+    if (!openRef.current) return;
+    if (micBlockedRef.current) { announceMicBlocked(); return; }
     startListening();
   }
 
-  function startListening() {
+  // With the panel gone, "mic blocked" and "couldn't start listening" used
+  // to be silent-except-for-a-text-box failures -- now that voice is the
+  // only channel, they need to actually be SPOKEN, or a real failure looks
+  // identical to "said the greeting and just stopped" from the outside.
+  function announceMicBlocked() {
+    if (announcedMicBlockedRef.current) return;
+    announcedMicBlockedRef.current = true;
+    const msg = "I can't hear you -- please allow microphone access and try again.";
+    setReply(msg);
+    speak(msg, () => { onClose && onClose(); });
+  }
+
+  function startListening(startAttempt = 0) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { setMicBlocked(true); return; }
+    if (!SR) { setMicBlocked(true); micBlockedRef.current = true; announceMicBlocked(); return; }
     if (recognitionRef.current) { try { recognitionRef.current.abort(); } catch (e) { /* already stopped */ } }
     const r = new SR();
     r.lang = LANG;
@@ -158,20 +175,27 @@ export default function HeyShreeReactor({ open, onClose, onTranscript, greeting 
       setTranscript(finalText || interim);
     };
     r.onerror = (e) => {
-      // Only a real permission problem should stop the loop and show the
-      // "mic blocked" state. Everything else ('no-speech', 'aborted',
+      // Only a real permission problem should stop the loop and speak the
+      // "mic blocked" message. Everything else ('no-speech', 'aborted',
       // 'network', ...) is recoverable -- onend below decides what to do.
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') setMicBlocked(true);
+      // Set the ref directly (not just via setState) so the onend handler
+      // that fires right after sees it immediately, not after the next
+      // render -- state updates alone aren't fast enough here.
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        setMicBlocked(true);
+        micBlockedRef.current = true;
+      }
     };
     r.onend = () => {
       recognitionRef.current = null;
+      if (micBlockedRef.current) { announceMicBlocked(); return; }
       const text = finalText.trim();
       if (text) {
         noSpeechRetriesRef.current = 0;
         resolveTranscript(text);
         return;
       }
-      if (!openRef.current || micBlockedRef.current) { setMode('idle'); return; }
+      if (!openRef.current) { setMode('idle'); return; }
       if (noSpeechRetriesRef.current < MAX_NO_SPEECH_RETRIES) {
         noSpeechRetriesRef.current += 1;
         setTimeout(() => { if (openRef.current) startListening(); }, 250);
@@ -185,7 +209,23 @@ export default function HeyShreeReactor({ open, onClose, onTranscript, greeting 
       speak(nudge, () => setNeedsTap(true));
     };
     recognitionRef.current = r;
-    try { r.start(); } catch (e) { setMode('idle'); }
+    try {
+      r.start();
+    } catch (e) {
+      // Starting a new recognizer while a previous one (e.g. the
+      // always-on wake-word listener) hasn't fully released the mic yet
+      // can throw synchronously. Retry a couple of times with a short
+      // delay before actually giving up out loud.
+      recognitionRef.current = null;
+      if (startAttempt < 2) {
+        setTimeout(() => { if (openRef.current) startListening(startAttempt + 1); }, 300);
+        return;
+      }
+      setMode('idle');
+      const msg = "Something went wrong starting the mic -- tap the reactor to try again.";
+      setReply(msg);
+      speak(msg, () => { onClose && onClose(); });
+    }
   }
 
   async function resolveTranscript(text) {

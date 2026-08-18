@@ -119,6 +119,15 @@ export default function ReactorHome() {
   // quietly does nothing and the reactor still works fully via click.
   const voiceOpenRef = useRef(false);
   useEffect(() => { voiceOpenRef.current = voiceOpen; }, [voiceOpen]);
+  // Exposed so toggleVoice() (a manual reactor click) can stop the
+  // wake-word recognizer SYNCHRONOUSLY, in the same tick as the click,
+  // instead of waiting for this effect's cleanup to run on next render.
+  // Two SpeechRecognition instances racing for the mic (this one winding
+  // down while HeyShreeReactor's own listener tries to start up) was a
+  // real reported bug -- greet() would speak and then go completely
+  // silent, since there's no panel anymore to visually reveal a "mic
+  // blocked" state.
+  const stopWakeListeningRef = useRef(() => {});
 
   useEffect(() => {
     const SR = typeof window !== 'undefined' && (window.SpeechRecognition || window.webkitSpeechRecognition);
@@ -139,6 +148,7 @@ export default function ReactorHome() {
         recognition = null;
       }
     }
+    stopWakeListeningRef.current = stopWakeListening;
 
     function startWakeListening() {
       if (deniedPermanently || voiceOpenRef.current || document.hidden || recognition) return;
@@ -275,6 +285,9 @@ export default function ReactorHome() {
       setVoiceOpen(false);
       setWakeGreeting(false);
     } else {
+      // Stop the wake-word recognizer synchronously, right now, before
+      // flipping voiceOpen -- see the ref's comment above for why.
+      stopWakeListeningRef.current();
       setWakeGreeting(false);
       setVoiceOpen(true);
     }
