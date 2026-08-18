@@ -91,6 +91,15 @@ export default function ReactorHome() {
   // first-time onboarding line, since the person just spoke to it and is
   // already mid-conversation, not discovering the feature.
   const [wakeGreeting, setWakeGreeting] = useState(false);
+  // True while the reactor is armed-and-listening after a manual click,
+  // waiting to actually HEAR "hey shree" before it opens the conversation.
+  // A click used to open the conversation immediately and speak "Yes
+  // Boss" -- reported as wrong: it should only start interacting once it
+  // hears the wake word, exactly like the always-on passive listener
+  // below already does when nobody has clicked anything. This just makes
+  // clicking a visible "I'm listening now" confirmation instead of a
+  // bypass of that wake-word requirement.
+  const [wakeArmed, setWakeArmed] = useState(false);
   // Reading localStorage inside this initializer used to mismatch the
   // server render (which has no localStorage and always renders
   // 'sunburst'), tripping React hydration errors #418/#423 on every
@@ -167,6 +176,7 @@ export default function ReactorHome() {
           const t = e.results[i][0].transcript || '';
           if (WAKE_PATTERN.test(t)) {
             stopWakeListening();
+            setWakeArmed(false);
             setWakeGreeting(true);
             setVoiceOpen(true);
             return;
@@ -290,12 +300,17 @@ export default function ReactorHome() {
     if (voiceOpen) {
       setVoiceOpen(false);
       setWakeGreeting(false);
+      setWakeArmed(false);
+    } else if (wakeArmed) {
+      // Second click while already armed -- treat as "never mind", stop
+      // showing the listening glow.
+      setWakeArmed(false);
     } else {
-      // Stop the wake-word recognizer synchronously, right now, before
-      // flipping voiceOpen -- see the ref's comment above for why.
-      stopWakeListeningRef.current();
-      setWakeGreeting(false);
-      setVoiceOpen(true);
+      // Arm: the reactor glows to confirm it's listening, but does NOT
+      // greet or open the conversation yet. It only actually starts
+      // interacting once the wake-word recognizer (already running,
+      // above) hears "hey shree" / "shree".
+      setWakeArmed(true);
     }
   }
 
@@ -469,9 +484,9 @@ export default function ReactorHome() {
             </span>
           </div>
           {reactorStyle === 'dial' ? (
-            <OrbitalStageDial selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen} />
+            <OrbitalStageDial selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen || wakeArmed} />
           ) : (
-            <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen} />
+            <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen || wakeArmed} />
           )}
         </div>
 
