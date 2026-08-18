@@ -1301,12 +1301,15 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
    each half-hiding it. Kept thin/subtle on purpose -- see home2-col below
    for why the per-card glass got dialed way down too. */
 .home2-glass-shell{
+  /* Fully transparent now on request -- no fill, no blur at all. Just a
+     thin border/glow to mark the frame, so the animated theme canvas
+     behind it (see ThemeBackground, rendered as .home2-full's first
+     child) shows through completely untouched instead of being tinted
+     or softened at all. */
   position:relative; flex:1 1 auto; min-height:0; margin:14px 32px 0;
   border-radius:20px; padding:16px; display:flex; flex-direction:column;
-  background:linear-gradient(160deg, rgba(255,255,255,0.025), rgba(255,255,255,0.006) 55%, rgba(var(--amber-rgb),0.015) 100%);
+  background:transparent;
   border:1px solid rgba(var(--amber-rgb),0.18);
-  backdrop-filter:blur(3px) saturate(130%);
-  -webkit-backdrop-filter:blur(3px) saturate(130%);
   box-shadow:
     0 0 0 1px rgba(var(--amber-rgb),0.04) inset,
     0 24px 60px rgba(0,0,0,0.35);
@@ -1322,12 +1325,13 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
    the animated background behind it down to nothing. The shell above
    carries the "glass" look now; these just delineate the three areas. */
 .home2-col{
+  /* Fully transparent, no blur -- same reasoning as .home2-glass-shell
+     above. Just the border + corner brackets mark out the three areas
+     now; the animated background reads through completely clean. */
   display:flex; flex-direction:column; min-width:0; min-height:0; position:relative;
   padding:20px 22px; border-radius:14px;
-  background:rgba(255,255,255,0.015);
+  background:transparent;
   border:1px solid rgba(var(--amber-rgb),0.22);
-  backdrop-filter:blur(2px) saturate(120%);
-  -webkit-backdrop-filter:blur(2px) saturate(120%);
   box-shadow:
     0 0 0 1px rgba(var(--amber-rgb),0.05) inset,
     0 10px 26px rgba(0,0,0,0.22);
