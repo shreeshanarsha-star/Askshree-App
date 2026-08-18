@@ -118,7 +118,11 @@ export default function HeyShreeReactor({ open, onClose, onTranscript, greeting 
   }
 
   function greet() {
-    const text = greeting || "Hey, I'm Shree. Try “open calculator”, “find a sales candidate in Mexico”, “play some lofi music”, or ask me anything about this site.";
+    // Short voice-only greeting now that there's no panel to show example
+    // commands in -- "Yes Boss." for an explicit reactor click, "Hi Boss."
+    // for the wake-word trigger (passed in via the greeting prop from
+    // ReactorHome). Either way it starts listening right after.
+    const text = greeting || 'Yes Boss.';
     setReply(text);
     speak(text, autoListen);
   }
@@ -204,46 +208,11 @@ export default function HeyShreeReactor({ open, onClose, onTranscript, greeting 
     }
   }
 
-  if (!open) return null;
-
-  return (
-    <div className="hs-panel open">
-      <div className="hs-head">
-        <span>Hey Shree</span>
-        <span className="x" onClick={onClose}>&times;</span>
-      </div>
-
-      <div className="hs-body">
-        <div className={`hs-orb ${mode}`}>
-          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="9" y="2" width="6" height="12" rx="3" />
-            <path d="M5 11a7 7 0 0 0 14 0" />
-            <line x1="12" y1="18" x2="12" y2="22" />
-            <line x1="8" y1="22" x2="16" y2="22" />
-          </svg>
-        </div>
-
-        <div className="hs-status">
-          {micBlocked ? 'Mic blocked — allow microphone access and reopen.' :
-            mode === 'listening' ? 'Listening…' :
-            mode === 'thinking' ? 'Thinking…' :
-            mode === 'speaking' ? 'Speaking…' : 'Ready'}
-        </div>
-
-        {transcript && mode === 'listening' && (
-          <div className="hs-line hs-user">&#8220;{transcript}&#8221;</div>
-        )}
-        {reply && mode !== 'listening' && (
-          <div className="hs-line hs-reply">{reply}</div>
-        )}
-
-        {needsTap && (
-          <button className="hs-tap-btn" onClick={tapToBegin}>Tap to speak</button>
-        )}
-        {micBlocked && (
-          <button className="hs-tap-btn" onClick={() => { setMicBlocked(false); startListening(); }}>Try mic again</button>
-        )}
-      </div>
-    </div>
-  );
+  // No visible chat box per request -- this is voice-only now. All the
+  // state above (mode, transcript, reply, needsTap, micBlocked) still
+  // drives the conversation logic internally; it just isn't rendered.
+  // The reactor's own glow (the voiceActive prop passed to
+  // OrbitalStage/OrbitalStageDial in ReactorHome, driven by the same
+  // `open`/voiceOpen state) is the only visual feedback now.
+  return null;
 }

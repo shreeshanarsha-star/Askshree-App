@@ -266,6 +266,20 @@ export default function ReactorHome() {
   //  3. Otherwise, the existing Ask Shree knowledge-base brain answers it
   //     as a general question about the site.
   // Returns the string HeyShreeReactor should speak back.
+  // With the Hey Shree panel gone (voice-only now, no visible X button),
+  // clicking the reactor while it's already active is the only way besides
+  // a spoken stop-phrase to end the conversation -- so this toggles instead
+  // of always opening.
+  function toggleVoice() {
+    if (voiceOpen) {
+      setVoiceOpen(false);
+      setWakeGreeting(false);
+    } else {
+      setWakeGreeting(false);
+      setVoiceOpen(true);
+    }
+  }
+
   async function handleVoiceCommand(text) {
     const raw = (text || '').trim();
     if (!raw) return "I didn't catch that — try again.";
@@ -399,9 +413,9 @@ export default function ReactorHome() {
             </span>
           </div>
           {reactorStyle === 'dial' ? (
-            <OrbitalStageDial selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => { setWakeGreeting(false); setVoiceOpen(true); }} voiceActive={voiceOpen} />
+            <OrbitalStageDial selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen} />
           ) : (
-            <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={() => { setWakeGreeting(false); setVoiceOpen(true); }} voiceActive={voiceOpen} />
+            <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen} />
           )}
         </div>
 
