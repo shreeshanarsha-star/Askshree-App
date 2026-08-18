@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 
-// "Rachel" -- ElevenLabs' clear, professional, general-purpose premade
-// voice. Overridable via ELEVENLABS_VOICE_ID once the site owner picks (or
-// clones) a different one in their ElevenLabs account, with no code change.
-const DEFAULT_VOICE_ID = '21m00Tcm4TlvDq8ikWAM';
+// "Declan Sage" -- deep, resonant, authoritative narration voice, picked
+// from ElevenLabs' Voice Library (https://elevenlabs.io/voices/kqVT88a5QfII1HNAEPTJ).
+// Still overridable via ELEVENLABS_VOICE_ID with no code change -- e.g. once
+// a personal voice clone exists under "My Voices" instead of the shared
+// Library, which the free-tier API restriction below does not apply to.
+const DEFAULT_VOICE_ID = 'kqVT88a5QfII1HNAEPTJ';
 
 // Server-side only, same reason as the news route: keeps the API key out
 // of client JS, and ElevenLabs' key isn't meant to be a public/browser key.
