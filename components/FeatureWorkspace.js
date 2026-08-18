@@ -14,6 +14,7 @@ import UnitConverterWidget from './widgets/UnitConverterWidget';
 import WorldTimeWidget from './widgets/WorldTimeWidget';
 import MoonPhaseWidget from './widgets/MoonPhaseWidget';
 import SunriseSunsetWidget from './widgets/SunriseSunsetWidget';
+import YouTubePlayerWidget from './widgets/YouTubePlayerWidget';
 
 export default function FeatureWorkspace({ feature, onClose }) {
   const wsRef = useRef(null);
@@ -113,6 +114,9 @@ export default function FeatureWorkspace({ feature, onClose }) {
         {feature.id === 'world-time' && <WorldTimeWidget />}
         {feature.id === 'moon-phase' && <MoonPhaseWidget />}
         {feature.id === 'sunrise-sunset' && <SunriseSunsetWidget />}
+        {feature.id === 'youtube-player' && (feature.videoId || feature.playlistId) && (
+          <YouTubePlayerWidget videoId={feature.videoId} playlistId={feature.playlistId} />
+        )}
         {feature.id === 'iframe' && feature.href && (
           <iframe
             src={`${feature.href}${feature.href.includes('?') ? '&' : '?'}embed=1`}

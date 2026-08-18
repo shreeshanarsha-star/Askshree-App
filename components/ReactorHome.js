@@ -52,9 +52,15 @@ function matchMediaCommand(raw) {
   const q = (raw || '').trim();
   if (!q) return null;
   let m = q.match(MEDIA_PLAY_PATTERN);
-  if (m && m[3] && m[3].trim()) return { query: m[3].trim() };
+  if (m && m[3] && m[3].trim()) {
+    const query = m[3].trim();
+    return { query, type: /playlist/i.test(query) ? 'playlist' : 'video' };
+  }
   m = q.match(MEDIA_OPEN_YT_PATTERN);
-  if (m) return { query: (m[2] || '').trim() || null };
+  if (m) {
+    const query = (m[2] || '').trim() || null;
+    return { query, type: query && /playlist/i.test(query) ? 'playlist' : 'video' };
+  }
   return null;
 }
 
@@ -308,30 +314,53 @@ export default function ReactorHome() {
 
     const media = matchMediaCommand(raw);
     if (media) {
-      // YouTube's old listType=search embed is deprecated (confirmed live:
-      // it renders "video unavailable"), and YouTube's own pages refuse to
-      // be iframed (X-Frame-Options) -- so a new tab is the only honest way
-      // to actually play something. But window.open() called from an async
-      // voice-transcript callback loses the browser's "user gesture" token
-      // by the time speech recognition resolves (confirmed: popup blocked
-      // in testing), so firing it programmatically here would silently do
-      // nothing. Instead, open a workspace card with a real link the person
-      // clicks themselves -- that's a guaranteed-real gesture, so it always
-      // works, with no popup-blocker roulette.
-      const url = media.query
-        ? `https://www.youtube.com/results?search_query=${encodeURIComponent(media.query)}`
-        : 'https://www.youtube.com/';
+      // Bare "open youtube" with nothing to search for -- there's nothing
+      // to resolve/embed, so a new-tab link is still the honest option
+      // (YouTube's own homepage sends X-Frame-Options and can't be iframed).
+      if (!media.query) {
+        openFeature({
+          id: 'external-link',
+          title: 'YouTube',
+          subtitle: 'Your browser blocks auto-opened tabs from voice, so tap below to open YouTube.',
+          href: 'https://www.youtube.com/',
+        });
+        return "Here's a link to YouTube — tap it in the workspace panel.";
+      }
+
+      // Real play-by-voice: resolve the spoken phrase to an actual video or
+      // playlist ID via YouTube Data API v3 (YOUTUBE_API_KEY), then embed
+      // and autoplay it with the IFrame Player API. This is NOT
+      // window.open(), so it doesn't hit the popup-blocker wall the old
+      // link-card approach was built around -- it actually plays.
+      try {
+        const res = await fetch('/api/hey-shree/youtube-resolve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: media.query, type: media.type }),
+        });
+        const data = await res.json();
+        if (res.ok && (data.videoId || data.playlistId)) {
+          openFeature({
+            id: 'youtube-player',
+            title: `YouTube — ${data.title || media.query}`,
+            videoId: data.videoId,
+            playlistId: data.playlistId,
+          });
+          return `Playing ${data.title || media.query} on YouTube.`;
+        }
+      } catch (e) { /* fall through to the link fallback below */ }
+
+      // Resolve failed -- key not configured yet, quota, no results, or a
+      // network hiccup. Never worse than before: fall back to the old
+      // click-a-link behavior instead of a dead end.
+      const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(media.query)}`;
       openFeature({
         id: 'external-link',
-        title: media.query ? `YouTube — ${media.query}` : 'YouTube',
-        subtitle: media.query
-          ? `Your browser blocks auto-opened tabs from voice, so tap below to play "${media.query}" on YouTube.`
-          : 'Your browser blocks auto-opened tabs from voice, so tap below to open YouTube.',
+        title: `YouTube — ${media.query}`,
+        subtitle: `Couldn't auto-play that one, so here's a link to play "${media.query}" on YouTube instead.`,
         href: url,
       });
-      return media.query
-        ? `Here's a link to play ${media.query} on YouTube — tap it in the workspace panel.`
-        : "Here's a link to YouTube — tap it in the workspace panel.";
+      return `I couldn't auto-play that, but here's a link to play ${media.query} on YouTube — tap it in the workspace panel.`;
     }
 
     const news = matchNewsCommand(raw);
