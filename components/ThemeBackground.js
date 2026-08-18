@@ -94,15 +94,34 @@ export default function ThemeBackground({ themeId }) {
         });
       } else if (theme.mode === 'blackhole') {
         const cx = W * 0.5, cy = H * 0.42;
-        const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 210);
+        // Scales with the viewport now (was a fixed 210px) -- on the
+        // reactor homepage that read as smaller than, and got absorbed
+        // into, the reactor's own glow. This makes the ring big enough to
+        // extend past the reactor and actually be its own visible shape.
+        const radius = Math.max(240, Math.min(W, H) * 0.4);
+        const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
         grd.addColorStop(0, 'rgba(0,0,0,1)');
         grd.addColorStop(0.55, 'rgba(0,0,0,0.9)');
         grd.addColorStop(0.75, `rgba(${color},0.32)`);
         grd.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = grd;
         ctx.beginPath();
-        ctx.arc(cx, cy, 210, 0, Math.PI * 2);
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
         ctx.fill();
+        // A crisp glowing rim ring on top of the soft gradient -- the
+        // gradient alone reads as a vague glow; a real stroked circle is
+        // what makes it unmistakably "a ring", matching the reference
+        // look, and it visibly pulses so it's not just a static line.
+        const ringPulse = 0.5 + 0.5 * Math.sin(s.t * 0.015);
+        ctx.save();
+        ctx.strokeStyle = `rgba(${color},${0.55 + ringPulse * 0.35})`;
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = `rgba(${color},0.9)`;
+        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius * 0.78, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
         s.pts.forEach((p) => {
           p.angle += p.speed;
           const x = cx + Math.cos(p.angle) * p.r;
