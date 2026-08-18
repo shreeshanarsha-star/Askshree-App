@@ -487,6 +487,7 @@ export default function ReactorHome() {
         </div>
       </div>
 
+      <div className="home2-glass-shell">
       <div className="home2-triptych" id="ai-systems" style={{ gridTemplateColumns: triptychCols }}>
         <div className="home2-col">
           <div className="home2-col-label">YOUR WORKSPACE</div>
@@ -524,6 +525,7 @@ export default function ReactorHome() {
           <div className="home2-col-label">TOOLS</div>
           <FeatureNavPanel selected={selected} onOpenFeature={openFeature} />
         </div>
+      </div>
       </div>
 
       <div className="home2-command-grid" style={{ gridTemplateColumns: triptychCols }}>

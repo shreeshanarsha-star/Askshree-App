@@ -1295,28 +1295,42 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 .home2-topbar-h1 em{color:var(--amber); font-style:italic;}
 .home2-topbar-sub{margin:4px 0 0; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:400; letter-spacing:.01em; color:var(--cream); opacity:.55;}
 
+/* One rectangular glass shell holding all three cards, so the theme's
+   animated background (blackhole etc.) reads as ONE surface glowing
+   behind the whole triptych, instead of three separately-blurred islands
+   each half-hiding it. Kept thin/subtle on purpose -- see home2-col below
+   for why the per-card glass got dialed way down too. */
+.home2-glass-shell{
+  position:relative; flex:1 1 auto; min-height:0; margin:14px 32px 0;
+  border-radius:20px; padding:16px; display:flex; flex-direction:column;
+  background:linear-gradient(160deg, rgba(255,255,255,0.025), rgba(255,255,255,0.006) 55%, rgba(var(--amber-rgb),0.015) 100%);
+  border:1px solid rgba(var(--amber-rgb),0.18);
+  backdrop-filter:blur(3px) saturate(130%);
+  -webkit-backdrop-filter:blur(3px) saturate(130%);
+  box-shadow:
+    0 0 0 1px rgba(var(--amber-rgb),0.04) inset,
+    0 24px 60px rgba(0,0,0,0.35);
+}
 .home2-triptych{
-  display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch; margin:14px 32px 0;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:stretch; margin:0;
   position:relative; z-index:1; transition:grid-template-columns .45s cubic-bezier(.22,.9,.32,1);
   flex:1 1 auto; min-height:0;
 }
-/* Each column reads as its own floating glass panel (matching the approved
-   mockup's 3-card layout) instead of one single frame with divider lines.
-   JARVIS-style treatment: real backdrop-filter glass (translucent, blurred,
-   saturated -- not just a low-opacity fill), a slow breathing border glow,
-   and HUD corner brackets instead of a full box border. */
+/* Each column still reads as its own panel (thin border, HUD corner
+   brackets) but is now genuinely transparent -- barely any fill, almost
+   no blur -- instead of the old 20px-blurred glass that quietly erased
+   the animated background behind it down to nothing. The shell above
+   carries the "glass" look now; these just delineate the three areas. */
 .home2-col{
   display:flex; flex-direction:column; min-width:0; min-height:0; position:relative;
   padding:20px 22px; border-radius:14px;
-  background:linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.012) 55%, rgba(var(--amber-rgb),0.03) 100%);
-  border:1px solid rgba(var(--amber-rgb),0.28);
-  backdrop-filter:blur(20px) saturate(160%);
-  -webkit-backdrop-filter:blur(20px) saturate(160%);
+  background:rgba(255,255,255,0.015);
+  border:1px solid rgba(var(--amber-rgb),0.22);
+  backdrop-filter:blur(2px) saturate(120%);
+  -webkit-backdrop-filter:blur(2px) saturate(120%);
   box-shadow:
-    0 0 0 1px rgba(var(--amber-rgb),0.06) inset,
-    0 0 30px rgba(var(--amber-rgb),0.09) inset,
-    0 16px 40px rgba(0,0,0,0.35),
-    0 0 26px rgba(var(--amber-rgb),0.06);
+    0 0 0 1px rgba(var(--amber-rgb),0.05) inset,
+    0 10px 26px rgba(0,0,0,0.22);
   animation:home2GlassBreathe 5s ease-in-out infinite;
 }
 @keyframes home2GlassBreathe{
@@ -1632,6 +1646,6 @@ table.margin-table tr.subtotal td{font-weight:600; background:rgba(var(--amber-r
 }
 @media (max-width:640px){
   .home2-topbar{padding:76px 20px 16px; display:block;}
-  .home2-triptych{padding:0 20px;}
+  .home2-glass-shell{margin:14px 20px 0; padding:12px;}
 }
 /* redeploy trigger 1786824606 */

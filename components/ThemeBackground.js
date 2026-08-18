@@ -41,7 +41,12 @@ export default function ThemeBackground({ themeId }) {
         if (theme.mode === 'blackhole') {
           const r = 90 + Math.random() * Math.max(W, H) * 0.42;
           const angle = Math.random() * Math.PI * 2;
-          return { r, angle, speed: (0.0025 + Math.random() * 0.004) * (r < 220 ? 2.2 : 1), size: 0.5 + Math.random() * 1.6 };
+          // Bumped up from the original 0.5-1.6px -- those all but
+          // vanished once the homepage's glass cards went from a heavy
+          // 20px blur down to ~2-3px (see globals.css .home2-col), which
+          // is what "bring the blackhole animation in" needed to actually
+          // read as a visible moving layer instead of a faint smear.
+          return { r, angle, speed: (0.0025 + Math.random() * 0.004) * (r < 220 ? 2.2 : 1), size: 1 + Math.random() * 2.6 };
         }
         if (theme.mode === 'sunrise') {
           return { x: Math.random() * W, y: Math.random() * H * 0.55, size: 0.5 + Math.random() * 1.4, tw: Math.random() * Math.PI * 2 };
@@ -92,7 +97,7 @@ export default function ThemeBackground({ themeId }) {
         const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 210);
         grd.addColorStop(0, 'rgba(0,0,0,1)');
         grd.addColorStop(0.55, 'rgba(0,0,0,0.9)');
-        grd.addColorStop(0.75, `rgba(${color},0.18)`);
+        grd.addColorStop(0.75, `rgba(${color},0.32)`);
         grd.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = grd;
         ctx.beginPath();
@@ -104,7 +109,7 @@ export default function ThemeBackground({ themeId }) {
           const y = cy + Math.sin(p.angle) * p.r * 0.5;
           const nearRim = p.r < 260 ? 1 : 0.4;
           ctx.beginPath();
-          ctx.fillStyle = `rgba(${color},${0.2 + nearRim * 0.5})`;
+          ctx.fillStyle = `rgba(${color},${0.35 + nearRim * 0.55})`;
           ctx.arc(x, y, p.size, 0, Math.PI * 2);
           ctx.fill();
         });
