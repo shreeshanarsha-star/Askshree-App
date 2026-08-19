@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AskShree — Arc Reactor (real 3D)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  html,body{height:100%; background:#000; overflow:hidden;}
+  body{font-family:'Segoe UI',system-ui,sans-serif;}
+  #stage{position:fixed; inset:0;}
+  .label{position:fixed; bottom:26px; left:0; right:0; text-align:center; z-index:5;
+    color:rgba(255,255,255,.4); font-size:11px; letter-spacing:.22em; text-transform:uppercase; pointer-events:none;}
+  .loading{position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+    color:rgba(255,255,255,.4); font-size:12px; letter-spacing:.15em; z-index:10;}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div class="label">Ask Shree — real WebGL arc reactor, not CSS</div>
+<div class="loading" id="loading">LOADING REACTOR…</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const stage = document.getElementById('stage');
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.FogExp2(0x000000, 0.045);
+
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 100);
+camera.position.set(0, 0.25, 6.2);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.appendChild(renderer.domElement);
+
+// Realistic PBR reflections on the metal rings without needing an HDRI file.
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+// ---- Lights ----
+// Kept deliberately modest -- the first pass used a very hot core
+// point light (intensity 40) plus a very bright PMREM environment
+// (RoomEnvironment's default area lights run up to 100) with a low
+// bloom threshold (0.12). Every reflective surface in the shot ended
+// up past the bloom cutoff at once, so the rings, ticks and core all
+// blew out into one indistinct white blob instead of reading as
+// separate lit surfaces around a distinct bright center.
+scene.add(new THREE.AmbientLight(0x0c1730, 0.55));
+const coreLight = new THREE.PointLight(0x8fd6ff, 7, 7, 2);
+coreLight.position.set(0,0,0);
+scene.add(coreLight);
+const rim1 = new THREE.PointLight(0x4488ff, 1.8, 14);
+rim1.position.set(-4, 2, 3);
+scene.add(rim1);
+const rim2 = new THREE.PointLight(0xffffff, 1.4, 14);
+rim2.position.set(4, -1.5, 4);
+scene.add(rim2);
+// Frontal fill so the rings show clear metal shading facing the camera
+// instead of relying on the environment map alone.
+const fill = new THREE.PointLight(0xdfeeff, 1.6, 16);
+fill.position.set(0, 0.5, 6);
+scene.add(fill);
+
+// ---- Reactor group ----
+const reactor = new THREE.Group();
+scene.add(reactor);
+
+const metal = new THREE.MeshStandardMaterial({ color:0xb9c8e0, metalness:1, roughness:0.32, envMapIntensity:0.55 });
+const metalDark = new THREE.MeshStandardMaterial({ color:0x4a5568, metalness:0.9, roughness:0.45, envMapIntensity:0.5 });
+const emissive = new THREE.MeshBasicMaterial({ color:0xdff3ff });
+
+// Concentric rings
+const ringDefs = [
+  { r:0.62, tube:0.045 },
+  { r:0.92, tube:0.03 },
+  { r:1.22, tube:0.05 },
+  { r:1.5,  tube:0.022 },
+];
+ringDefs.forEach((d,i) => {
+  const geo = new THREE.TorusGeometry(d.r, d.tube, 24, 120);
+  const ring = new THREE.Mesh(geo, i % 2 === 0 ? metal : metalDark);
+  reactor.add(ring);
+});
+
+// Radial spokes between core and first ring (classic arc-reactor segmented look)
+const spokeCount = 8;
+for (let i=0;i<spokeCount;i++){
+  const a = (Math.PI*2/spokeCount)*i;
+  const geo = new THREE.CylinderGeometry(0.018, 0.018, 0.5, 10);
+  const spoke = new THREE.Mesh(geo, metal);
+  spoke.rotation.z = Math.PI/2;
+  spoke.position.set(Math.cos(a)*0.42, Math.sin(a)*0.42, 0);
+  spoke.rotation.z = a;
+  reactor.add(spoke);
+}
+
+// Small glowing ticks around the outer ring
+const tickGeo = new THREE.BoxGeometry(0.03, 0.09, 0.03);
+const tickCount = 28;
+const ticks = new THREE.InstancedMesh(tickGeo, emissive, tickCount);
+const dummy = new THREE.Object3D();
+for (let i=0;i<tickCount;i++){
+  const a = (Math.PI*2/tickCount)*i;
+  dummy.position.set(Math.cos(a)*1.5, Math.sin(a)*1.5, 0);
+  dummy.rotation.z = a;
+  dummy.updateMatrix();
+  ticks.setMatrixAt(i, dummy.matrix);
+}
+reactor.add(ticks);
+
+// Core: bright emissive sphere + soft glow sprite behind it for bloom bleed
+const core = new THREE.Mesh(new THREE.SphereGeometry(0.24, 32, 32), emissive);
+reactor.add(core);
+
+const glowTex = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(128,128,0,128,128,128);
+  g.addColorStop(0,'rgba(255,255,255,1)');
+  g.addColorStop(0.4,'rgba(160,220,255,.6)');
+  g.addColorStop(1,'rgba(160,220,255,0)');
+  ctx.fillStyle = g; ctx.fillRect(0,0,256,256);
+  return new THREE.CanvasTexture(c);
+})();
+const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending }));
+glowSprite.scale.set(1.5,1.5,1);
+reactor.add(glowSprite);
+
+// Faint starfield behind
+const starGeo = new THREE.BufferGeometry();
+const starCount = 600;
+const positions = new Float32Array(starCount*3);
+for (let i=0;i<starCount;i++){
+  const r = 20 + Math.random()*30;
+  const th = Math.random()*Math.PI*2, ph = Math.acos(2*Math.random()-1);
+  positions[i*3] = r*Math.sin(ph)*Math.cos(th);
+  positions[i*3+1] = r*Math.sin(ph)*Math.sin(th);
+  positions[i*3+2] = -Math.abs(r*Math.cos(ph)) - 5;
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color:0xaaccff, size:0.05, transparent:true, opacity:.5 }));
+scene.add(stars);
+
+// ---- Postprocessing (bloom is what sells the "glowing energy core" look) ----
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.55, 0.35, 0.78);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+// ---- Interaction: mouse parallax + hover brighten + click pulse ----
+let mx = 0, my = 0, targetIntensity = 40;
+window.addEventListener('pointermove', (e) => {
+  mx = (e.clientX / window.innerWidth - 0.5);
+  my = (e.clientY / window.innerHeight - 0.5);
+});
+renderer.domElement.addEventListener('pointerdown', () => { pulseT = 0; });
+let pulseT = 999;
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+});
+
+document.getElementById('loading').style.display = 'none';
+
+let t = 0;
+function animate(){
+  t += 0.01;
+  pulseT += 0.02;
+  reactor.rotation.z += 0.0018;
+  reactor.rotation.x = my * 0.25;
+  reactor.rotation.y += (mx*0.35 - reactor.rotation.y) * 0.03;
+
+  const breathe = 0.5 + 0.5*Math.sin(t*1.6);
+  const pulse = pulseT < 1 ? (1-pulseT)*2.2 : 0;
+  const scale = 1 + breathe*0.06 + pulse*0.15;
+  core.scale.setScalar(scale);
+  glowSprite.scale.setScalar(1.5 + breathe*0.3 + pulse*0.7);
+  coreLight.intensity = 6 + breathe*3 + pulse*8;
+
+  camera.position.x += (mx*0.6 - camera.position.x) * 0.03;
+  camera.position.y += (0.25 - my*0.4 - camera.position.y) * 0.03;
+  camera.lookAt(0,0,0);
+
+  composer.render();
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
