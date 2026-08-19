@@ -43,7 +43,7 @@ scene.background = new THREE.Color(0x000000);
 scene.fog = new THREE.FogExp2(0x000000, 0.045);
 
 const camera = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 100);
-camera.position.set(0, 0.25, 6.2);
+camera.position.set(0, 0.25, 7.2);
 
 const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance', preserveDrawingBuffer:true });
 window.__reactorDebug = { renderer, scene, camera };
@@ -66,20 +66,20 @@ scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 // up past the bloom cutoff at once, so the rings, ticks and core all
 // blew out into one indistinct white blob instead of reading as
 // separate lit surfaces around a distinct bright center.
-scene.add(new THREE.AmbientLight(0x0c1730, 0.55));
-const coreLight = new THREE.PointLight(0x8fd6ff, 7, 7, 2);
+scene.add(new THREE.AmbientLight(0x121c38, 0.7));
+const coreLight = new THREE.PointLight(0x8fd6ff, 8, 8, 2);
 coreLight.position.set(0,0,0);
 scene.add(coreLight);
-const rim1 = new THREE.PointLight(0x4488ff, 1.8, 14);
-rim1.position.set(-4, 2, 3);
+const rim1 = new THREE.PointLight(0x4488ff, 3.2, 16);
+rim1.position.set(-4, 2, 3.5);
 scene.add(rim1);
-const rim2 = new THREE.PointLight(0xffffff, 1.4, 14);
-rim2.position.set(4, -1.5, 4);
+const rim2 = new THREE.PointLight(0xffffff, 2.6, 16);
+rim2.position.set(4, -1.5, 4.5);
 scene.add(rim2);
 // Frontal fill so the rings show clear metal shading facing the camera
 // instead of relying on the environment map alone.
-const fill = new THREE.PointLight(0xdfeeff, 1.6, 16);
-fill.position.set(0, 0.5, 6);
+const fill = new THREE.PointLight(0xdfeeff, 2.4, 18);
+fill.position.set(0, 0.5, 7);
 scene.add(fill);
 
 // ---- Reactor group ----
@@ -92,10 +92,10 @@ const emissive = new THREE.MeshBasicMaterial({ color:0xdff3ff });
 
 // Concentric rings
 const ringDefs = [
-  { r:0.62, tube:0.045 },
-  { r:0.92, tube:0.03 },
-  { r:1.22, tube:0.05 },
-  { r:1.5,  tube:0.022 },
+  { r:0.7,  tube:0.075 },
+  { r:1.05, tube:0.05 },
+  { r:1.4,  tube:0.09 },
+  { r:1.75, tube:0.04 },
 ];
 ringDefs.forEach((d,i) => {
   const geo = new THREE.TorusGeometry(d.r, d.tube, 24, 120);
@@ -122,7 +122,7 @@ const ticks = new THREE.InstancedMesh(tickGeo, emissive, tickCount);
 const dummy = new THREE.Object3D();
 for (let i=0;i<tickCount;i++){
   const a = (Math.PI*2/tickCount)*i;
-  dummy.position.set(Math.cos(a)*1.5, Math.sin(a)*1.5, 0);
+  dummy.position.set(Math.cos(a)*1.95, Math.sin(a)*1.95, 0);
   dummy.rotation.z = a;
   dummy.updateMatrix();
   ticks.setMatrixAt(i, dummy.matrix);
@@ -162,11 +162,23 @@ starGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
 const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color:0xaaccff, size:0.05, transparent:true, opacity:.5 }));
 scene.add(stars);
 
-// ---- Postprocessing (bloom is what sells the "glowing energy core" look) ----
+// ---- Postprocessing ----
+// Pixel-sampled the previous version's actual rendered frame (readPixels
+// across a horizontal scanline through the core): the brightness profile
+// came back as one smooth symmetric bump with no secondary peaks --
+// confirming the rings were NOT surviving as distinct bright bands, they
+// were bloom-smeared into the same blob as the core, exactly matching
+// "just one big light". Root cause: UnrealBloomPass blurs across a wide
+// kernel (nMips=5, radius up to 0.35 of the frame) -- with the rings'
+// thin tube-bright-bands sitting close to the core in screen space, that
+// blur radius was wide enough to merge them all into one shape no matter
+// how the threshold/strength were tuned. Fix: drop bloom entirely so the
+// rings render as sharp, separated, individually-lit metal -- and give
+// the core its own SEPARATE soft halo via the additive glow sprite
+// (already in the scene), which only affects the core's own pixels, not
+// everything within blur range of it.
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.55, 0.35, 0.78);
-composer.addPass(bloom);
 composer.addPass(new OutputPass());
 window.__reactorDebug.composer = composer;
 
