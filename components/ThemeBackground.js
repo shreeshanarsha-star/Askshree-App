@@ -38,7 +38,7 @@ export default function ThemeBackground({ themeId, anchorSelector }) {
 
     function seed() {
       const s = stateRef.current;
-      const count = theme.mode === 'deepfield' ? 260 : theme.mode === 'nebula' ? 70 : 130;
+      const count = theme.mode === 'deepfield' ? 260 : theme.mode === 'nebula' ? 70 : theme.mode === 'blackhole' ? 190 : 130;
       s.pts = Array.from({ length: count }, (_, i) => {
         if (theme.mode === 'spiral') {
           const arm = i % 3;
@@ -47,14 +47,17 @@ export default function ThemeBackground({ themeId, anchorSelector }) {
           return { r, baseAngle, size: 0.6 + Math.random() * 1.8, tw: Math.random() * Math.PI * 2 };
         }
         if (theme.mode === 'blackhole') {
-          const r = 90 + Math.random() * Math.max(W, H) * 0.42;
           const angle = Math.random() * Math.PI * 2;
-          // Bumped up from the original 0.5-1.6px -- those all but
-          // vanished once the homepage's glass cards went from a heavy
-          // 20px blur down to ~2-3px (see globals.css .home2-col), which
-          // is what "bring the blackhole animation in" needed to actually
-          // read as a visible moving layer instead of a faint smear.
-          return { r, angle, speed: (0.0025 + Math.random() * 0.004) * (r < 220 ? 2.2 : 1), size: 1 + Math.random() * 2.6 };
+          // rOffset (not an absolute radius) -- most points sit within a
+          // tight +/-45px band, a handful further out for depth. Actual
+          // on-screen radius = ring radius (known only per-frame, see
+          // tick()) + this offset, so the whole cluster tracks the ring
+          // wherever it currently is -- e.g. hugging the belt exactly
+          // when anchored to the reactor's real node ring, instead of
+          // being smeared thinly across a huge, mostly-empty area.
+          const tight = Math.random() < 0.82;
+          const rOffset = tight ? (Math.random() - 0.5) * 90 : (Math.random() - 0.5) * 260;
+          return { angle, rOffset, speed: 0.003 + Math.random() * 0.005, size: tight ? 1.6 + Math.random() * 2.8 : 0.8 + Math.random() * 1.6 };
         }
         if (theme.mode === 'sunrise') {
           return { x: Math.random() * W, y: Math.random() * H * 0.55, size: 0.5 + Math.random() * 1.4, tw: Math.random() * Math.PI * 2 };
@@ -132,23 +135,27 @@ export default function ThemeBackground({ themeId, anchorSelector }) {
         // gradient alone reads as a vague glow; a real stroked circle is
         // what makes it unmistakably "a ring", matching the reference
         // look, and it visibly pulses so it's not just a static line.
+        // Thicker + brighter than the first pass, which was reading as
+        // barely distinguishable from the reactor's own thin UI ring.
         const ringPulse = 0.5 + 0.5 * Math.sin(s.t * 0.015);
+        const ringR = anchorSelector ? radius : radius * 0.78;
         ctx.save();
-        ctx.strokeStyle = `rgba(${color},${0.55 + ringPulse * 0.35})`;
-        ctx.lineWidth = 2.5;
-        ctx.shadowColor = `rgba(${color},0.9)`;
-        ctx.shadowBlur = 18;
+        ctx.strokeStyle = `rgba(${color},${0.75 + ringPulse * 0.25})`;
+        ctx.lineWidth = 4;
+        ctx.shadowColor = `rgba(${color},1)`;
+        ctx.shadowBlur = 26;
         ctx.beginPath();
-        ctx.arc(cx, cy, radius * 0.78, 0, Math.PI * 2);
+        ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
         s.pts.forEach((p) => {
           p.angle += p.speed;
-          const x = cx + Math.cos(p.angle) * p.r;
-          const y = cy + Math.sin(p.angle) * p.r * 0.5;
-          const nearRim = p.r < 260 ? 1 : 0.4;
+          const r = ringR + p.rOffset;
+          const x = cx + Math.cos(p.angle) * r;
+          const y = cy + Math.sin(p.angle) * r;
+          const nearRim = Math.abs(p.rOffset) < 45 ? 1 : 0.4;
           ctx.beginPath();
-          ctx.fillStyle = `rgba(${color},${0.35 + nearRim * 0.55})`;
+          ctx.fillStyle = `rgba(${color},${0.4 + nearRim * 0.5})`;
           ctx.arc(x, y, p.size, 0, Math.PI * 2);
           ctx.fill();
         });
