@@ -139,11 +139,21 @@ export default function ThemeBackground({ themeId, anchorSelector }) {
         // barely distinguishable from the reactor's own thin UI ring.
         const ringPulse = 0.5 + 0.5 * Math.sin(s.t * 0.015);
         const ringR = anchorSelector ? radius : radius * 0.78;
+        // When anchored to a real UI element (the reactor), the theme's
+        // own particle color reads as invisible -- it's the SAME pale
+        // color as the reactor's own tick marks/rings/icon borders (they
+        // all follow the site accent, which the theme also drives), so
+        // two different things drawn in one color visually merge into
+        // one flat surface instead of standing apart. A near-white,
+        // fully-saturated glow cuts through regardless of which theme is
+        // active, so the belt reads as its own distinct layer. Untouched
+        // (still theme-colored) on pages with no anchor.
+        const beltColor = anchorSelector ? '235,245,255' : color;
         ctx.save();
-        ctx.strokeStyle = `rgba(${color},${0.75 + ringPulse * 0.25})`;
-        ctx.lineWidth = 4;
-        ctx.shadowColor = `rgba(${color},1)`;
-        ctx.shadowBlur = 26;
+        ctx.strokeStyle = `rgba(${beltColor},${0.85 + ringPulse * 0.15})`;
+        ctx.lineWidth = anchorSelector ? 3 : 4;
+        ctx.shadowColor = `rgba(${beltColor},1)`;
+        ctx.shadowBlur = anchorSelector ? 34 : 26;
         ctx.beginPath();
         ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
         ctx.stroke();
@@ -155,10 +165,17 @@ export default function ThemeBackground({ themeId, anchorSelector }) {
           const y = cy + Math.sin(p.angle) * r;
           const nearRim = Math.abs(p.rOffset) < 45 ? 1 : 0.4;
           ctx.beginPath();
-          ctx.fillStyle = `rgba(${color},${0.4 + nearRim * 0.5})`;
+          ctx.fillStyle = `rgba(${beltColor},${0.5 + nearRim * 0.5})`;
+          if (nearRim === 1) {
+            ctx.shadowColor = `rgba(${beltColor},0.9)`;
+            ctx.shadowBlur = 8;
+          } else {
+            ctx.shadowBlur = 0;
+          }
           ctx.arc(x, y, p.size, 0, Math.PI * 2);
           ctx.fill();
         });
+        ctx.shadowBlur = 0;
       } else if (theme.mode === 'nebula') {
         s.pts.forEach((p, i) => {
           if (p.size > 20) {
