@@ -474,7 +474,12 @@ export default function ReactorHome() {
   return (
     <div className="home2-shell" style={{ position: 'relative', ...(themeReady ? getThemeAccentStyle(themeId) : {}) }}>
       <div className="home2-full">
-      {themeReady && <ThemeBackground themeId={themeId} />}
+      {/* anchorSelector locks the blackhole ring's center + size onto the
+          reactor's own node ring (dial-ring-outer / orb2-ring-outer,
+          whichever style is active -- both carry data-reactor-ring) so
+          the widget icons visibly sit on the ring's belt instead of it
+          being a generic full-page backdrop. */}
+      {themeReady && <ThemeBackground themeId={themeId} anchorSelector="[data-reactor-ring]" />}
       <div style={{ position: 'relative', zIndex: 1 }}>
       <GestureControl />
 

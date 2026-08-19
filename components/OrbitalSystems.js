@@ -161,7 +161,7 @@ export function OrbitalStage({ selectedId, onSelect, onMicClick, voiceActive }) 
         <div className="orb2-glow-halo" />
         <div className="orb2-sunburst" />
         <div className="orb2-ring-accent" />
-        <div className="orb2-ring orb2-ring-outer" />
+        <div className="orb2-ring orb2-ring-outer" data-reactor-ring="true" />
         <div className="orb2-ring orb2-ring-mid" />
         {/* A single unmistakable bright point traveling the node ring, on
             top of everything else. Gradient-texture rotation (the sunburst,
@@ -233,7 +233,7 @@ export function OrbitalStageDial({ selectedId, onSelect, onMicClick, voiceActive
       <div className="dial-stage">
         <div className="dial-ticks" />
         <div className="dial-ring-dashed" />
-        <div className="dial-ring-outer" />
+        <div className="dial-ring-outer" data-reactor-ring="true" />
         <div className="dial-orbit-track"><div className="dial-orbit-dot" /></div>
         {DEPARTMENTS.map((d, i) => {
           const angle = -90 + (360 / n) * i;

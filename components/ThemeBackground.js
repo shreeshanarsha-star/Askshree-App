@@ -7,7 +7,15 @@ import { getTheme } from '../lib/themes';
 // twinkle, orbiting) -- a still gradient reads as decoration, animation
 // reads as "the site is alive". Kept to one canvas + one rAF loop for
 // performance regardless of how many themes exist.
-export default function ThemeBackground({ themeId }) {
+// `anchorSelector`, if given, is a CSS selector for a real DOM element to
+// center-and-size the 'blackhole' ring on every frame, instead of the
+// generic viewport-relative default -- this is what makes the ring
+// actually wrap around a specific thing (the reactor's own node ring) on
+// pages that have one, rather than being a decorative backdrop that
+// happens to be somewhere behind it. Ignored for every other mode, and
+// silently falls back to the default centering if the element isn't
+// found (e.g. still mounting, or on pages that don't have it at all).
+export default function ThemeBackground({ themeId, anchorSelector }) {
   const canvasRef = useRef(null);
   const stateRef = useRef({ pts: [], t: 0 });
 
@@ -93,12 +101,24 @@ export default function ThemeBackground({ themeId }) {
           ctx.fill();
         });
       } else if (theme.mode === 'blackhole') {
-        const cx = W * 0.5, cy = H * 0.42;
-        // Scales with the viewport now (was a fixed 210px) -- on the
-        // reactor homepage that read as smaller than, and got absorbed
-        // into, the reactor's own glow. This makes the ring big enough to
-        // extend past the reactor and actually be its own visible shape.
-        const radius = Math.max(240, Math.min(W, H) * 0.4);
+        // Default: generic viewport-relative centering (used on pages
+        // with no anchor, e.g. Settings/About/Contact). If an anchor
+        // element is given and found, use ITS live center + radius
+        // instead -- read fresh every frame so it tracks layout changes
+        // (e.g. the homepage triptych's columns resizing when a tool
+        // panel opens) without needing a resize-listener of its own.
+        let cx = W * 0.5, cy = H * 0.42;
+        let radius = Math.max(240, Math.min(W, H) * 0.4);
+        if (anchorSelector) {
+          const anchorEl = document.querySelector(anchorSelector);
+          if (anchorEl) {
+            const aRect = anchorEl.getBoundingClientRect();
+            const pRect = c.parentElement.getBoundingClientRect();
+            cx = aRect.left + aRect.width / 2 - pRect.left;
+            cy = aRect.top + aRect.height / 2 - pRect.top;
+            radius = Math.max(aRect.width, aRect.height) / 2;
+          }
+        }
         const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
         grd.addColorStop(0, 'rgba(0,0,0,1)');
         grd.addColorStop(0.55, 'rgba(0,0,0,0.9)');
@@ -220,7 +240,7 @@ export default function ThemeBackground({ themeId }) {
       clearTimeout(rt);
       cancelAnimationFrame(raf);
     };
-  }, [themeId]);
+  }, [themeId, anchorSelector]);
 
   const theme = getTheme(themeId);
   return (
