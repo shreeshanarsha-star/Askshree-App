@@ -45,7 +45,8 @@ scene.fog = new THREE.FogExp2(0x000000, 0.045);
 const camera = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 100);
 camera.position.set(0, 0.25, 6.2);
 
-const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance', preserveDrawingBuffer:true });
+window.__reactorDebug = { renderer, scene, camera };
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -167,6 +168,7 @@ composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.55, 0.35, 0.78);
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
+window.__reactorDebug.composer = composer;
 
 // ---- Interaction: mouse parallax + hover brighten + click pulse ----
 let mx = 0, my = 0, targetIntensity = 40;
