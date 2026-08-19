@@ -129,23 +129,65 @@ for (let i=0;i<tickCount;i++){
 }
 reactor.add(ticks);
 
-// Core: bright emissive sphere + soft glow sprite behind it for bloom bleed
-const core = new THREE.Mesh(new THREE.SphereGeometry(0.24, 32, 32), emissive);
-reactor.add(core);
+// Center circle: Sri Chakra (9 interlocking triangles + bindu) drawn to
+// an offscreen 2D canvas -- same construction/proportions as the
+// standalone ring+yantra preview -- then used as a camera-facing sprite
+// texture. A Sprite always billboards to the camera regardless of the
+// reactor group's own rotation, so the yantra stays flat and readable
+// even while the metal rings tilt with mouse parallax. Everything else
+// (rings, spokes, ticks, lights, camera, starfield) is untouched.
+const chakraCanvas = document.createElement('canvas');
+chakraCanvas.width = chakraCanvas.height = 512;
+(function drawSriChakra(){
+  const c = chakraCanvas.getContext('2d');
+  const W = 512, cx = W/2, cy = W/2;
+  c.clearRect(0,0,W,W);
 
-const glowTex = (() => {
-  const c = document.createElement('canvas'); c.width = c.height = 256;
-  const ctx = c.getContext('2d');
-  const g = ctx.createRadialGradient(128,128,0,128,128,128);
-  g.addColorStop(0,'rgba(255,255,255,1)');
-  g.addColorStop(0.4,'rgba(160,220,255,.6)');
-  g.addColorStop(1,'rgba(160,220,255,0)');
-  ctx.fillStyle = g; ctx.fillRect(0,0,256,256);
-  return new THREE.CanvasTexture(c);
+  // soft core glow behind the yantra
+  const glow = c.createRadialGradient(cx,cy,0,cx,cy,W*0.42);
+  glow.addColorStop(0,'rgba(235,245,255,.65)');
+  glow.addColorStop(0.45,'rgba(200,225,255,.28)');
+  glow.addColorStop(1,'rgba(200,225,255,0)');
+  c.fillStyle = glow;
+  c.fillRect(0,0,W,W);
+
+  const R = W*0.4;
+  const triangles = [
+    { apexY:-0.86, baseY: 0.84, hw:0.92 * R, },
+    { apexY:-0.62, baseY: 0.70, hw:0.72 * R, },
+    { apexY:-0.40, baseY: 0.53, hw:0.53 * R, },
+    { apexY:-0.20, baseY: 0.32, hw:0.32 * R, },
+    { apexY: 0.90, baseY:-0.85, hw:0.95 * R, },
+    { apexY: 0.76, baseY:-0.66, hw:0.78 * R, },
+    { apexY: 0.58, baseY:-0.48, hw:0.60 * R, },
+    { apexY: 0.40, baseY:-0.28, hw:0.42 * R, },
+    { apexY: 0.20, baseY:-0.10, hw:0.20 * R, },
+  ];
+  c.strokeStyle = 'rgba(225,240,255,.95)';
+  c.lineWidth = 2.4;
+  c.shadowColor = 'rgba(150,205,255,.95)';
+  c.shadowBlur = 14;
+  triangles.forEach(t => {
+    const ay = cy + t.apexY * R, by = cy + t.baseY * R;
+    c.beginPath();
+    c.moveTo(cx, ay);
+    c.lineTo(cx - t.hw, by);
+    c.lineTo(cx + t.hw, by);
+    c.closePath();
+    c.stroke();
+  });
+
+  c.shadowBlur = 22;
+  c.shadowColor = 'rgba(255,255,255,1)';
+  c.fillStyle = '#ffffff';
+  c.beginPath();
+  c.arc(cx, cy, 6, 0, Math.PI*2);
+  c.fill();
 })();
-const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map:glowTex, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending }));
-glowSprite.scale.set(1.5,1.5,1);
-reactor.add(glowSprite);
+const chakraTex = new THREE.CanvasTexture(chakraCanvas);
+const chakraSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map:chakraTex, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending }));
+chakraSprite.scale.set(1.3, 1.3, 1);
+reactor.add(chakraSprite);
 
 // Faint starfield behind
 const starGeo = new THREE.BufferGeometry();
@@ -211,8 +253,7 @@ function animate(){
   const breathe = 0.5 + 0.5*Math.sin(t*1.6);
   const pulse = pulseT < 1 ? (1-pulseT)*2.2 : 0;
   const scale = 1 + breathe*0.06 + pulse*0.15;
-  core.scale.setScalar(scale);
-  glowSprite.scale.setScalar(1.5 + breathe*0.3 + pulse*0.7);
+  chakraSprite.scale.setScalar(1.3 + breathe*0.05 + pulse*0.18);
   coreLight.intensity = 6 + breathe*3 + pulse*8;
 
   camera.position.x += (mx*0.6 - camera.position.x) * 0.03;
