@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AskShree — Sri Chakra Reactor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  html,body{height:100%; background:#000;}
+  body{display:flex; align-items:center; justify-content:center; overflow:hidden;}
+  .stage{position:relative; width:520px; height:520px;}
+
+  /* Outer glowing ring -- same blue glow/light as your reference, kept as-is */
+  .ring{
+    position:absolute; inset:0; border-radius:50%;
+    box-shadow:
+      0 0 0 3px rgba(160,205,255,.9),
+      0 0 30px 6px rgba(90,170,255,.65),
+      0 0 70px 18px rgba(60,140,255,.35),
+      inset 0 0 40px rgba(90,170,255,.25);
+    animation: ring-breathe 3.6s ease-in-out infinite;
+  }
+  @keyframes ring-breathe{
+    0%,100%{ box-shadow:0 0 0 3px rgba(160,205,255,.85), 0 0 30px 6px rgba(90,170,255,.6), 0 0 70px 18px rgba(60,140,255,.3), inset 0 0 40px rgba(90,170,255,.2); }
+    50%{ box-shadow:0 0 0 3px rgba(200,225,255,1), 0 0 42px 9px rgba(110,185,255,.8), 0 0 90px 24px rgba(70,150,255,.45), inset 0 0 55px rgba(110,185,255,.3); }
+  }
+
+  /* Soft core glow behind the yantra -- same soft white glow as your reference */
+  .core-glow{
+    position:absolute; left:50%; top:50%; width:70%; height:70%; transform:translate(-50%,-50%);
+    border-radius:50%;
+    background:radial-gradient(circle at 50% 50%, rgba(235,245,255,.55) 0%, rgba(200,225,255,.22) 45%, transparent 75%);
+    animation: core-breathe 3.6s ease-in-out infinite;
+  }
+  @keyframes core-breathe{
+    0%,100%{ opacity:.85; }
+    50%{ opacity:1; }
+  }
+
+  svg.yantra{position:absolute; inset:0; width:100%; height:100%;}
+  .yantra-line{
+    fill:none; stroke:rgba(225,240,255,.92); stroke-width:1.6;
+    filter: drop-shadow(0 0 4px rgba(150,205,255,.9)) drop-shadow(0 0 10px rgba(90,170,255,.5));
+  }
+  .bindu{ fill:rgba(255,255,255,1); filter: drop-shadow(0 0 6px rgba(255,255,255,1)) drop-shadow(0 0 14px rgba(150,205,255,.9)); }
+
+  .caption{position:fixed; bottom:26px; left:0; right:0; text-align:center; color:rgba(255,255,255,.35);
+    font-family:'Segoe UI',system-ui,sans-serif; font-size:11px; letter-spacing:.2em; text-transform:uppercase;}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="ring"></div>
+    <div class="core-glow"></div>
+    <svg class="yantra" viewBox="-100 -100 200 200"></svg>
+  </div>
+  <div class="caption">Ask Shree — Sri Chakra core</div>
+
+<script>
+  // 9 interlocking triangles: 4 upward (Shiva) + 5 downward (Shakti),
+  // classic Sri Yantra proportion, normalized so the whole figure sits
+  // inside the ring with a clean margin. apexY / baseY given directly in
+  // normalized units (-1..1), positive = downward on screen.
+  const R = 82; // overall figure radius within the -100..100 viewBox
+  const svg = document.querySelector('svg.yantra');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const triangles = [
+    // upward-pointing (apex above base)
+    { apexY:-0.86, baseY: 0.84, hw:0.92 * R, kind:'up' },
+    { apexY:-0.62, baseY: 0.70, hw:0.72 * R, kind:'up' },
+    { apexY:-0.40, baseY: 0.53, hw:0.53 * R, kind:'up' },
+    { apexY:-0.20, baseY: 0.32, hw:0.32 * R, kind:'up' },
+    // downward-pointing (apex below base)
+    { apexY: 0.90, baseY:-0.85, hw:0.95 * R, kind:'down' },
+    { apexY: 0.76, baseY:-0.66, hw:0.78 * R, kind:'down' },
+    { apexY: 0.58, baseY:-0.48, hw:0.60 * R, kind:'down' },
+    { apexY: 0.40, baseY:-0.28, hw:0.42 * R, kind:'down' },
+    { apexY: 0.20, baseY:-0.10, hw:0.20 * R, kind:'down' },
+  ];
+
+  triangles.forEach(t => {
+    const ay = t.apexY * R, by = t.baseY * R;
+    const pts = `0,${ay} ${-t.hw},${by} ${t.hw},${by}`;
+    const poly = document.createElementNS(ns, 'polygon');
+    poly.setAttribute('points', pts);
+    poly.setAttribute('class', 'yantra-line');
+    svg.appendChild(poly);
+  });
+
+  const bindu = document.createElementNS(ns, 'circle');
+  bindu.setAttribute('cx', 0); bindu.setAttribute('cy', 0); bindu.setAttribute('r', 2.6);
+  bindu.setAttribute('class', 'bindu');
+  svg.appendChild(bindu);
+</script>
+</body>
+</html>
