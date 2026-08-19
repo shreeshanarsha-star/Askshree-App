@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AskShree — Home (orbit)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0; padding:0; box-sizing:border-box;}
+  html,body{background:#000; color:#eef2fa; height:100%;}
+  body{font-family:'Inter',system-ui,sans-serif; overflow:hidden;}
+
+  #hero{position:relative; width:100%; height:100vh;}
+  #stage{position:absolute; inset:0;}
+  .topbar{position:absolute; top:0; left:0; right:0; z-index:5; display:flex; align-items:center;
+    justify-content:space-between; padding:26px 40px; pointer-events:none;}
+  .logo{font-family:'Sora',sans-serif; font-weight:600; font-size:14px; letter-spacing:.2em; color:rgba(255,255,255,.8);}
+  .tagline{position:absolute; bottom:28px; left:0; right:0; text-align:center; z-index:5;
+    font-family:'Sora',sans-serif; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.35); pointer-events:none;}
+  .tagline b{color:rgba(225,240,255,.8); font-weight:500;}
+
+  #orbit{position:absolute; inset:0; z-index:4;}
+  .node{position:absolute; width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%;
+    background:rgba(8,14,26,.82); border:1px solid rgba(140,190,255,.28);
+    display:flex; align-items:center; justify-content:center; color:rgba(215,232,255,.85);
+    backdrop-filter:blur(6px); transition:all .3s ease; cursor:pointer; text-decoration:none;
+  }
+  .node.soon{opacity:.4; cursor:default;}
+  .node:not(.soon):hover{background:rgba(20,35,60,.92); border-color:rgba(160,205,255,.7); transform:scale(1.14);
+    box-shadow:0 0 22px rgba(90,170,255,.45);}
+  .node svg{width:18px; height:18px;}
+  .node-label{position:absolute; top:100%; left:50%; transform:translateX(-50%); margin-top:6px;
+    font-size:9.5px; letter-spacing:.04em; color:rgba(255,255,255,.55); white-space:nowrap; pointer-events:none;}
+  .node.label-above .node-label{top:auto; bottom:100%; margin-top:0; margin-bottom:6px;}
+  .dot{position:absolute; top:-2px; right:-2px; width:8px; height:8px; border-radius:50%; background:#6fe3a3; box-shadow:0 0 6px #6fe3a3;}
+
+  .flyout{position:absolute; z-index:20; min-width:170px; background:rgba(6,10,20,.96); border:1px solid rgba(140,190,255,.3);
+    border-radius:10px; padding:8px; display:none; backdrop-filter:blur(10px); box-shadow:0 12px 30px rgba(0,0,0,.6);}
+  .flyout.open{display:block;}
+  .flyout a{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 8px; border-radius:6px;
+    color:rgba(225,235,255,.85); text-decoration:none; font-size:11.5px;}
+  .flyout a:hover{background:rgba(140,190,255,.12);}
+  .flyout a.soon{opacity:.4; pointer-events:none;}
+  .flyout span.st{font-size:8px; color:#6fe3a3; letter-spacing:.06em;}
+
+  .loading{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:9;
+    color:rgba(255,255,255,.4); font-size:12px; letter-spacing:.15em;}
+</style>
+</head>
+<body>
+
+<div id="hero">
+  <div id="stage"></div>
+  <div class="topbar"><div class="logo">ASKSHREE</div></div>
+  <div class="tagline"><b>Hey Shree</b> — tap the reactor, or pick a system on the ring</div>
+  <div id="orbit"></div>
+  <div class="loading" id="loading">LOADING REACTOR…</div>
+</div>
+
+<script>
+// Real department/tool data -- identical to components/OrbitalSystems.js
+// DEPARTMENTS array, letters A-L (12 nodes), same icons/hrefs/status.
+const ICONS = {
+  heartbeat: 'M3 12h4l2-7 4 14 2-7h6',
+  briefcase: 'M4 8h16v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V8zM8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M4 13h16',
+  users: 'M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM17 11a2.6 2.6 0 1 0 0-5.2M2.5 19c.6-3 3-5 5.5-5s4.9 2 5.5 5M15 14.3c2.3.4 4.2 2.2 4.7 4.7',
+  award: 'M12 3l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7L12 3z',
+  megaphone: 'M3 10v4a1 1 0 0 0 1 1h2l7 4V5L6 9H4a1 1 0 0 0-1 1zM17 8a5 5 0 0 1 0 8M20 5a9 9 0 0 1 0 14',
+  school: 'M12 3 2 8l10 5 10-5-10-5zM6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5',
+  gift: 'M4 9h16v11H4zM4 9V6a2 2 0 0 1 2-2h1a2 2 0 0 1 2 2v3M20 9V6a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v3M12 4v16',
+  dollar: 'M12 2v20M17 6.5c0-1.9-2.2-3.5-5-3.5S7 4.6 7 6.5s2.2 3 5 3.5 5 1.6 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5',
+  sparkle: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z',
+  chart: 'M4 19h16M7 16v-4M12 16V8M17 16v-7',
+  flask: 'M9 3h6M10 3v6l-5.5 9.5A1 1 0 0 0 5.4 20h13.2a1 1 0 0 0 .9-1.5L14 9V3M8 15h8',
+  widgets: 'M3 3h7v18H3zM14 3h7v8h-7zM14 13h3v8h-3zM18 13h3v8h-3z',
+};
+const DEPARTMENTS = [
+  { id:'gauri', name:'Gauri.ai', icon:'heartbeat', status:'live', href:'/gauri', tools:[] },
+  { id:'csuite', name:'C suite.ai', icon:'briefcase', status:'soon', tools:[] },
+  { id:'recruit', name:'Recruit.ai', icon:'users', status:'live', tools:[
+      { name:'Job Postings.ai', href:'/tools/job-postings-ai', status:'live' },
+      { name:'Apply.ai', href:'/tools/apply-ai', status:'live' },
+      { name:'Smart Source.ai', href:'/tools/smart-source-ai', status:'live' },
+      { name:'Smart hunt.ai', href:'/tools/smart-hunt-ai', status:'live' },
+      { name:'Smart screen.ai', href:'/tools/smart-screen-ai', status:'live' },
+      { name:'Assessment.ai', href:'/tools/assessment-ai', status:'live' },
+      { name:'Offer.ai', href:'/tools/offer-ai', status:'live' },
+      { name:'Interview.ai', status:'soon' },
+      { name:'Refer.ai', status:'soon' },
+      { name:'Onboard.ai', status:'soon' },
+  ]},
+  { id:'talent', name:'Talent.ai', icon:'award', status:'soon', tools:[] },
+  { id:'market', name:'Market.ai', icon:'megaphone', status:'soon', tools:[
+      { name:'Leads.ai', status:'soon' }, { name:'Research.ai', status:'soon' } ] },
+  { id:'learn', name:'Learn.ai', icon:'school', status:'soon', tools:[] },
+  { id:'rewards', name:'Rewards.ai', icon:'gift', status:'soon', tools:[] },
+  { id:'finance', name:'Finance.ai', icon:'dollar', status:'live', tools:[
+      { name:'Margin.ai', href:'/tools/margin-ai', status:'live' } ] },
+  { id:'brand', name:'Brand.ai', icon:'sparkle', status:'soon', tools:[] },
+  { id:'sales', name:'Sales.ai', icon:'chart', status:'soon', tools:[] },
+  { id:'research', name:'Research.ai', icon:'flask', status:'soon', tools:[] },
+  { id:'widgets', name:'Widgets.ai', icon:'widgets', status:'live', tools:[
+      { name:'Calculator', status:'live' }, { name:'Quick Notes', status:'live' },
+      { name:'Calendar', status:'live' }, { name:'Clock', status:'live' },
+      { name:'Timer / Stopwatch', status:'live' }, { name:'To-Do List', status:'live' } ] },
+];
+
+const orbitEl = document.getElementById('orbit');
+const hero = document.getElementById('hero');
+
+function iconSvg(name){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${ICONS[name]||''}"/></svg>`;
+}
+
+const nodeEls = [];
+DEPARTMENTS.forEach((d, i) => {
+  const angle = -90 + (360 / DEPARTMENTS.length) * i;
+  const el = document.createElement(d.href ? 'a' : 'div');
+  if (d.href) el.href = d.href;
+  el.className = 'node' + (d.status !== 'live' ? ' soon' : '');
+  const labelAbove = Math.sin(angle * Math.PI/180) < -0.15;
+  if (labelAbove) el.classList.add('label-above');
+  el.innerHTML = iconSvg(d.icon) + `<span class="node-label">${d.name}</span>` + (d.status==='live' ? '<span class="dot"></span>' : '');
+  orbitEl.appendChild(el);
+  nodeEls.push({ el, angle, dep: d });
+
+  if (d.tools && d.tools.length){
+    const fly = document.createElement('div');
+    fly.className = 'flyout';
+    fly.innerHTML = d.tools.map(t => t.href
+      ? `<a href="${t.href}">${t.name}<span class="st">LIVE</span></a>`
+      : `<a class="soon" href="#">${t.name}<span class="st" style="color:rgba(255,255,255,.3)">SOON</span></a>`
+    ).join('');
+    orbitEl.appendChild(fly);
+    el.addEventListener('mouseenter', () => {
+      const r = el.getBoundingClientRect(), hr = hero.getBoundingClientRect();
+      fly.style.left = (r.left - hr.left + r.width/2) + 'px';
+      fly.style.top = (labelAbove ? (r.bottom - hr.top + 34) : (r.top - hr.top - 10)) + 'px';
+      fly.style.transform = labelAbove ? 'translate(-50%,0)' : 'translate(-50%,-100%)';
+      fly.classList.add('open');
+    });
+    el.addEventListener('mouseleave', () => fly.classList.remove('open'));
+    fly.addEventListener('mouseenter', () => fly.classList.add('open'));
+    fly.addEventListener('mouseleave', () => fly.classList.remove('open'));
+  }
+});
+
+function layoutOrbit(){
+  const w = hero.clientWidth, h = hero.clientHeight;
+  const cx = w/2, cy = h*0.5;
+  const R = Math.min(w,h) * 0.34;
+  nodeEls.forEach(({el,angle}) => {
+    const rad = angle * Math.PI/180;
+    el.style.left = (cx + R*Math.cos(rad)) + 'px';
+    el.style.top = (cy + R*Math.sin(rad)) + 'px';
+  });
+}
+window.addEventListener('resize', layoutOrbit);
+</script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+const hero = document.getElementById('hero');
+const stage = document.getElementById('stage');
+function heroSize(){ return [hero.clientWidth, hero.clientHeight]; }
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x000000);
+scene.fog = new THREE.FogExp2(0x000000, 0.045);
+
+let [W0,H0] = heroSize();
+const camera = new THREE.PerspectiveCamera(38, W0/H0, 0.1, 100);
+camera.position.set(0, 0.1, 8.6);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance', preserveDrawingBuffer:true });
+window.__reactorDebug = { renderer, scene, camera };
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(W0, H0);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.appendChild(renderer.domElement);
+
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+scene.add(new THREE.AmbientLight(0x121c38, 0.7));
+const coreLight = new THREE.PointLight(0x8fd6ff, 8, 8, 2);
+coreLight.position.set(0,0,0);
+scene.add(coreLight);
+const rim1 = new THREE.PointLight(0x4488ff, 3.2, 16);
+rim1.position.set(-4, 2, 3.5);
+scene.add(rim1);
+const rim2 = new THREE.PointLight(0xffffff, 2.6, 16);
+rim2.position.set(4, -1.5, 4.5);
+scene.add(rim2);
+const fill = new THREE.PointLight(0xdfeeff, 2.4, 18);
+fill.position.set(0, 0.5, 7);
+scene.add(fill);
+
+// Note for next pass: this whole group is already a single THREE.Group
+// (`reactor`) rotated only by code, not by user input -- so wiring
+// "movable by hand" later is a small, contained change (drag deltaX/Y ->
+// reactor.rotation.y/x) rather than a redesign.
+const reactor = new THREE.Group();
+scene.add(reactor);
+
+const metal = new THREE.MeshStandardMaterial({ color:0xb9c8e0, metalness:1, roughness:0.32, envMapIntensity:0.55 });
+const metalDark = new THREE.MeshStandardMaterial({ color:0x4a5568, metalness:0.9, roughness:0.45, envMapIntensity:0.5 });
+const emissive = new THREE.MeshBasicMaterial({ color:0xdff3ff });
+
+const ringDefs = [
+  { r:0.7,  tube:0.075 },
+  { r:1.05, tube:0.05 },
+  { r:1.4,  tube:0.09 },
+  { r:1.75, tube:0.04 },
+];
+ringDefs.forEach((d,i) => {
+  const geo = new THREE.TorusGeometry(d.r, d.tube, 24, 120);
+  const ring = new THREE.Mesh(geo, i % 2 === 0 ? metal : metalDark);
+  reactor.add(ring);
+});
+
+const tickGeo = new THREE.BoxGeometry(0.03, 0.09, 0.03);
+const tickCount = 28;
+const ticks = new THREE.InstancedMesh(tickGeo, emissive, tickCount);
+const dummy = new THREE.Object3D();
+for (let i=0;i<tickCount;i++){
+  const a = (Math.PI*2/tickCount)*i;
+  dummy.position.set(Math.cos(a)*1.95, Math.sin(a)*1.95, 0);
+  dummy.rotation.z = a;
+  dummy.updateMatrix();
+  ticks.setMatrixAt(i, dummy.matrix);
+}
+reactor.add(ticks);
+
+const chakraCanvas = document.createElement('canvas');
+chakraCanvas.width = chakraCanvas.height = 512;
+(function drawSriChakra(){
+  const c = chakraCanvas.getContext('2d');
+  const W = 512, cx = W/2, cy = W/2;
+  c.clearRect(0,0,W,W);
+  const glow = c.createRadialGradient(cx,cy,0,cx,cy,W*0.42);
+  glow.addColorStop(0,'rgba(235,245,255,.65)');
+  glow.addColorStop(0.45,'rgba(200,225,255,.28)');
+  glow.addColorStop(1,'rgba(200,225,255,0)');
+  c.fillStyle = glow;
+  c.fillRect(0,0,W,W);
+  const R = W*0.4;
+  const triangles = [
+    { apexY:-0.86, baseY: 0.84, hw:0.92 * R },
+    { apexY:-0.62, baseY: 0.70, hw:0.72 * R },
+    { apexY:-0.40, baseY: 0.53, hw:0.53 * R },
+    { apexY:-0.20, baseY: 0.32, hw:0.32 * R },
+    { apexY: 0.90, baseY:-0.85, hw:0.95 * R },
+    { apexY: 0.76, baseY:-0.66, hw:0.78 * R },
+    { apexY: 0.58, baseY:-0.48, hw:0.60 * R },
+    { apexY: 0.40, baseY:-0.28, hw:0.42 * R },
+    { apexY: 0.20, baseY:-0.10, hw:0.20 * R },
+  ];
+  c.strokeStyle = 'rgba(225,240,255,.95)';
+  c.lineWidth = 2.4;
+  c.shadowColor = 'rgba(150,205,255,.95)';
+  c.shadowBlur = 14;
+  triangles.forEach(t => {
+    const ay = cy + t.apexY * R, by = cy + t.baseY * R;
+    c.beginPath();
+    c.moveTo(cx, ay);
+    c.lineTo(cx - t.hw, by);
+    c.lineTo(cx + t.hw, by);
+    c.closePath();
+    c.stroke();
+  });
+  c.shadowBlur = 22;
+  c.shadowColor = 'rgba(255,255,255,1)';
+  c.fillStyle = '#ffffff';
+  c.beginPath();
+  c.arc(cx, cy, 6, 0, Math.PI*2);
+  c.fill();
+})();
+const chakraTex = new THREE.CanvasTexture(chakraCanvas);
+const chakraSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map:chakraTex, transparent:true, depthWrite:false, blending:THREE.AdditiveBlending }));
+chakraSprite.scale.set(1.3, 1.3, 1);
+reactor.add(chakraSprite);
+
+const starGeo = new THREE.BufferGeometry();
+const starCount = 500;
+const positions = new Float32Array(starCount*3);
+for (let i=0;i<starCount;i++){
+  const r = 20 + Math.random()*30;
+  const th = Math.random()*Math.PI*2, ph = Math.acos(2*Math.random()-1);
+  positions[i*3] = r*Math.sin(ph)*Math.cos(th);
+  positions[i*3+1] = r*Math.sin(ph)*Math.sin(th);
+  positions[i*3+2] = -Math.abs(r*Math.cos(ph)) - 5;
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color:0xaaccff, size:0.05, transparent:true, opacity:.5 }));
+scene.add(stars);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new OutputPass());
+window.__reactorDebug.composer = composer;
+
+let mx = 0, my = 0;
+window.addEventListener('pointermove', (e) => {
+  const r = hero.getBoundingClientRect();
+  mx = ((e.clientX - r.left) / r.width - 0.5);
+  my = ((e.clientY - r.top) / r.height - 0.5);
+});
+let pulseT = 999;
+renderer.domElement.addEventListener('pointerdown', () => { pulseT = 0; });
+
+function onResize(){
+  const [w,h] = heroSize();
+  camera.aspect = w/h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+  composer.setSize(w, h);
+  layoutOrbit();
+}
+window.addEventListener('resize', onResize);
+layoutOrbit();
+
+document.getElementById('loading').style.display = 'none';
+
+let t = 0;
+function animate(){
+  t += 0.01;
+  pulseT += 0.02;
+  reactor.rotation.z += 0.0018;
+  reactor.rotation.x = my * 0.2;
+  reactor.rotation.y += (mx*0.3 - reactor.rotation.y) * 0.03;
+
+  const breathe = 0.5 + 0.5*Math.sin(t*1.6);
+  const pulse = pulseT < 1 ? (1-pulseT)*2.2 : 0;
+  chakraSprite.scale.setScalar(1.3 + breathe*0.05 + pulse*0.18);
+  coreLight.intensity = 6 + breathe*3 + pulse*8;
+
+  camera.position.x += (mx*0.5 - camera.position.x) * 0.03;
+  camera.position.y += (0.1 - my*0.3 - camera.position.y) * 0.03;
+  camera.lookAt(0,0,0);
+
+  composer.render();
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>
