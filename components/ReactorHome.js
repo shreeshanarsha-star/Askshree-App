@@ -127,7 +127,7 @@ export default function ReactorHome() {
   useLayoutEffect(() => {
     try {
       const cached = window.localStorage.getItem('askshree_reactor_style_cache');
-      if (cached === 'dial' || cached === 'sunburst') setReactorStyle(cached);
+      if (cached === 'dial' || cached === 'sunburst' || cached === 'arc') setReactorStyle(cached);
     } catch (e) { /* ignore */ }
   }, []);
 
@@ -251,7 +251,7 @@ export default function ReactorHome() {
   // setting, same read pattern as the site theme.
   useEffect(() => {
     fetch('/api/reactor-style').then((r) => r.json()).then((d) => {
-      const style = d.style === 'dial' ? 'dial' : 'sunburst';
+      const style = (d.style === 'dial' || d.style === 'arc') ? d.style : 'sunburst';
       setReactorStyle(style);
       try { window.localStorage.setItem('askshree_reactor_style_cache', style); } catch (e) { /* ignore */ }
     }).catch(() => {});
