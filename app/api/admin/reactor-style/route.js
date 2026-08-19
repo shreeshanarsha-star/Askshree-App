@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../../lib/supabase';
 import { requireAdmin } from '../../../../lib/requireAdmin';
 
-const VALID = ['sunburst', 'dial'];
+const VALID = ['sunburst', 'dial', 'arc'];
 
 export async function GET(req) {
   const denied = await requireAdmin(req);

@@ -18,7 +18,7 @@ const ICONS = {
   chevron: 'M6 9l6 6 6-6',
 };
 
-function Icon({ name, size = 18 }) {
+export function Icon({ name, size = 18 }) {
   const d = ICONS[name];
   if (!d) return null;
   return (
@@ -413,4 +413,4 @@ export function FeatureNavPanel({ selected, onOpenFeature }) {
   );
 }
 
-export { DEPARTMENTS };
+export { DEPARTMENTS, ICONS };

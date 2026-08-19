@@ -149,6 +149,7 @@ export default function SettingsPage() {
               {[
                 { id: 'sunburst', label: 'Sunburst', desc: 'Dashed spoke lines radiate from the core to each system — current default' },
                 { id: 'dial', label: 'Dial', desc: 'Rotary dial — solid ring, clock ticks, bright core, nodes sit on the ring' },
+                { id: 'arc', label: 'Arc Reactor', desc: 'Real WebGL metal reactor with a Sri Chakra glowing in the core -- new, verify all 12 systems + voice before making this the site default' },
               ].map((opt) => (
                 <div
                   key={opt.id}

@@ -6,6 +6,7 @@ import HeyShreeReactor from './HeyShreeReactor';
 import GestureControl from './GestureControl';
 import ThemeBackground from './ThemeBackground';
 import { OrbitalStage, OrbitalStageDial, FeatureNavPanel, DEPARTMENTS } from './OrbitalSystems';
+import { OrbitalStageArc } from './OrbitalStageArc';
 import FeatureWorkspace from './FeatureWorkspace';
 import { useTheme } from '../lib/useTheme';
 import { getThemeAccentStyle } from '../lib/themes';
@@ -520,6 +521,8 @@ export default function ReactorHome() {
           </div>
           {reactorStyle === 'dial' ? (
             <OrbitalStageDial selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen || wakeArmed} />
+          ) : reactorStyle === 'arc' ? (
+            <OrbitalStageArc selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen || wakeArmed} />
           ) : (
             <OrbitalStage selectedId={selectedId} onSelect={setSelectedId} onMicClick={toggleVoice} voiceActive={voiceOpen || wakeArmed} />
           )}
